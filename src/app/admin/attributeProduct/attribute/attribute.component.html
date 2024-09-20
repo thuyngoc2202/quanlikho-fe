@@ -1,0 +1,70 @@
+<div class="flex">
+    <app-sidebar></app-sidebar>
+    <div class="flex-1 p-6">
+        <div class="bg-white p-6 rounded shadow">
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-2xl font-bold">
+                    Quản lý Thuộc Tính
+                </h1>
+                <input class="w-1/3 p-2 border rounded" placeholder="Search everywhere..." type="text" />
+                <button (click)="openAddAttributePopup()"
+                    class="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                    Thêm Thuộc Tính
+                </button>
+            </div>
+            <div *ngIf="isPopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+                    <h2 class="text-lg font-bold mb-4">Thêm thuộc tính</h2>
+                    <form (ngSubmit)="addAttribute()">
+                        <div class="mb-4">
+                            <input type="text" placeholder="Tên thuộc tính" name="attribute_name" required
+                                class="border border-gray-300 p-2 w-full rounded" />
+                        </div>
+                        <div class="mb-4">
+                            <input type="text" placeholder="Parent ID" name="attribute_parent_id" required
+                                class="border border-gray-300 p-2 w-full rounded" />
+                        </div>
+                        <div class="mb-4">
+                            <input type="text" placeholder="Loại thuộc tính" name="attribute_type" required
+                                class="border border-gray-300 p-2 w-full rounded" />
+                        </div>
+                        <div class="flex justify-between">
+                            <button type="submit"
+                                class="bg-green-500 hover:bg-green-700 text-white px-4 py-2 rounded">Lưu</button>
+                            <button type="button" (click)="closePopup()"
+                                class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Đóng</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-4 border-b text-left">ID</th>
+                            <th class="py-2 px-4 border-b text-left">Tên thuộc tính</th>
+                            <th class="py-2 px-4 border-b text-left">Parent ID</th>
+                            <th class="py-2 px-4 border-b text-left">Loại thuộc tính</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let attribute of attributes">
+                            <td class="py-2 px-4 border-b">{{ attribute.id }}</td>
+                            <td class="py-2 px-4 border-b">{{ attribute.attribute_name }}</td>
+                            <td class="py-2 px-4 border-b">{{ attribute.attribute_parent_id }}</td>
+                            <td class="py-2 px-4 border-b">{{ attribute.attribute_type }}</td>
+                            <div class="flex space-x-2">
+                                <button class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded">
+                                    Sửa
+                                </button>
+                                <button class="bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded">
+                                    Xoá
+                                </button>
+                            </div>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

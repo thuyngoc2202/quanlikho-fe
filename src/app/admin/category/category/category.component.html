@@ -1,0 +1,85 @@
+<div class="flex">
+    <app-sidebar></app-sidebar>
+    <div class="flex-1 p-6">
+        <div class="bg-white p-6 rounded shadow">
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-2xl font-bold">
+                    Quản lý loại hàng
+                </h1>
+                <input class="w-1/3 p-2 border rounded" placeholder="Search everywhere..." type="text" />
+                <button (click)="openAddCategoryPopup()"
+                    class="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                    Thêm loại hàng
+                </button>
+            </div>
+            <div *ngIf="isPopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+                    <h2 class="text-lg font-bold mb-4">Thêm loại hàng</h2>
+                    <form (ngSubmit)="addCategory()">
+                        <div class="mb-4">
+                            <input type="text" placeholder="Tên loại hàng" name="category_name" required
+                                class="border border-gray-300 p-2 w-full rounded" />
+                        </div>
+                        <div class="mb-4">
+                            <input type="text" placeholder="Parent ID" name="category_parent_id" required
+                                class="border border-gray-300 p-2 w-full rounded" />
+                        </div>
+                        <div class="mb-4">
+                            <input type="text" placeholder="Loại" name="catagory_type" required
+                                class="border border-gray-300 p-2 w-full rounded" />
+                        </div>
+                        <div class="mb-4">
+                            <input type="text" placeholder="Trạng thái" name="display_status" required
+                                class="border border-gray-300 p-2 w-full rounded" />
+                        </div>
+                        <div class="mb-4">
+                            <input type="text" placeholder="Vị trí" name="display_position" required
+                                class="border border-gray-300 p-2 w-full rounded" />
+                        </div>
+                        <!-- Thêm các trường khác nếu cần -->
+                        <div class="flex justify-between">
+                            <button type="submit"
+                                class="bg-green-500 hover:bg-green-700 text-white px-4 py-2 rounded">Lưu</button>
+                            <button type="button" (click)="closePopup()"
+                                class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Đóng</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-4 border-b text-left">ID</th>
+                            <th class="py-2 px-4 border-b text-left">Tên loại hàng</th>
+                            <th class="py-2 px-4 border-b text-left">Parent ID</th>
+                            <th class="py-2 px-4 border-b text-left">Loại</th>
+                            <th class="py-2 px-4 border-b text-left">Trạng thái</th>
+                            <th class="py-2 px-4 border-b text-left">Vị trí</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let category of categories">
+                            <td class="py-2 px-4 border-b">{{ category.id }}</td>
+                            <td class="py-2 px-4 border-b">{{ category.category_name }}</td>
+                            <td class="py-2 px-4 border-b">{{ category.category_parent_id }}</td>
+                            <td class="py-2 px-4 border-b">{{ category.catagory_type }}</td>
+                            <td class="py-2 px-4 border-b">{{ category.display_status }}</td>
+                            <td class="py-2 px-4 border-b">{{ category.display_position }}</td>
+                            <td class="py-2 px-4 border-b">
+                                <div class="flex space-x-2">
+                                    <button class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded">
+                                        Sửa
+                                    </button>
+                                    <button class="bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded">
+                                        Xoá
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

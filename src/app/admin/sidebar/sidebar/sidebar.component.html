@@ -1,0 +1,27 @@
+<div class="w-64 bg-gray-900 text-white h-screen">
+    <div class="p-4 text-2xl font-bold flex justify-between items-center mb-6">
+        Admin One
+        <div class="flex items-center space-x-4">
+            <a class="text-gray-600" href="#">
+                <i class="fas fa-cog">
+                </i>
+            </a>
+        </div>
+    </div>
+    <nav class="mt-10">
+        <a class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700" href="#">
+            Dashboard
+        </a>
+        <div class="mt-4">
+            <a class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700" routerLink="/admin/products" routerLinkActive="bg-gray-700" [routerLinkActiveOptions]="{ exact: true }">
+                Quản lý sản phẩm
+            </a>
+            <a class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700" routerLink="/admin/categories" routerLinkActive="bg-gray-700" [routerLinkActiveOptions]="{ exact: true }">
+                Quản lý loại hàng
+            </a>
+            <a class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700" routerLink="/admin/attributes" routerLinkActive="bg-gray-700" [routerLinkActiveOptions]="{ exact: true }">
+                Quản lý thuộc tính
+            </a>
+        </div>
+    </nav>
+</div>
