@@ -9,6 +9,8 @@ import { RegisterComponent } from './register/register/register.component';
 
 const routes: Routes = [
   { path: '', component: IndexComponent },
+  { path: 'home', component: IndexComponent },
+  { path: 'admin', component: ProductComponent },
   { path: 'admin/products', component: ProductComponent },
   { path: 'admin/attributes', component: AttributeComponent },
   { path: 'admin/categories', component: CategoryComponent },

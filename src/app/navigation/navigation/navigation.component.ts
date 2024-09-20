@@ -23,7 +23,7 @@ export class NavigationComponent implements OnInit {
     if (this.getCurrentRoute === 'register') {
       this.currentRoute ='ĐĂNG KÍ';
     }
-    if (this.getCurrentRoute === '') {
+    if (this.getCurrentRoute === '' || this.getCurrentRoute === 'home') {
       this.currentRoute ='DANH MỤC SẢN PHẨM';
     }
   }
