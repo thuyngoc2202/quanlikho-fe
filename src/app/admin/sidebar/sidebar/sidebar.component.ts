@@ -1,17 +1,19 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
-export class SidebarComponent implements OnInit {
-
+export class SidebarComponent {
+  @Output() sidebarToggled = new EventEmitter<boolean>();
+  
   isDropdownOpen = false;
+  isSidebarCollapsed = false;
 
-  constructor() { }
-
-  ngOnInit(): void {
+  @HostListener('window:resize', ['$event'])
+  onResize() {
+    this.checkScreenSize();
   }
 
   @HostListener('document:click', ['$event'])
@@ -21,15 +23,27 @@ export class SidebarComponent implements OnInit {
     }
   }
 
+  ngOnInit() {
+    this.checkScreenSize();
+  }
+
+  checkScreenSize() {
+    this.isSidebarCollapsed = window.innerWidth < 1024; // Changed to 1024px
+    this.sidebarToggled.emit(this.isSidebarCollapsed);
+  }
+
+  toggleSidebar() {
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    this.sidebarToggled.emit(this.isSidebarCollapsed);
+  }
+
   toggleDropdown(event: Event) {
     event.stopPropagation();
     this.isDropdownOpen = !this.isDropdownOpen;
   }
 
   logout() {
-    // Implement your logout logic here
     console.log('Logging out...');
-    // For example: this.authService.logout();
+    // Implement logout logic
   }
-
 }
