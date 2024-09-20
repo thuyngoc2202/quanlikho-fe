@@ -16,6 +16,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { LoginServiceService } from './service/login-service.service';
 import { TokenInterceptor } from './auth/token.interceptor';
 import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   declarations: [
@@ -33,7 +35,13 @@ import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    BrowserAnimationsModule,
+    ToastrModule.forRoot({
+      timeOut: 3000,
+      positionClass: 'toast-top-right',
+      preventDuplicates: true,
+    })
   ],
   providers: [
     {
@@ -41,7 +49,8 @@ import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
     },
     { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },
     JwtHelperService,
-    LoginServiceService
+    LoginServiceService,
+    
   ],
   bootstrap: [AppComponent]
 })

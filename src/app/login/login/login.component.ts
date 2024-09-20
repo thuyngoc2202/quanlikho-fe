@@ -21,7 +21,6 @@ export class LoginComponent implements OnInit {
     this.createForm();
   }
   form!: FormGroup;
-  private loggedType!: string;
   public loginForm: any;
   error = false;
   loading = false;
@@ -38,9 +37,6 @@ export class LoginComponent implements OnInit {
       email: '',
       password: '',
     });
-  }
-  get f() {
-    return this.form.controls;
   }
 
   Login() {
