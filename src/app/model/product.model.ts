@@ -1,33 +1,33 @@
 export class Product {
-    id: string;
-    code: string;
-    barCode: string;
-    attribute_id: [];
-    product_name: string;
-    shortDescription: string;
-    longDescription: string;
-    price: number;
-    salePrice: number;
-    quantity: number;
-    status: string;
-    createdDate: string;
-    category_id: [];
+  product_id: string;
+  product_code: string;
+  bar_code: string;
+  attribute_id: [];
+  product_name: string;
+  description_short: string;
+  description_long: string;
+  price: number;
+  promotional_price: number;
+  quantity: number;
+  status: string;
+  createdDate: string;
+  category_id: [];
 
   constructor() {
-    this.id = "";
-    this.code = "";
-    this.barCode = "";
+    this.product_id = "";
+    this.product_code = "";
+    this.bar_code = "";
     this.attribute_id = [];
     this.product_name = "";
-    this.shortDescription = "";
-    this.longDescription = "";
-    this.price = 0; 
-    this.salePrice = 0;
+    this.description_short = "";
+    this.description_long = "";
+    this.price = 0;
+    this.promotional_price = 0;
     this.quantity = 0;
     this.status = "";
     this.createdDate = "";
     this.category_id = [];
   }
-  
+
 }
 

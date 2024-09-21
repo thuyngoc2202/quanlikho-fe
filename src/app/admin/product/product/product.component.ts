@@ -1,18 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Product } from 'src/app/model/product.model';
 
-interface Product {
-  id: number;
-  code: string;
-  barCode: string;
-  name: string;
-  shortDescription: string;
-  longDescription: string;
-  price: number;
-  salePrice: number;
-  quantity: number;
-  status: string;
-  createdDate: string;
-}
 
 @Component({
   selector: 'app-product',
@@ -20,56 +9,82 @@ interface Product {
   styleUrls: ['./product.component.css']
 })
 export class ProductComponent implements OnInit {
+ 
 
-  products: Product[] = [
-    {
-      id: 1,
-      code: '123456',
-      barCode: '123456',
-      name: 'Product 1',
-      shortDescription: 'Short Description 1',
-      longDescription: 'Long Description 1',
-      price: 100000,
-      salePrice: 90000,
-      quantity: 100,
-      status: 'Ngưỡng thấp',
-      createdDate: '2021-01-01',
-    },
-    {
-      id: 2,
-      code: '123456',
-      barCode: '123456',
-      name: 'Product 2',
-      shortDescription: 'Short Description 2',
-      longDescription: 'Long Description 2',
-      price: 200,
-      salePrice: 200,
-      quantity: 200,
-      status: 'Ngưỡng cao',
-      createdDate: '2021-01-01',
-    },
+  products: Product[] = [ ];
+  isCreatePopupOpen: any;
+  formProduct!: FormGroup<any>;
+  categories: any;
+  isUpdatePopupOpen: any;
+  isConfirmUpdatePopupOpen: any;
+  isConfirmCreatePopupOpen: any;
 
-  ];
-
-  constructor() { }
+  constructor(private formBuilder: FormBuilder) { }
 
   ngOnInit(): void {
+    this.createForm();
+    this.validate();
+
+  }
+  
+  validate() {
+    this.formProduct = this.formBuilder.group({
+      product_name: ['', Validators.required],
+      product_code: ['', Validators.required],
+      bar_code: ['', Validators.required],
+      description_short: ['', Validators.required],
+      description_long: ['', Validators.required],
+      price: ['', Validators.required],
+      promotional_price: ['', Validators.required],
+      quantity: ['', Validators.required],
+    });
+  }
+  createForm() {
+    this.formProduct = this.formBuilder.group({
+      product_name: '',
+      product_code: '',
+      bar_code: '',
+      description_short: '',
+      description_long: '',
+      price: '',
+      promotional_price: '',
+      quantity: '',
+    });
   }
 
-  isPopupOpen = false;
-
   openAddProductPopup() {
-    this.isPopupOpen = true;
+    this.isCreatePopupOpen = true;
+    this.createForm();
+  }
+  selectProductForUpdate(_t83: any) {
+    throw new Error('Method not implemented.');
+  }
+  deleteProduct(arg0: any) {
+    throw new Error('Method not implemented.');
+  }
+  confirmUpdate() {
+    this.isConfirmUpdatePopupOpen = true;
+  }
+  confirmCreate() {
+    this.isConfirmCreatePopupOpen = true;
+  }
+  updateProduct() {
+    throw new Error('Method not implemented.');
+  }
+  closeConfirmPopup() {
+    if (this.isConfirmCreatePopupOpen || this.isConfirmUpdatePopupOpen) {
+      this.isConfirmCreatePopupOpen = false;
+      this.isConfirmUpdatePopupOpen = false
+    }
   }
 
   closePopup() {
-    this.isPopupOpen = false;
+    if (this.isCreatePopupOpen || this.isUpdatePopupOpen) {
+      this.isCreatePopupOpen = false;
+      this.isUpdatePopupOpen = false
+    }
   }
-
   addProduct() {
-    // Logic để thêm sản phẩm vào mảng products
-    // this.products.push({ ...this.newProduct });
-    // this.closePopup(); // Đóng popup sau khi thêm
-    // this.newProduct = { name: '', price: '' }; // Reset form
+    throw new Error('Method not implemented.');
   }
 }
