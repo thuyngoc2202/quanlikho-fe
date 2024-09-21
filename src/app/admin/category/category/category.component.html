@@ -6,7 +6,7 @@
                 <div class="bg-white p-6 rounded-lg shadow-md">
                     <div class="flex flex-col lg:flex-row justify-between items-center mb-6 space-y-4 lg:space-y-0">
                         <h1 class="text-2xl font-bold w-full lg:w-1/4">
-                            Quản lý loại hàng
+                            Danh mục hàng
                         </h1>
                         <div class="w-full lg:w-1/2 px-4">
                             <input class="w-full p-2 border rounded" placeholder="Tìm kiếm..." type="text" />
@@ -18,7 +18,7 @@
                             </button>
                             <button (click)="openAddCategoryPopup()"
                                 class="w-full sm:w-1/2 bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded">
-                                Thêm loại hàng
+                                Thêm danh mục
                             </button>
                         </div>
                     </div>
@@ -28,21 +28,16 @@
                             <thead>
                                 <tr>
                                     <th class="py-2 px-4 border-b text-left">ID</th>
-                                    <th class="py-2 px-4 border-b text-left">Tên loại hàng</th>
-                                    <th class="py-2 px-4 border-b text-left">Parent ID</th>
-                                    <th class="py-2 px-4 border-b text-left">Loại</th>
-                                    <th class="py-2 px-4 border-b text-left">Trạng thái</th>
-                                    <th class="py-2 px-4 border-b text-left">Vị trí</th>
+                                    <th class="py-2 px-4 border-b text-left">Tên danh mục hàng</th>
+                                    <th class="py-2 px-4 border-b text-left">danh mục</th>
+                                    <th class="py-2 px-4 border-b text-left">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let category of categories" class="text-sm md:text-base">
                                     <td class="py-2 px-4 border-b">{{ category.category_id }}</td>
                                     <td class="py-2 px-4 border-b">{{ category.category_name }}</td>
-                                    <td class="py-2 px-4 border-b">{{ category.category_parent_id }}</td>
                                     <td class="py-2 px-4 border-b">{{ category.category_type }}</td>
-                                    <td class="py-2 px-4 border-b">{{ category.display_status }}</td>
-                                    <td class="py-2 px-4 border-b">{{ category.display_position }}</td>
                                     <td class="py-2 px-4 border-b">
                                         <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                                             <button class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded w-full sm:w-auto" (click)="selectCategoryForUpdate(category)">
@@ -59,38 +54,23 @@
                     </div>
                     <div *ngIf="isCreatePopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                         <div class="bg-white p-6 rounded-lg shadow-lg w-[800px]">
-                            <h2 class="text-lg font-bold mb-4">Thêm loại hàng</h2>
-                            <form [formGroup]="formProduct" (ngSubmit)="confirmCreate()" class="grid grid-cols-3 gap-4">
+                            <h2 class="text-lg font-bold mb-4">Thêm danh mục hàng</h2>
+                            <form [formGroup]="formProduct" (ngSubmit)="confirmCreate()" class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block mb-1 text-gray-400">Tên loại hàng</label>
+                                    <label class="block mb-1 text-gray-400">Tên danh mục hàng</label>
                                     <input type="text"  name="category_name" required
                                         class="border border-gray-300 p-2 w-full rounded" formControlName="category_name" />
                                 </div>
                                 <div>
-                                    <label class="block mb-1 text-gray-400">Parent ID</label>
-                                    <input type="text"  name="category_parent_id" 
-                                            class="border border-gray-300 p-2 w-full rounded" formControlName="category_parent_id" />
-                                </div>
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Loại</label>
-                                    <select name="category_type" required
+                                    <label class="block mb-1 text-gray-400">danh mục</label>
+                                    <select name="category_type" 
                                             class="border border-gray-300 p-2 w-full rounded" 
                                             formControlName="category_type">
-                                        <option value="" disabled>Chọn loại</option>
+                                        <option value="" disabled>Chọn danh mục</option>
                                         <option value="BANNER_CATEGORY">BANNER_CATEGORY</option>
                                         <option value="PRODUCT_CATEGORY">PRODUCT_CATEGORY</option>
                                         <option value="NEW_CATEGORY">NEW_CATEGORY</option>
                                     </select>
-                                </div>
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Trạng thái</label>
-                                    <input type="text"  name="display_status" 
-                                                class="border border-gray-300 p-2 w-full rounded" formControlName="display_status" />
-                                </div>
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Vị trí</label>
-                                    <input type="text"  name="display_position"
-                                                class="border border-gray-300 p-2 w-full rounded" formControlName="display_position" />
                                 </div>
                                 <div class="col-span-3 flex justify-end mt-4">
                                     <button type="submit"
@@ -103,38 +83,23 @@
                     </div>
                     <div *ngIf="isUpdatePopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                         <div class="bg-white p-6 rounded-lg shadow-lg w-[800px]">
-                            <h2 class="text-lg font-bold mb-4">Sửa loại hàng</h2>
-                            <form [formGroup]="formProduct" (ngSubmit)="confirmUpdate()" class="grid grid-cols-3 gap-4">
+                            <h2 class="text-lg font-bold mb-4">Sửa danh mục hàng</h2>
+                            <form [formGroup]="formProduct" (ngSubmit)="confirmUpdate()" class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block mb-1 text-gray-400">Tên loại hàng</label>
+                                    <label class="block mb-1 text-gray-400">Tên danh mục hàng</label>
                                     <input type="text"  name="category_name" required
                                         class="border border-gray-300 p-2 w-full rounded" formControlName="category_name" />
                                 </div>
                                 <div>
-                                    <label class="block mb-1 text-gray-400">Parent ID</label>
-                                    <input type="text"  name="category_parent_id" 
-                                        class="border border-gray-300 p-2 w-full rounded" formControlName="category_parent_id" />
-                                </div>
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Loại</label>
-                                    <select name="category_type" required
+                                    <label class="block mb-1 text-gray-400">danh mục</label>
+                                    <select name="category_type" 
                                             class="border border-gray-300 p-2 w-full rounded" 
                                             formControlName="category_type">
-                                        <option value="" disabled>Chọn loại</option>
+                                        <option value="" disabled>Chọn danh mục</option>
                                         <option value="BANNER_CATEGORY">BANNER_CATEGORY</option>
                                         <option value="PRODUCT_CATEGORY">PRODUCT_CATEGORY</option>
                                         <option value="NEW_CATEGORY">NEW_CATEGORY</option>
                                     </select>
-                                </div>
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Trạng thái</label>
-                                    <input type="text"  name="display_status" 
-                                        class="border border-gray-300 p-2 w-full rounded" formControlName="display_status" />
-                                </div>
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Vị trí</label>
-                                    <input type="text"  name="display_position" 
-                                        class="border border-gray-300 p-2 w-full rounded" formControlName="display_position" />
                                 </div>
                                 <div class="col-span-3 flex justify-end mt-4">
                                     <button type="submit"
@@ -148,7 +113,7 @@
                     
                     <div *ngIf="showFileUploadPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                         <div class="bg-white p-6 rounded-lg shadow-lg w-[1000px]">
-                            <h2 class="text-lg font-bold mb-4">Nhập loại hàng</h2>
+                            <h2 class="text-lg font-bold mb-4">Nhập danh mục hàng</h2>
                             
                             <div class="mb-4">
                                 <label for="file-upload" class="block text-sm font-medium text-gray-700 mb-2">
@@ -182,8 +147,8 @@
                     <!-- Popup xác nhận -->
                     <div *ngIf="isConfirmUpdatePopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                         <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-                            <h2 class="text-lg font-bold mb-4">Xác nhận sửa loại hàng</h2>
-                            <p>Bạn có chắc chắn muốn sửa loại hàng này?</p>
+                            <h2 class="text-lg font-bold mb-4">Xác nhận sửa danh mục hàng</h2>
+                            <p>Bạn có chắc chắn muốn sửa danh mục hàng này?</p>
                             <div class="flex justify-end mt-4">
                                 <button (click)="updateCategory()" class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded">Có</button>
                                 <button (click)="closeConfirmPopup()" class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Không</button>
@@ -192,8 +157,8 @@
                     </div>
                     <div *ngIf="isConfirmCreatePopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                         <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-                            <h2 class="text-lg font-bold mb-4">Xác nhận sửa loại hàng</h2>
-                            <p>Bạn có chắc chắn muốn sửa loại hàng này?</p>
+                            <h2 class="text-lg font-bold mb-4">Xác nhận sửa danh mục hàng</h2>
+                            <p>Bạn có chắc chắn muốn sửa danh mục hàng này?</p>
                             <div class="flex justify-end mt-4">
                                 <button (click)="addCategory()" class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded">Có</button>
                                 <button (click)="closeConfirmPopup()" class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Không</button>

@@ -30,23 +30,14 @@ export class CategoryComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.validate();
     this.createForm();
     this.loadCategory();
   }
-  validate() {
-    this.formProduct = this.formBuilder.group({
-      category_name: ['', Validators.required],
-      category_type: ['', Validators.required],
-    });
-  }
+
   createForm() {
     this.formProduct = this.formBuilder.group({
-      category_name: '',
-      category_parent_id: '',
-      category_type: '',
-      display_status: '',
-      display_position: ''
+      category_name: ['', Validators.required],
+      category_type: [''],
     });
   }
 
@@ -150,10 +141,7 @@ export class CategoryComponent implements OnInit {
   selectCategoryForUpdate(category: Category) {
     this.formProduct.patchValue({
       category_name: category.category_name,
-      category_parent_id: category.category_parent_id,
       category_type: category.category_type,
-      display_status: category.display_status,
-      display_position: category.display_position,
     });
     this.isUpdatePopupOpen = true; // Mở popup cập nhật
     this.idCategory = category.category_id;

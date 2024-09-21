@@ -8,17 +8,40 @@
     </div>
     <nav class="flex-grow mt-6">
         <a class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 flex items-center" 
-           routerLink="/admin/products" routerLinkActive="bg-gray-700" 
-           [routerLinkActiveOptions]="{ exact: true }">
+           (click)="setActiveMenu('products')"
+           [ngClass]="{'bg-gray-700': activeMenu === 'products'}"
+           routerLink="/admin/products">
             <i class="fas fa-box mr-2"></i>
             <span [ngClass]="{'hidden': isSidebarCollapsed}">Quản lý sản phẩm</span>
         </a>
         <a class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 flex items-center" 
-           routerLink="/admin/categories" routerLinkActive="bg-gray-700" 
-           [routerLinkActiveOptions]="{ exact: true }">
+           (click)="setActiveMenu('categories')"
+           [ngClass]="{'bg-gray-700': activeMenu === 'categories'}"
+           [routerLink]="['/admin/categories']">
             <i class="fas fa-list mr-2"></i>
-            <span [ngClass]="{'hidden': isSidebarCollapsed}">Quản lý loại hàng</span>
+            <span [ngClass]="{'hidden': isSidebarCollapsed}">Danh mục hàng</span>
         </a>
+        <div class="relative">
+            <a class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 flex items-center justify-between cursor-pointer" 
+               (click)="toggleCategoryMenu(); setActiveMenu('categoryManagement')"
+               [ngClass]="{'bg-gray-700': activeMenu === 'categoryManagement'}"
+               >
+                <div class="flex items-center">
+                    <i class="fas fa-list mr-2"></i>
+                    <span [ngClass]="{'hidden': isSidebarCollapsed}">Quản lý loại hàng</span>
+                </div>
+                <i class="fas" [ngClass]="{'fa-chevron-down': !isCategoryMenuOpen, 'fa-chevron-up': isCategoryMenuOpen}"></i>
+            </a>
+            <div class="pl-8" *ngIf="isCategoryMenuOpen && !isSidebarCollapsed">
+                <a *ngFor="let category of categories"
+                   (click)="selectCategory(category); setActiveMenu('category-' + category.category_id)"
+                   [routerLink]="['/admin/categories']"
+                   class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-600"
+                   [ngClass]="{'bg-gray-700': activeMenu === 'category-' + category.category_id}">
+                    {{ category.category_name }}
+                </a>
+            </div>
+        </div>
     </nav>
     <div class="p-4">
         <div class="relative">
