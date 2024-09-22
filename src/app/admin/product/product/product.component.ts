@@ -52,7 +52,7 @@ export class ProductComponent implements OnInit {
     this.formProduct.patchValue({
       product_name: product.product_name,
     });
-    this.newKeywords = product.keywords;
+    this.newKeywords = [...product.keywords];
     this.idProduct = product.product_id;
   }
 
