@@ -13,8 +13,9 @@ export class AdminServiceService {
   private apiUrl = 'http://localhost:8083/api/v1/un_auth/category';
   private adminApiUrl = 'http://localhost:8083/api/v1/admin/category';
   private productApiUrl = 'http://localhost:8083/api/v1/un_auth/product';
+  private adminProductApiUrl = 'http://localhost:8083/api/v1/admin/product';
   private httpClient: HttpClient;
-
+  token = localStorage.getItem('token');
   constructor(private backend: HttpBackend) {
     this.httpClient = new HttpClient(backend);
   }
@@ -24,18 +25,30 @@ export class AdminServiceService {
 
   getProduct(): Observable<Product[]> {
     return this.httpClient.get<Product[]>(`${this.productApiUrl}/product_list`);
-  } 
+  }
 
   createProduct(product: Product): Observable<Product> {
-    return this.httpClient.post<Product>(`${this.apiUrl}/product`, product, { headers: this.headers });
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${this.token}`)
+      .set('Content-Type', 'application/json');
+
+    return this.httpClient.post<Product>(`${this.adminProductApiUrl}/create`, product, { headers }).pipe(
+      tap(response => console.log('Create response:', response))
+    );
   }
 
   updateProduct(product: Product): Observable<Product> {
-    return this.httpClient.put<Product>(`${this.apiUrl}/product/product_update`, product, { headers: this.headers });
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
+    return this.httpClient.post<Product>(`${this.adminProductApiUrl}/product_update`, product, { headers }).pipe(
+      tap(response => console.log('Create response:', response))
+    );;
   }
 
   deleteProduct(id: string): Observable<void> {
-    return this.httpClient.delete<void>(`${this.apiUrl}/product/delete/${id}`, { headers: this.headers });
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
+    return this.httpClient.delete<void>(`${this.adminProductApiUrl}/delete/${id}`, { headers }).pipe(
+      tap(response => console.log('Create response:', response))
+    );;;
   }
 
   createCategory(category: Category): Observable<Category> {
@@ -47,8 +60,7 @@ export class AdminServiceService {
   }
 
   deleteCategory(id: string): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
 
     return this.httpClient.delete(`${this.adminApiUrl}/delete/${id}`, { headers }).pipe(
       tap(response => console.log('Delete response:', response)));

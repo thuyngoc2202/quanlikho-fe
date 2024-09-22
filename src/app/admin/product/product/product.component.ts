@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Product } from 'src/app/model/product.model';
 import { AdminServiceService } from 'src/app/service/admin-service.service';
 import * as XLSX from 'xlsx';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-product',
@@ -10,50 +11,35 @@ import * as XLSX from 'xlsx';
   styleUrls: ['./product.component.css']
 })
 export class ProductComponent implements OnInit {
- 
 
-  products: Product[] = [ ];
-  isCreatePopupOpen: any;
-  formProduct!: FormGroup<any>;
-  categories: any;
-  isUpdatePopupOpen: any;
-  isConfirmUpdatePopupOpen: any;
-  isConfirmCreatePopupOpen: any;
+
+  products: Product[] = [];
+  isCreatePopupOpen = false;
+  formProduct!: FormGroup;
+  isUpdatePopupOpen = false;
+  isConfirmUpdatePopupOpen = false;
+  isConfirmCreatePopupOpen = false;
+  isConfirmDeletePopupOpen = false;
+  idProduct: string = '';
   showFileUploadPopup = false;
   selectedFile: File | null = null;
+  keywords: string[] = [];
+  newKeywords: string[] = [];
 
   constructor(private formBuilder: FormBuilder,
-        private adminService: AdminServiceService,
+    private adminService: AdminServiceService,
+    private toastr: ToastrService,
   ) { }
 
   ngOnInit(): void {
     this.createForm();
-    this.validate();
+
     this.loadProduct();
   }
-  
-  validate() {
-    this.formProduct = this.formBuilder.group({
-      product_name: ['', Validators.required],
-      product_code: ['', Validators.required],
-      bar_code: ['', Validators.required],
-      description_short: ['', Validators.required],
-      description_long: ['', Validators.required],
-      price: ['', Validators.required],
-      promotional_price: ['', Validators.required],
-      quantity: ['', Validators.required],
-    });
-  }
+
   createForm() {
     this.formProduct = this.formBuilder.group({
-      product_name: '',
-      product_code: '',
-      bar_code: '',
-      description_short: '',
-      description_long: '',
-      price: '',
-      promotional_price: '',
-      quantity: '',
+      product_name: ['', Validators.required],
     });
   }
 
@@ -61,12 +47,15 @@ export class ProductComponent implements OnInit {
     this.isCreatePopupOpen = true;
     this.createForm();
   }
-  selectProductForUpdate(_t83: any) {
-    throw new Error('Method not implemented.');
+  selectProductForUpdate(product: Product) {
+    this.isUpdatePopupOpen = true;
+    this.formProduct.patchValue({
+      product_name: product.product_name,
+    });
+    this.newKeywords = product.keywords;
+    this.idProduct = product.product_id;
   }
-  deleteProduct(arg0: any) {
-    throw new Error('Method not implemented.');
-  }
+
   confirmUpdate() {
     this.isConfirmUpdatePopupOpen = true;
   }
@@ -74,12 +63,40 @@ export class ProductComponent implements OnInit {
     this.isConfirmCreatePopupOpen = true;
   }
   updateProduct() {
-    throw new Error('Method not implemented.');
+    const productData = this.formProduct.value;
+    productData.keywords = this.newKeywords;
+    productData.product_id = this.idProduct;
+    console.log('productData', productData);
+
+    if (this.formProduct.valid) {
+      this.adminService.updateProduct(productData).subscribe({
+        next: (response) => {
+          console.log('Category created successfully', response);
+          this.isConfirmUpdatePopupOpen = false;
+          this.isUpdatePopupOpen = false;
+          this.loadProduct();
+          this.createForm();
+          this.newKeywords = [];
+          this.idProduct = '';
+          this.toastr.success('Sửa sản phẩm thành công', 'Thành công');
+        },
+        error: (error) => {
+          console.error('Failed to create category', error);
+          this.isConfirmCreatePopupOpen = false;
+          this.toastr.error(`${error.error.result_data.msg}`, 'Thất bại');
+        }
+      });
+    } else {
+      console.log('form in not valid')
+      this.isConfirmCreatePopupOpen = false;
+      this.toastr.error(`Thiếu trường`, 'Thất bại');
+    }
   }
   closeConfirmPopup() {
-    if (this.isConfirmCreatePopupOpen || this.isConfirmUpdatePopupOpen ) {
+    if (this.isConfirmCreatePopupOpen || this.isConfirmUpdatePopupOpen || this.isConfirmDeletePopupOpen) {
       this.isConfirmCreatePopupOpen = false;
       this.isConfirmUpdatePopupOpen = false;
+      this.isConfirmDeletePopupOpen = false;
     }
   }
 
@@ -88,14 +105,40 @@ export class ProductComponent implements OnInit {
       this.isCreatePopupOpen = false;
       this.isUpdatePopupOpen = false;
       this.showFileUploadPopup = false;
+      this.newKeywords = [];
       if (this.selectedFile) {
         this.selectedFile = null;
       }
     }
   }
   addProduct() {
-    throw new Error('Method not implemented.');
+    const productData = this.formProduct.value;
+    productData.keywords = this.newKeywords;
+
+    if (this.formProduct.valid) {
+      this.adminService.createProduct(productData).subscribe({
+        next: (response) => {
+          console.log('Category created successfully', response);
+          this.isConfirmCreatePopupOpen = false;
+          this.isCreatePopupOpen = false;
+          this.loadProduct();
+          this.createForm();
+          this.newKeywords = [];
+          this.toastr.success('Thêm sản phẩm thành công', 'Thành công');
+        },
+        error: (error) => {
+          console.error('Failed to create category', error);
+          this.isConfirmCreatePopupOpen = false;
+          this.toastr.error(`${error.error.result_data.msg}`, 'Thất bại');
+        }
+      });
+    } else {
+      console.log('form in not valid')
+      this.isConfirmCreatePopupOpen = false;
+      this.toastr.error(`Thiếu trường`, 'Thất bại');
+    }
   }
+
   loadProduct() {
     this.adminService.getProduct().subscribe({
       next: (response: any) => {
@@ -106,6 +149,27 @@ export class ProductComponent implements OnInit {
         console.error('Failed to load category', error);
       }
     });
+  }
+
+  deleteProduct() {
+    this.adminService.deleteProduct(this.idProduct).subscribe({
+      next: (response) => {
+        console.log('Product deleted successfully', response);
+        this.loadProduct();
+        this.toastr.success('Xóa sản phẩm thành công', 'Thành công');
+        this.idProduct = '';
+        this.isConfirmDeletePopupOpen = false
+      },
+      error: (error) => {
+        console.error('Failed to delete product', error);
+        this.toastr.error('Xóa sản phẩm thất bại', 'Thất bại');
+      }
+    });
+  }
+
+  openDeleteProductPopup(productId: string){
+    this.isConfirmDeletePopupOpen = true;
+    this.idProduct = productId;
   }
 
   openFileUploadPopup() {
@@ -134,7 +198,7 @@ export class ProductComponent implements OnInit {
 
     const formData = new FormData();
     formData.append('file', this.selectedFile);
-    
+
     console.log('FormData:', formData);
     this.adminService.importProduct(formData).subscribe({
       next: (response) => {
@@ -149,57 +213,18 @@ export class ProductComponent implements OnInit {
     });
   }
 
-  // uploadFile(): void {
-  //   if (!this.selectedFile) {
-  //     return;
-  //   }
 
-  //   const fileReader = new FileReader();
-  //   fileReader.onload = (e: any) => {
-  //     let product;
+  addKeyword(keyword: string) {
+    if (keyword && keyword.trim() !== '') {
+      this.newKeywords.push(keyword.trim());
+    }
+    console.log('newKeywords', this.newKeywords);
 
-  //     if (this.selectedFile!.name.endsWith('.xlsx')) {
-  //       const data = new Uint8Array(e.target.result);
-  //       const workbook = XLSX.read(data, { type: 'array' });
-  //       product = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-  //     } else if (this.selectedFile!.name.endsWith('.csv')) {
-  //       const csvContent = e.target.result as string;
-  //       product = this.parseCSV(csvContent);
-  //     }
+  }
 
-  //     if (product) {
-  //       this.adminService.importProduct(this.selectedFile).subscribe({
-  //         next: (response) => {
-  //           console.log('Product imported successfully', response);
-  //           // Thêm xử lý thành công ở đây (ví dụ: hiển thị thông báo, đóng popup)
-  //         },
-  //         error: (error) => {
-  //           console.error('Error importing product', error);
-  //           // Thêm xử lý lỗi ở đây
-  //         },
-  //         complete: () => {
-  //           // Xử lý khi observable hoàn thành (nếu cần)
-  //         }
-  //       });
-  //     }
-  //   };
+  removeKeyword(index: number) {
+    this.newKeywords.splice(index, 1);
+  }
 
-  //   if (this.selectedFile!.name.endsWith('.xlsx')) {
-  //     fileReader.readAsArrayBuffer(this.selectedFile);
-  //   } else if (this.selectedFile!.name.endsWith('.csv')) {
-  //     fileReader.readAsText(this.selectedFile);
-  //   }
-  // }
 
-  // private parseCSV(content: string): any[] {
-  //   const lines = content.split('\n');
-  //   const headers = lines[0].split(',');
-  //   return lines.slice(1).map(line => {
-  //     const values = line.split(',');
-  //     return headers.reduce((obj, header, index) => {
-  //       obj[header.trim()] = values[index] ? values[index].trim() : '';
-  //       return obj;
-  //     }, {} as any);
-  //   }).filter(obj => Object.values(obj).some(value => value !== '')); // Lọc bỏ các dòng trống
-  // }
 }

@@ -22,43 +22,42 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <div class="overflow-x-auto">
                         <table class="min-w-full bg-white">
                             <thead>
                                 <tr>
                                     <th class="py-2 px-4 border-b text-left">ID</th>
-                                    <th class="py-2 px-4 border-b text-left">Mã sản phẩm</th>
-                                    <th class="py-2 px-4 border-b text-left">Mã Bar Code</th>
                                     <th class="py-2 px-4 border-b text-left">Tên sản phẩm</th>
-                                    <th class="py-2 px-4 border-b text-left">Mô tả ngắn</th>
-                                    <th class="py-2 px-4 border-b text-left">Mô tả dài</th>
-                                    <th class="py-2 px-4 border-b text-left">Giá</th>
-                                    <th class="py-2 px-4 border-b text-left">Giá khuyến mãi</th>
-                                    <th class="py-2 px-4 border-b text-left">Số lượng</th>
-                                    <th class="py-2 px-4 border-b text-left">Trạng thái</th>
+                                    <th class="py-2 px-4 border-b text-left">Từ khoá</th>
                                     <th class="py-2 px-4 border-b text-left">Ngày tạo</th>
+                                    <th class="py-2 px-4 border-b text-left">Ngày cập nhật</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let product of products" class="text-sm md:text-base">
                                     <td class="py-2 px-4 border-b">{{ product.product_id }}</td>
-                                    <td class="py-2 px-4 border-b">{{ product.product_code }}</td>
-                                    <td class="py-2 px-4 border-b">{{ product.bar_code }}</td>
                                     <td class="py-2 px-4 border-b">{{ product.product_name }}</td>
-                                    <td class="py-2 px-4 border-b">{{ product.description_short }}</td>
-                                    <td class="py-2 px-4 border-b">{{ product.description_long }}</td>
-                                    <td class="py-2 px-4 border-b">{{ product.price }}</td>
-                                    <td class="py-2 px-4 border-b">{{ product.promotional_price }}</td>
-                                    <td class="py-2 px-4 border-b">{{ product.quantity }}</td>
-                                    <td class="py-2 px-4 border-b">{{ product.status }}</td>
-                                    <td class="py-2 px-4 border-b">{{ product.createdDate}}</td>
+                                    <td class="py-2 px-4 border-b">
+                                        <select class="border border-gray-300 rounded px-2 py-1 w-full" 
+                                                [title]="product.keywords.join(', ')">
+                                            <option *ngFor="let keyword of product.keywords" [value]="keyword">
+                                                {{ keyword }}
+                                            </option>
+                                        </select>
+                                    </td>
+                                    <td class="py-2 px-4 border-b">{{ product.create_date }}</td>
+                                    <td class="py-2 px-4 border-b">{{ product.modify_date }}</td>
                                     <td class="py-2 px-4 border-b">
                                         <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                                            <button class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded w-full sm:w-auto" (click)="selectProductForUpdate(product)">
+                                            <button
+                                                class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded w-full sm:w-auto"
+                                                (click)="selectProductForUpdate(product)">
                                                 Sửa
                                             </button>
-                                            <button class="bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded w-full sm:w-auto" (click)="deleteProduct(product.category_id)">
+                                            <button
+                                                class="bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded w-full sm:w-auto"
+                                                (click)="openDeleteProductPopup(product.product_id)">
                                                 Xoá
                                             </button>
                                         </div>
@@ -68,44 +67,47 @@
                         </table>
                     </div>
                     <!-- Popup Cập nhật -->
-                    <div *ngIf="isUpdatePopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div *ngIf="isUpdatePopupOpen"
+                        class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                         <div class="bg-white p-6 rounded-lg shadow-lg w-[800px]">
                             <h2 class="text-lg font-bold mb-4">Sửa sản phẩm</h2>
-                            <form [formGroup]="formProduct" (ngSubmit)="confirmUpdate()" class="grid grid-cols-3 gap-4">
+                            <form [formGroup]="formProduct" class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block mb-1 text-gray-400">Tên sản phẩm</label>
-                                    <input type="text"  name="category_name" required
-                                        class="border border-gray-300 p-2 w-full rounded" formControlName="category_name" />
+                                    <input type="text" name="product_name" required
+                                        class="border border-gray-300 p-2 w-full rounded"
+                                        formControlName="product_name" />
                                 </div>
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Parent ID</label>
-                                    <input type="text"  name="category_parent_id" 
-                                        class="border border-gray-300 p-2 w-full rounded" formControlName="category_parent_id" />
+                                <div class="col-span-2">
+                                    <label class="block mb-1 text-gray-400">Từ khóa</label>
+                                    
+                                    <div class="flex mb-2">
+                                        <input type="text" #newKeywordInput
+                                            (keyup.enter)="addKeyword(newKeywordInput.value); newKeywordInput.value = ''"
+                                            placeholder="Thêm từ khóa mới..."
+                                            class="border border-gray-300 p-2 rounded-l flex-grow">
+                                        <button (click)="addKeyword(newKeywordInput.value); newKeywordInput.value = ''"
+                                            class="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600 focus:outline-none">
+                                            Thêm
+                                        </button>
+                                    </div>
+
+                                    <div class="flex flex-wrap gap-2 ">
+                                        <span *ngFor="let keyword of newKeywords; let i = index"
+                                            class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center">
+                                            {{ keyword }}
+                                            <button (click)="removeKeyword(i)"
+                                                class="ml-1 text-blue-600 hover:text-blue-800 focus:outline-none">
+                                                &times;
+                                            </button>
+                                        </span>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Loại</label>
-                                    <select name="category_type" required
-                                            class="border border-gray-300 p-2 w-full rounded" 
-                                            formControlName="category_type">
-                                        <option value="" disabled>Chọn loại</option>
-                                        <option value="BANNER_CATEGORY">BANNER_CATEGORY</option>
-                                        <option value="PRODUCT_CATEGORY">PRODUCT_CATEGORY</option>
-                                        <option value="NEW_CATEGORY">NEW_CATEGORY</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Trạng thái</label>
-                                    <input type="text"  name="display_status" 
-                                        class="border border-gray-300 p-2 w-full rounded" formControlName="display_status" />
-                                </div>
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Vị trí</label>
-                                    <input type="text"  name="display_position" 
-                                        class="border border-gray-300 p-2 w-full rounded" formControlName="display_position" />
-                                </div>
+
                                 <div class="col-span-3 flex justify-end mt-4">
                                     <button type="submit"
-                                        class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded">Cập nhật</button>
+                                        class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded"
+                                        (click)="confirmUpdate()">Cập nhật</button>
                                     <button type="button" (click)="closePopup()"
                                         class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Đóng</button>
                                 </div>
@@ -113,70 +115,47 @@
                         </div>
                     </div>
                     <!-- Popup Thêm -->
-                    <div *ngIf="isCreatePopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div *ngIf="isCreatePopupOpen"
+                        class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                         <div class="bg-white p-6 rounded-lg shadow-lg w-[800px]">
                             <h2 class="text-lg font-bold mb-4">Thêm sản phẩm</h2>
-                            <form [formGroup]="formProduct" (ngSubmit)="confirmCreate()" class="grid grid-cols-3 gap-4">
+                            <form [formGroup]="formProduct" class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block mb-1 text-gray-400">Tên sản phẩm</label>
-                                    <input type="text"  name="category_name" required
-                                        class="border border-gray-300 p-2 w-full rounded" formControlName="product_name" />
+                                    <input type="text" name="product_name" required
+                                        class="border border-gray-300 p-2 w-full rounded"
+                                        formControlName="product_name" />
                                 </div>
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Mã sản phẩm</label>
-                                    <input type="text"  name="category_parent_id" 
-                                            class="border border-gray-300 p-2 w-full rounded" formControlName="product_code" />
-                                </div>
-                                <!-- <div>
-                                    <label class="block mb-1 text-gray-400">Loại</label>
-                                    <select name="category_type" required
-                                            class="border border-gray-300 p-2 w-full rounded" 
-                                            formControlName="category_type">
-                                        <option value="" disabled>Chọn loại</option>
-                                        <option value="BANNER_CATEGORY">BANNER_CATEGORY</option>
-                                        <option value="PRODUCT_CATEGORY">PRODUCT_CATEGORY</option>
-                                        <option value="NEW_CATEGORY">NEW_CATEGORY</option>
-                                    </select>
-                                </div> -->
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Bar Code</label>
-                                    <input type="text"  name="bar_code" 
-                                                class="border border-gray-300 p-2 w-full rounded" formControlName="bar_code" />
-                                </div>
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Mô tả ngắn</label>
-                                    <input type="text"  name="description_short"
-                                                class="border border-gray-300 p-2 w-full rounded" formControlName="description_short" />
-                                </div>
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Mô tả dài</label>
-                                    <input type="text"  name="description_long"
-                                                class="border border-gray-300 p-2 w-full rounded" formControlName="description_long" />
-                                </div>
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Giá</label>
-                                    <input type="text"  name="price"
-                                                class="border border-gray-300 p-2 w-full rounded" formControlName="price" />
-                                </div>
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Giá khuyến mãi</label>
-                                    <input type="text"  name="promotional_price"
-                                                class="border border-gray-300 p-2 w-full rounded" formControlName="promotional_price" />
-                                </div>
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Số lượng</label>
-                                    <input type="text"  name="quantity"
-                                                class="border border-gray-300 p-2 w-full rounded" formControlName="quantity" />
-                                </div>
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Trạng thái</label>
-                                    <input type="text"  name="status"
-                                                class="border border-gray-300 p-2 w-full rounded" formControlName="status" />
+                                <div class="col-span-2">
+                                    <label class="block mb-1 text-gray-400">Từ khóa</label>
+                                    
+                                    <div class="flex mb-2">
+                                        <input type="text" #newKeywordInput
+                                            (keyup.enter)="addKeyword(newKeywordInput.value); newKeywordInput.value = ''"
+                                            placeholder="Thêm từ khóa mới..."
+                                            class="border border-gray-300 p-2 rounded-l flex-grow">
+                                        <button (click)="addKeyword(newKeywordInput.value); newKeywordInput.value = ''"
+                                            class="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600 focus:outline-none">
+                                            Thêm
+                                        </button>
+                                    </div>
+
+                                    <div class="flex flex-wrap gap-2 ">
+                                        <span *ngFor="let keyword of newKeywords; let i = index"
+                                            class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center">
+                                            {{ keyword }}
+                                            <button (click)="removeKeyword(i)"
+                                                class="ml-1 text-blue-600 hover:text-blue-800 focus:outline-none">
+                                                &times;
+                                            </button>
+                                        </span>
+                                    </div>
                                 </div>
 
                                 <div class="col-span-3 flex justify-end mt-4">
                                     <button type="submit"
-                                        class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded">Thêm</button>
+                                        class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded"
+                                        (click)="confirmCreate()">Thêm</button>
                                     <button type="button" (click)="closePopup()"
                                         class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Đóng</button>
                                 </div>
@@ -184,34 +163,35 @@
                         </div>
                     </div>
 
-                    <div *ngIf="showFileUploadPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div *ngIf="showFileUploadPopup"
+                        class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                         <div class="bg-white p-6 rounded-lg shadow-lg w-[1000px]">
                             <h2 class="text-lg font-bold mb-4">Nhập danh mục hàng</h2>
-                            
+
                             <div class="mb-4">
                                 <label for="file-upload" class="block text-sm font-medium text-gray-700 mb-2">
                                     Chọn file Excel (.xlsx) hoặc CSV:
                                 </label>
                                 <input type="file" id="file-upload" (change)="onFileSelected($event)"
-                                       accept=".xlsx,.csv" class="block w-full text-sm text-gray-500
+                                    accept=".xlsx,.csv" class="block w-full text-sm text-gray-500
                                        file:mr-4 file:py-2 file:px-4
                                        file:rounded-full file:border-0
                                        file:text-sm file:font-semibold
                                        file:bg-blue-50 file:text-blue-700
                                        hover:file:bg-blue-100" />
                             </div>
-                            
+
                             <div *ngIf="selectedFile" class="mb-4 text-sm text-gray-600">
                                 Đã chọn file: {{ selectedFile.name }}
                             </div>
 
                             <div class="col-span-3 flex justify-end mt-4">
                                 <button type="button" (click)="uploadFile()" [disabled]="!selectedFile"
-                                        class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
+                                    class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
                                     Nhập
                                 </button>
                                 <button type="button" (click)="closePopup()"
-                                        class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">
+                                    class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">
                                     Đóng
                                 </button>
                             </div>
@@ -219,22 +199,38 @@
                     </div>
 
                     <!-- Popup xác nhận -->
-                    <div *ngIf="isConfirmUpdatePopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div *ngIf="isConfirmUpdatePopupOpen"
+                        class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                         <div class="bg-white p-6 rounded-lg shadow-lg w-96">
                             <h2 class="text-lg font-bold mb-4">Xác nhận sửa sản phẩm</h2>
                             <p>Bạn có chắc chắn muốn sửa sản phẩm này?</p>
                             <div class="flex justify-end mt-4">
-                                <button (click)="updateProduct()" class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded">Có</button>
-                                <button (click)="closeConfirmPopup()" class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Không</button>
+                                <button (click)="updateProduct()"
+                                    class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded">Có</button>
+                                <button (click)="closeConfirmPopup()"
+                                    class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Không</button>
                             </div>
                         </div>
                     </div>
-                    <div *ngIf="isConfirmCreatePopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div *ngIf="isConfirmCreatePopupOpen"
+                        class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                         <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-                            <h2 class="text-lg font-bold mb-4">Xác nhận sửa sản phẩm</h2>
-                            <p>Bạn có chắc chắn muốn sửa sản phẩm này?</p>
+                            <h2 class="text-lg font-bold mb-4">Xác nhận thêm sản phẩm</h2>
+                            <p>Bạn có chắc chắn muốn thêm sản phẩm này?</p>
                             <div class="flex justify-end mt-4">
-                                <button (click)="addProduct()" class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded">Có</button>
+                                <button (click)="addProduct()"
+                                    class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded">Có</button>
+                                <button (click)="closeConfirmPopup()"
+                                    class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Không</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="isConfirmDeletePopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+                            <h2 class="text-lg font-bold mb-4">Xác nhận sửa danh mục hàng</h2>
+                            <p>Bạn có chắc chắn muốn xoá danh mục hàng này?</p>
+                            <div class="flex justify-end mt-4">
+                                <button (click)="deleteProduct()" class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded">Có</button>
                                 <button (click)="closeConfirmPopup()" class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Không</button>
                             </div>
                         </div>
