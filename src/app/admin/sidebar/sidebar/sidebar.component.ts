@@ -4,6 +4,7 @@ import { Category } from 'src/app/model/category.model';
 import { AdminServiceService } from 'src/app/service/admin-service.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { ActiveMenuService } from '../../../util/active-menu-service';
+import { ProductCategory } from 'src/app/model/product-category.model';
 
 @Component({
   selector: 'app-sidebar',
@@ -16,7 +17,7 @@ export class SidebarComponent implements OnInit {
   isDropdownOpen = false;
   isSidebarCollapsed = false;
   isCategoryMenuOpen = true;
-  categories: Category[]=[];
+  productCategories : ProductCategory[]=[];
   selectedCategory: any = null;
   activeMenu: string = '';
 
@@ -57,18 +58,23 @@ export class SidebarComponent implements OnInit {
 
   toggleCategoryMenu() {
     console.log('alo');
+    this.activeMenuService.clearSelectedCategory();
     this.isCategoryMenuOpen = !this.isCategoryMenuOpen;
+    if (this.isCategoryMenuOpen){
+      this.loadCategory();
+    }
   }
+
 
   isRouteActive(route: string): boolean {
     return this.router.isActive(route, false);
   }
   
   loadCategory() {
-    this.adminService.getCategory().subscribe({
+    this.adminService.getProductCategory().subscribe({
       next: (response: any) => {
         console.log('Category loaded successfully', response.result_data);
-        this.categories = response.result_data;
+        this.productCategories = response.result_data;
       },
       error: (error) => {
         console.error('Failed to load category', error);
@@ -76,13 +82,15 @@ export class SidebarComponent implements OnInit {
     });
   }
   
-  selectCategory(category: any) {
-    this.setActiveMenu('category-' + category.id);
+  selectCategory(productCategory: any) {
+    this.setActiveMenu('category-' + productCategory.id);
+    this.activeMenuService.setSelectedCategoryId(productCategory.category_id);
   }
 
   logout() {
     console.log('Logging out...');
-    // Implement logout logic
+    localStorage.clear();
+    this.router.navigate(['/login']);
   }
 
   setActiveMenu(menuItem: string) {

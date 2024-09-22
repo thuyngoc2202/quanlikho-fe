@@ -5,6 +5,7 @@ import { Product } from '../model/product.model';
 import { Category } from '../model/category.model';
 import { Attribute } from '../model/attribute.model';
 import { map, tap } from 'rxjs/operators';
+import { ProductCategory } from '../model/product-category.model';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,8 @@ export class AdminServiceService {
   private adminApiUrl = 'http://localhost:8083/api/v1/admin/category';
   private productApiUrl = 'http://localhost:8083/api/v1/un_auth/product';
   private adminProductApiUrl = 'http://localhost:8083/api/v1/admin/product';
+  private productCategoryApiUrl = 'http://localhost:8083/api/v1/un_auth/product_category';
+  private adminProductCategoryApiUrl = 'http://localhost:8083/api/v1/admin/product_category';
   private httpClient: HttpClient;
   token = localStorage.getItem('token');
   constructor(private backend: HttpBackend) {
@@ -68,6 +71,29 @@ export class AdminServiceService {
 
   getCategory(): Observable<Category[]> {
     return this.httpClient.get<Category[]>(`${this.apiUrl}/all`);
+  }
+
+  getProductCategory(): Observable<ProductCategory[]> {
+    return this.httpClient.get<ProductCategory[]>(`${this.productCategoryApiUrl}/all`);
+  }
+
+  createProductCategory(productCategory: ProductCategory): Observable<ProductCategory> {
+    return this.httpClient.post<ProductCategory>(`${this.productCategoryApiUrl}/create`, productCategory, { headers: this.headers });
+  }
+
+  updateProductCategory(productCategory: ProductCategory): Observable<ProductCategory> {
+    return this.httpClient.post<ProductCategory>(`${this.productCategoryApiUrl}/update`, productCategory, { headers: this.headers });
+  }
+
+  deleteProductCategory(id: string): Observable<void> {
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
+    return this.httpClient.delete<void>(`${this.adminProductCategoryApiUrl}/delete/${id}`, { headers }).pipe(
+      tap(response => console.log('Delete response:', response))
+    );
+  }
+
+  getProductCategoryByCategoryId(categoryId: string): Observable<ProductCategory[]> {
+    return this.httpClient.get<ProductCategory[]>(`${this.productCategoryApiUrl}/${categoryId}`);
   }
 
   importProduct(formData: FormData): Observable<any> {

@@ -11,43 +11,56 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./product.component.css']
 })
 export class ProductComponent implements OnInit {
-
-
+  // Properties
   products: Product[] = [];
-  isCreatePopupOpen = false;
+  filteredProducts: Product[] = [];
   formProduct!: FormGroup;
+  idProduct: string = '';
+  keywords: string[] = [];
+  newKeywords: string[] = [];
+  selectedFile: File | null = null;
+  searchTerm: string = '';
+
+  // Popup control flags
+  isCreatePopupOpen = false;
   isUpdatePopupOpen = false;
   isConfirmUpdatePopupOpen = false;
   isConfirmCreatePopupOpen = false;
   isConfirmDeletePopupOpen = false;
-  idProduct: string = '';
   showFileUploadPopup = false;
-  selectedFile: File | null = null;
-  keywords: string[] = [];
-  newKeywords: string[] = [];
 
-  constructor(private formBuilder: FormBuilder,
+  constructor(
+    private formBuilder: FormBuilder,
     private adminService: AdminServiceService,
     private toastr: ToastrService,
   ) { }
 
   ngOnInit(): void {
     this.createForm();
-
-    this.loadProduct();
+    this.loadProducts();
   }
 
+  // Form Management
   createForm() {
     this.formProduct = this.formBuilder.group({
       product_name: ['', Validators.required],
     });
   }
 
+  resetProductForm() {
+    this.formProduct.reset();
+    this.newKeywords = [];
+    this.idProduct = '';
+  }
+
+  // Popup Management
   openAddProductPopup() {
     this.isCreatePopupOpen = true;
     this.createForm();
   }
+
   selectProductForUpdate(product: Product) {
+    this.resetProductForm();
     this.isUpdatePopupOpen = true;
     this.formProduct.patchValue({
       product_name: product.product_name,
@@ -59,58 +72,28 @@ export class ProductComponent implements OnInit {
   confirmUpdate() {
     this.isConfirmUpdatePopupOpen = true;
   }
+
   confirmCreate() {
     this.isConfirmCreatePopupOpen = true;
   }
-  updateProduct() {
-    const productData = this.formProduct.value;
-    productData.keywords = this.newKeywords;
-    productData.product_id = this.idProduct;
-    console.log('productData', productData);
 
-    if (this.formProduct.valid) {
-      this.adminService.updateProduct(productData).subscribe({
-        next: (response) => {
-          console.log('Category created successfully', response);
-          this.isConfirmUpdatePopupOpen = false;
-          this.isUpdatePopupOpen = false;
-          this.loadProduct();
-          this.createForm();
-          this.newKeywords = [];
-          this.idProduct = '';
-          this.toastr.success('Sửa sản phẩm thành công', 'Thành công');
-        },
-        error: (error) => {
-          console.error('Failed to create category', error);
-          this.isConfirmCreatePopupOpen = false;
-          this.toastr.error(`${error.error.result_data.msg}`, 'Thất bại');
-        }
-      });
-    } else {
-      console.log('form in not valid')
-      this.isConfirmCreatePopupOpen = false;
-      this.toastr.error(`Thiếu trường`, 'Thất bại');
-    }
-  }
   closeConfirmPopup() {
-    if (this.isConfirmCreatePopupOpen || this.isConfirmUpdatePopupOpen || this.isConfirmDeletePopupOpen) {
-      this.isConfirmCreatePopupOpen = false;
-      this.isConfirmUpdatePopupOpen = false;
-      this.isConfirmDeletePopupOpen = false;
-    }
+    this.isConfirmCreatePopupOpen = false;
+    this.isConfirmUpdatePopupOpen = false;
+    this.isConfirmDeletePopupOpen = false;
   }
 
   closePopup() {
     if (this.isCreatePopupOpen || this.isUpdatePopupOpen || this.showFileUploadPopup) {
+      this.resetProductForm();
       this.isCreatePopupOpen = false;
       this.isUpdatePopupOpen = false;
       this.showFileUploadPopup = false;
-      this.newKeywords = [];
-      if (this.selectedFile) {
-        this.selectedFile = null;
-      }
+      this.selectedFile = null;
     }
   }
+
+  // Product CRUD Operations
   addProduct() {
     const productData = this.formProduct.value;
     productData.keywords = this.newKeywords;
@@ -118,47 +101,80 @@ export class ProductComponent implements OnInit {
     if (this.formProduct.valid) {
       this.adminService.createProduct(productData).subscribe({
         next: (response) => {
-          console.log('Category created successfully', response);
+          console.log('Product created successfully', response);
           this.isConfirmCreatePopupOpen = false;
           this.isCreatePopupOpen = false;
-          this.loadProduct();
-          this.createForm();
-          this.newKeywords = [];
+          this.loadProducts();
+          this.resetProductForm();
           this.toastr.success('Thêm sản phẩm thành công', 'Thành công');
         },
         error: (error) => {
-          console.error('Failed to create category', error);
+          console.error('Failed to create product', error);
           this.isConfirmCreatePopupOpen = false;
           this.toastr.error(`${error.error.result_data.msg}`, 'Thất bại');
         }
       });
     } else {
-      console.log('form in not valid')
+      console.log('Form is not valid');
       this.isConfirmCreatePopupOpen = false;
       this.toastr.error(`Thiếu trường`, 'Thất bại');
     }
   }
 
-  loadProduct() {
+  updateProduct() {
+    const productData = this.formProduct.value;
+    productData.keywords = this.newKeywords;
+    productData.product_id = this.idProduct;
+
+    if (this.formProduct.valid) {
+      this.adminService.updateProduct(productData).subscribe({
+        next: (response) => {
+          console.log('Product updated successfully', response);
+          this.isConfirmUpdatePopupOpen = false;
+          this.isUpdatePopupOpen = false;
+          this.loadProducts();
+          this.resetProductForm();
+          this.toastr.success('Sửa sản phẩm thành công', 'Thành công');
+        },
+        error: (error) => {
+          console.error('Failed to update product', error);
+          this.isConfirmUpdatePopupOpen = false;
+          this.toastr.error(`${error.error.result_data.msg}`, 'Thất bại');
+        }
+      });
+    } else {
+      console.log('Form is not valid');
+      this.isConfirmUpdatePopupOpen = false;
+      this.toastr.error(`Thiếu trường`, 'Thất bại');
+    }
+  }
+
+  loadProducts() {
     this.adminService.getProduct().subscribe({
       next: (response: any) => {
-        console.log('Product loaded successfully', response.result_data);
+        console.log('Products loaded successfully', response.result_data);
         this.products = response.result_data;
+        this.filteredProducts = this.products;
       },
       error: (error) => {
-        console.error('Failed to load category', error);
+        console.error('Failed to load products', error);
       }
     });
+  }
+
+  openDeleteProductPopup(productId: string) {
+    this.isConfirmDeletePopupOpen = true;
+    this.idProduct = productId;
   }
 
   deleteProduct() {
     this.adminService.deleteProduct(this.idProduct).subscribe({
       next: (response) => {
         console.log('Product deleted successfully', response);
-        this.loadProduct();
+        this.loadProducts();
         this.toastr.success('Xóa sản phẩm thành công', 'Thành công');
         this.idProduct = '';
-        this.isConfirmDeletePopupOpen = false
+        this.isConfirmDeletePopupOpen = false;
       },
       error: (error) => {
         console.error('Failed to delete product', error);
@@ -167,11 +183,7 @@ export class ProductComponent implements OnInit {
     });
   }
 
-  openDeleteProductPopup(productId: string){
-    this.isConfirmDeletePopupOpen = true;
-    this.idProduct = productId;
-  }
-
+  // File Upload Management
   openFileUploadPopup() {
     this.showFileUploadPopup = true;
   }
@@ -190,6 +202,7 @@ export class ProductComponent implements OnInit {
       this.selectedFile = null;
     }
   }
+
   uploadFile(): void {
     if (!this.selectedFile) {
       console.error('No file selected');
@@ -203,28 +216,37 @@ export class ProductComponent implements OnInit {
     this.adminService.importProduct(formData).subscribe({
       next: (response) => {
         console.log('Product imported successfully', response);
-        // Add success handling here (e.g., display a message, close popup)
         this.closeFileUploadPopup();
+        this.loadProducts();
+        this.toastr.success('Nhập sản phẩm thành công', 'Thành công');
       },
       error: (error) => {
         console.error('Error importing product', error);
-        // Add error handling here
+        this.toastr.error('Nhập sản phẩm thất bại', 'Thất bại');
       }
     });
   }
 
-
+  // Keyword Management
   addKeyword(keyword: string) {
     if (keyword && keyword.trim() !== '') {
       this.newKeywords.push(keyword.trim());
     }
     console.log('newKeywords', this.newKeywords);
-
   }
 
   removeKeyword(index: number) {
     this.newKeywords.splice(index, 1);
   }
 
-
+  // Search Products
+  searchProducts() {
+    if (!this.searchTerm) {
+      this.filteredProducts = this.products;
+    } else {
+      this.filteredProducts = this.products.filter(product =>
+        product.product_name.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    }
+  }
 }

@@ -9,15 +9,22 @@
                             Danh mục hàng
                         </h1>
                         <div class="w-full lg:w-1/2 px-4">
-                            <input class="w-full p-2 border rounded" placeholder="Tìm kiếm..." type="text" />
+                            <div class="relative">
+                                <input
+                                    [(ngModel)]="searchTerm"
+                                    (input)="searchCategories()"
+                                    class="w-full p-2 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 ease-in-out"
+                                    placeholder="Tìm kiếm danh mục..."
+                                    type="text"
+                                />
+                                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                            </div>
                         </div>
-                        <div class="flex flex-col sm:flex-row w-full lg:w-1/4 space-y-2 sm:space-y-0 sm:space-x-2">
-                            <button (click)="openFileUploadPopup()"
-                                class="w-full sm:w-1/2 bg-green-500 hover:bg-green-700 text-white px-4 py-2 rounded">
-                                Nhập
-                            </button>
+                        <div class="w-full lg:w-1/4 flex justify-end">
                             <button (click)="openAddCategoryPopup()"
-                                class="w-full sm:w-1/2 bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                                class="w-full sm:w-full bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
                                 Thêm danh mục
                             </button>
                         </div>
@@ -33,7 +40,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let category of categories" class="text-sm md:text-base">
+                                <tr *ngFor="let category of filteredCategories" class="text-sm md:text-base">
                                     <td class="py-2 px-4 border-b">{{ category.category_id }}</td>
                                     <td class="py-2 px-1 border-b">{{ category.category_name }}</td>
                                     <td class="py-2 px-4 border-b">
@@ -88,39 +95,7 @@
                         </div>
                     </div>
                     
-                    <div *ngIf="showFileUploadPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                        <div class="bg-white p-6 rounded-lg shadow-lg w-[1000px]">
-                            <h2 class="text-lg font-bold mb-4">Nhập danh mục hàng</h2>
-                            
-                            <div class="mb-4">
-                                <label for="file-upload" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Chọn file Excel (.xlsx) hoặc CSV:
-                                </label>
-                                <input type="file" id="file-upload" (change)="onFileSelected($event)"
-                                       accept=".xlsx,.csv" class="block w-full text-sm text-gray-500
-                                       file:mr-4 file:py-2 file:px-4
-                                       file:rounded-full file:border-0
-                                       file:text-sm file:font-semibold
-                                       file:bg-blue-50 file:text-blue-700
-                                       hover:file:bg-blue-100" />
-                            </div>
-                            
-                            <div *ngIf="selectedFile" class="mb-4 text-sm text-gray-600">
-                                Đã chọn file: {{ selectedFile.name }}
-                            </div>
-
-                            <div class="col-span-3 flex justify-end mt-4">
-                                <button type="button" (click)="uploadFile()" [disabled]="!selectedFile"
-                                        class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
-                                    Nhập
-                                </button>
-                                <button type="button" (click)="closePopup()"
-                                        class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">
-                                    Đóng
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                
                     <!-- Popup xác nhận -->
                     <div *ngIf="isConfirmUpdatePopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                         <div class="bg-white p-6 rounded-lg shadow-lg w-96">
@@ -134,8 +109,8 @@
                     </div>
                     <div *ngIf="isConfirmCreatePopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                         <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-                            <h2 class="text-lg font-bold mb-4">Xác nhận sửa danh mục hàng</h2>
-                            <p>Bạn có chắc chắn muốn sửa danh mục hàng này?</p>
+                            <h2 class="text-lg font-bold mb-4">Xác nhận thêm danh mục hàng</h2>
+                            <p>Bạn có chắc chắn muốn thêm danh mục hàng này?</p>
                             <div class="flex justify-end mt-4">
                                 <button (click)="addCategory()" class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded">Có</button>
                                 <button (click)="closeConfirmPopup()" class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Không</button>
@@ -144,7 +119,7 @@
                     </div>
                     <div *ngIf="isConfirmDeletePopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                         <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-                            <h2 class="text-lg font-bold mb-4">Xác nhận sửa danh mục hàng</h2>
+                            <h2 class="text-lg font-bold mb-4">Xác nhận xoá danh mục hàng</h2>
                             <p>Bạn có chắc chắn muốn xoá danh mục hàng này?</p>
                             <div class="flex justify-end mt-4">
                                 <button (click)="deleteCategory()" class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded">Có</button>

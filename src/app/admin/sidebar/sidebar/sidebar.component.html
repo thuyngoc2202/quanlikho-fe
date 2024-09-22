@@ -24,6 +24,8 @@
         <div class="relative">
             <a class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 flex items-center justify-between cursor-pointer" 
                (click)="toggleCategoryMenu(); setActiveMenu('categoryManagement')"
+  
+               [routerLink]="['/admin/product-category']"
                [ngClass]="{'bg-gray-700': activeMenu === 'categoryManagement'}"
                >
                 <div class="flex items-center">
@@ -33,12 +35,12 @@
                 <i class="fas" [ngClass]="{'fa-chevron-down': !isCategoryMenuOpen, 'fa-chevron-up': isCategoryMenuOpen}"></i>
             </a>
             <div class="pl-8" *ngIf="isCategoryMenuOpen && !isSidebarCollapsed">
-                <a *ngFor="let category of categories"
-                   (click)="selectCategory(category); setActiveMenu('category-' + category.category_id)"
-                   [routerLink]="['/admin/categories']"
+                <a *ngFor="let productCategory of productCategories"
+                   (click)="selectCategory(productCategory); setActiveMenu('category-' + productCategory.product_category_id)"
+                   [routerLink]="['/admin/product-category']"
                    class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-600"
-                   [ngClass]="{'bg-gray-700': activeMenu === 'category-' + category.category_id}">
-                    {{ category.category_name }}
+                   [ngClass]="{'bg-gray-700': activeMenu === 'category-' + productCategory.product_category_id}">
+                    {{ productCategory.product_name }}
                 </a>
             </div>
         </div>

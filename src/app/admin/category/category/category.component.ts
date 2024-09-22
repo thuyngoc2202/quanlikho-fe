@@ -22,6 +22,8 @@ export class CategoryComponent implements OnInit {
   isConfirmDeletePopupOpen = false;
   showFileUploadPopup = false;
   selectedFile: File | null = null;
+  searchTerm: string = '';
+  filteredCategories: Category[] = [];
 
   constructor(private formBuilder: FormBuilder,
     private adminService: AdminServiceService,
@@ -103,6 +105,7 @@ export class CategoryComponent implements OnInit {
       next: (response: any) => {
         console.log('Category loaded successfully', response.result_data);
         this.categories = response.result_data;
+        this.filteredCategories = this.categories
       },
       error: (error) => {
         console.error('Failed to load category', error);
@@ -172,57 +175,14 @@ export class CategoryComponent implements OnInit {
     }
   }
 
-  onFileSelected(event: any): void {
-    this.selectedFile = event.target.files[0];
-  }
 
-  uploadFile(): void {
-    if (!this.selectedFile) {
-      return;
+  searchCategories() {
+    if (!this.searchTerm) {
+      this.filteredCategories = this.categories;
+    } else {
+      this.filteredCategories = this.categories.filter(category =>
+        category.category_name.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
     }
-
-    const fileReader = new FileReader();
-    fileReader.onload = (e: any) => {
-      const data = new Uint8Array(e.target.result);
-      let categories;
-
-      if (this.selectedFile!.name.endsWith('.xlsx')) {
-        const workbook = XLSX.read(data, { type: 'array' });
-        categories = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-      } else if (this.selectedFile!.name.endsWith('.csv')) {
-        const csvContent = e.target.result;
-        categories = this.parseCSV(csvContent);
-      }
-
-      // if (categories) {
-      //   this.categoryService.importCategories(categories).subscribe(
-      //     response => {
-      //       console.log('Categories imported successfully', response);
-      //       // Thêm xử lý thành công ở đây (ví dụ: hiển thị thông báo, đóng popup)
-      //     },
-      //     error => {
-      //       console.error('Error importing categories', error);
-      //       // Thêm xử lý lỗi ở đây
-      //     }
-      //   );
-      // }
-    };
-
-    fileReader.readAsArrayBuffer(this.selectedFile);
   }
-
-  private parseCSV(content: string): any[] {
-    // Implement CSV parsing logic here
-    // This is a simple example and may need to be adjusted based on your CSV structure
-    const lines = content.split('\n');
-    const headers = lines[0].split(',');
-    return lines.slice(1).map(line => {
-      const values = line.split(',');
-      return headers.reduce((obj, header, index) => {
-        obj[header.trim()] = values[index].trim();
-        return obj;
-      }, {} as any);
-    });
-  }
-
 }

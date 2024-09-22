@@ -18,6 +18,10 @@ import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { RouterModule } from '@angular/router';
+import { ProductCategoryComponent } from './admin/product-category/product-category/product-category.component';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { FormsModule } from '@angular/forms';
+
 
 @NgModule({
   declarations: [
@@ -29,6 +33,7 @@ import { RouterModule } from '@angular/router';
     CategoryComponent,
     LoginComponent,
     RegisterComponent,
+    ProductCategoryComponent,
   ],
   imports: [
     RouterModule,
@@ -37,11 +42,13 @@ import { RouterModule } from '@angular/router';
     HttpClientModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
+    NgSelectModule,
+    FormsModule,
     ToastrModule.forRoot({
       timeOut: 3000,
       positionClass: 'toast-top-right',
       preventDuplicates: true,
-    })
+    }),
   ],
   providers: [
     {

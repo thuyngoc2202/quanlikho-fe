@@ -19,6 +19,7 @@
     "@angular/platform-browser-dynamic": "^14.2.0",
     "@angular/router": "^14.2.0",
     "@auth0/angular-jwt": "^5.2.0",
+    "@ng-select/ng-select": "^9.1.0",
     "ng-angular-popup": "^0.6.2",
     "ngx-toastr": "^14.3.0",
     "rxjs": "~7.5.0",

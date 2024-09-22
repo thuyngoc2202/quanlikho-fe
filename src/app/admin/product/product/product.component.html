@@ -9,7 +9,11 @@
                             Quản lý sản phẩm
                         </h1>
                         <div class="w-full lg:w-1/2 px-4">
-                            <input class="w-full p-2 border rounded" placeholder="Tìm kiếm..." type="text" />
+                            <input class="w-full p-2 border rounded" 
+                                   placeholder="Tìm kiếm..." 
+                                   type="text"
+                                   [(ngModel)]="searchTerm"
+                                   (ngModelChange)="searchProducts()" />
                         </div>
                         <div class="flex flex-col sm:flex-row w-full lg:w-1/4 space-y-2 sm:space-y-0 sm:space-x-2">
                             <button (click)="openFileUploadPopup()"
@@ -35,7 +39,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let product of products" class="text-sm md:text-base">
+                                <tr *ngFor="let product of filteredProducts" class="text-sm md:text-base">
                                     <td class="py-2 px-4 border-b">{{ product.product_id }}</td>
                                     <td class="py-2 px-4 border-b">{{ product.product_name }}</td>
                                     <td class="py-2 px-4 border-b">
@@ -166,7 +170,7 @@
                     <div *ngIf="showFileUploadPopup"
                         class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                         <div class="bg-white p-6 rounded-lg shadow-lg w-[1000px]">
-                            <h2 class="text-lg font-bold mb-4">Nhập danh mục hàng</h2>
+                            <h2 class="text-lg font-bold mb-4">Nhập sản phẩm</h2>
 
                             <div class="mb-4">
                                 <label for="file-upload" class="block text-sm font-medium text-gray-700 mb-2">
@@ -227,8 +231,8 @@
                     </div>
                     <div *ngIf="isConfirmDeletePopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                         <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-                            <h2 class="text-lg font-bold mb-4">Xác nhận sửa danh mục hàng</h2>
-                            <p>Bạn có chắc chắn muốn xoá danh mục hàng này?</p>
+                            <h2 class="text-lg font-bold mb-4">Xác nhận xoá sản phẩm</h2>
+                            <p>Bạn có chắc chắn muốn xoá sản phẩm này?</p>
                             <div class="flex justify-end mt-4">
                                 <button (click)="deleteProduct()" class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded">Có</button>
                                 <button (click)="closeConfirmPopup()" class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Không</button>
