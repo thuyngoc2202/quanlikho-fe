@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpBackend, HttpClient, HttpHeaders } from '@angular/common/http';
 import { User } from '../model/user.model';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +22,16 @@ export class LoginServiceService {
   }
 
   login(user: User) {
-    return this.httpClient.post(`${this.apiUrl}/signin`, user, { headers: this.headers });
+    return this.httpClient.post(`${this.apiUrl}/signin`, user, { headers: this.headers })
+      .pipe(
+        tap((response: any) => {
+          console.log('respónse', response);
+          
+          if (response) {
+            localStorage.setItem('token', response.result_data.token);
+            localStorage.setItem('role', response.result_data.roleId); // 
+          }
+        })
+      );
   }
 }

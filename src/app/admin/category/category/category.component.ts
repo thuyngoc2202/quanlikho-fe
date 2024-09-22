@@ -19,6 +19,7 @@ export class CategoryComponent implements OnInit {
   idCategory: string = '';
   isConfirmUpdatePopupOpen = false;
   isConfirmCreatePopupOpen = false;
+  isConfirmDeletePopupOpen = false;
   showFileUploadPopup = false;
   selectedFile: File | null = null;
 
@@ -48,6 +49,11 @@ export class CategoryComponent implements OnInit {
 
   openUpdateCategoryPopup() {
     this.isUpdatePopupOpen = true;
+  }
+
+  openDeleteCategoryPopup(categoryId: string){
+    this.isConfirmDeletePopupOpen = true;
+    this.idCategory = categoryId;
   }
 
   closePopup() {
@@ -115,6 +121,7 @@ export class CategoryComponent implements OnInit {
         this.loadCategory();
         this.isConfirmUpdatePopupOpen = false;
         this.isUpdatePopupOpen = false;
+        this.idCategory = '';
         this.toastr.success('Sửa loại hàng thành công', 'Thành công');
       },
       error: (error) => {
@@ -125,14 +132,18 @@ export class CategoryComponent implements OnInit {
     });
   }
 
-  deleteCategory(categoryId: string) {
-    this.adminService.deleteCategory(categoryId).subscribe({
+  deleteCategory() {
+    this.adminService.deleteCategory(this.idCategory).subscribe({
       next: (response) => {
         console.log('Category deleted successfully', response);
         this.loadCategory();
+        this.toastr.success('Sửa loại hàng thành công', 'Thành công');
+        this.idCategory = '';
+        this.isConfirmDeletePopupOpen = false;
       },
       error: (error) => {
         console.error('Failed to delete category', error);
+        this.toastr.error(`${error.error.result_data.msg}`, 'Thất bại');
       }
     });
   }
@@ -154,9 +165,10 @@ export class CategoryComponent implements OnInit {
     this.isConfirmCreatePopupOpen = true;
   }
   closeConfirmPopup() {
-    if (this.isConfirmUpdatePopupOpen || this.isConfirmCreatePopupOpen) {
+    if (this.isConfirmUpdatePopupOpen || this.isConfirmCreatePopupOpen || this.isConfirmDeletePopupOpen) {
       this.isConfirmUpdatePopupOpen = false;
-      this.isConfirmCreatePopupOpen = false
+      this.isConfirmCreatePopupOpen = false;
+      this.isConfirmDeletePopupOpen = false;
     }
   }
 
