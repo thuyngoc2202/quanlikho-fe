@@ -60,9 +60,6 @@ export class SidebarComponent implements OnInit {
     console.log('alo');
     this.activeMenuService.clearSelectedCategory();
     this.isCategoryMenuOpen = !this.isCategoryMenuOpen;
-    if (this.isCategoryMenuOpen){
-      this.loadCategory();
-    }
   }
 
 
@@ -85,6 +82,7 @@ export class SidebarComponent implements OnInit {
   selectCategory(productCategory: any) {
     this.setActiveMenu('category-' + productCategory.id);
     this.activeMenuService.setSelectedCategoryId(productCategory.category_id);
+    this.activeMenuService.setSelectedCategoryName(productCategory.category_name);
   }
 
   logout() {

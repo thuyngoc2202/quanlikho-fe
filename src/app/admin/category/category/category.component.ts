@@ -140,7 +140,7 @@ export class CategoryComponent implements OnInit {
       next: (response) => {
         console.log('Category deleted successfully', response);
         this.loadCategory();
-        this.toastr.success('Sửa loại hàng thành công', 'Thành công');
+        this.toastr.success('Xoá danh mục hàng thành công', 'Thành công');
         this.idCategory = '';
         this.isConfirmDeletePopupOpen = false;
       },
@@ -155,7 +155,6 @@ export class CategoryComponent implements OnInit {
   selectCategoryForUpdate(category: Category) {
     this.formProduct.patchValue({
       category_name: category.category_name,
-      category_type: category.category_type,
     });
     this.isUpdatePopupOpen = true; // Mở popup cập nhật
     this.idCategory = category.category_id;

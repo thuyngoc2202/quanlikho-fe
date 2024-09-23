@@ -21,6 +21,7 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
 
   private categorySubscription!: Subscription;
   selectedCategoryId: string | null = '';
+  selectedCategoryName: string | null = '';
   productsCategories: ProductCategory[] = [];
   products: Product[] = [];
   categories: Category[] = [];
@@ -65,6 +66,11 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
         this.loadProductCategoryByCategoryId(categoryId);
       }
     );
+    this.categorySubscription = this.activeMenuService.selectedCategoryName$.subscribe(
+      categoryName => {
+        this.selectedCategoryName = categoryName;
+      }
+    );
   }
 
   ngOnDestroy() {
@@ -84,7 +90,6 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
 
   createForm() {
     this.formProduct = this.formBuilder.group({
-      product_name: ['', Validators.required],
       price: ['', Validators.required],
       quantity: ['', Validators.required],
       min_limit: ['', Validators.required],
@@ -100,7 +105,6 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
     this.resetProductForm();
     this.isUpdatePopupOpen = true;
     this.formProduct.patchValue({
-      product_name: productsCategory.product_name,
       price: productsCategory.price,
       quantity: productsCategory.quantity,
       min_limit: productsCategory.min_limit,

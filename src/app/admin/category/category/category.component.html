@@ -30,32 +30,36 @@
                         </div>
                     </div>
                     
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full bg-white">
-                            <thead>
-                                <tr>
-                                    <th class="py-2 px-4 border-b text-left">ID</th>
-                                    <th class="py-2 px-1 border-b text-left">Tên danh mục hàng</th>
-                                    <th class="py-2 px-4 border-b text-left">Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let category of filteredCategories" class="text-sm md:text-base">
-                                    <td class="py-2 px-4 border-b">{{ category.category_id }}</td>
-                                    <td class="py-2 px-1 border-b">{{ category.category_name }}</td>
-                                    <td class="py-2 px-4 border-b">
-                                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                                            <button class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded w-full sm:w-auto" (click)="selectCategoryForUpdate(category)">
-                                                Sửa
-                                            </button>
-                                            <button class="bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded w-full sm:w-auto" (click)="openDeleteCategoryPopup(category.category_id)">
-                                                Xoá
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div >
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white">
+                                <thead>
+                                    <tr>
+                                        <th class="py-2 px-4 border-b text-left">ID</th>
+                                        <th class="py-2 px-1 border-b text-left">Tên danh mục hàng</th>
+                                        <th class="py-2 px-4 border-b text-left">Ngày cập nhật</th>
+                                        <th class="py-2 px-4 border-b text-left">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let category of filteredCategories; let i = index" class="text-sm md:text-base">
+                                        <td class="py-2 px-4 border-b">{{ i + 1 }}</td>
+                                        <td class="py-2 px-1 border-b">{{ category.category_name }}</td>
+                                        <td class="py-2 px-4 border-b">{{ category.modify_date }}</td>
+                                        <td class="py-2 px-4 border-b">
+                                            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                                                <button class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded w-full sm:w-auto" (click)="selectCategoryForUpdate(category)">
+                                                    Sửa
+                                                </button>
+                                                <button class="bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded w-full sm:w-auto" (click)="openDeleteCategoryPopup(category.category_id)">
+                                                    Xoá
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div *ngIf="isCreatePopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                         <div class="bg-white p-6 rounded-lg shadow-lg w-[800px]">

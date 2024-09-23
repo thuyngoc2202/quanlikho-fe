@@ -24,8 +24,7 @@
         <div class="relative">
             <a class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 flex items-center justify-between cursor-pointer" 
                (click)="toggleCategoryMenu(); setActiveMenu('categoryManagement')"
-  
-               [routerLink]="['/admin/product-category']"
+
                [ngClass]="{'bg-gray-700': activeMenu === 'categoryManagement'}"
                >
                 <div class="flex items-center">
