@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
-import { FormBuilder, FormGroup , Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { Category } from 'src/app/model/category.model';
 import { ProductCategory } from 'src/app/model/product-category.model';
@@ -20,8 +20,7 @@ import { CustomCurrencyPipe } from 'src/app/pipe/custom-currency.pipe';
 export class ProductCategoryComponent implements OnInit, OnDestroy {
 
   private categorySubscription!: Subscription;
-  selectedCategoryId: string | null = null;
-
+  selectedCategoryId: string | null = '';
   productsCategories: ProductCategory[] = [];
   products: Product[] = [];
   categories: Category[] = [];
@@ -46,7 +45,7 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
   filteredProducts: any[] = [];
   filteredCategories: any[] = [];
 
-  filteredProductCategories: any[] = []; 
+  filteredProductCategories: any[] = [];
   searchTerm: string = '';
 
   constructor(private formBuilder: FormBuilder,
@@ -63,11 +62,7 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
     this.categorySubscription = this.activeMenuService.selectedCategoryId$.subscribe(
       categoryId => {
         this.selectedCategoryId = categoryId;
-        if (categoryId !== null) {
-          this.loadProductCategoryByCategoryId(categoryId);
-        } else {
-          this.loadProductCategory();
-        }
+        this.loadProductCategoryByCategoryId(categoryId);
       }
     );
   }
@@ -111,7 +106,7 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
       min_limit: productsCategory.min_limit,
       max_limit: productsCategory.max_limit,
     });
-  
+
     this.idProduct = productsCategory.product_id;
     this.idCategory = productsCategory.category_id;
     this.idProductCategory = productsCategory.product_category_id;
@@ -189,7 +184,7 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
     const productCategorytData = this.formProduct.value;
     productCategorytData.product_id = this.idProduct;
     productCategorytData.category_id = this.idCategory;
-    
+
     console.log('producCategorytData', productCategorytData);
     if (this.formProduct.valid) {
       this.adminService.createProductCategory(productCategorytData).subscribe({
@@ -244,7 +239,7 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
     });
   }
 
-  openDeleteProductPopup(productCategoryId: string){
+  openDeleteProductPopup(productCategoryId: string) {
     this.isConfirmDeletePopupOpen = true;
     this.idProductCategory = productCategoryId;
   }
@@ -275,24 +270,28 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
 
     const formData = new FormData();
     formData.append('file', this.selectedFile);
+    if (this.selectedCategoryId !== null) {
+      console.log('selectedCategoryId', this.selectedCategoryId);
+      this.adminService.importProductCategory(this.selectedCategoryId, formData).subscribe({
+        next: (response) => {
+          console.log('Product imported successfully', response);
+          // Add success handling here (e.g., display a message, close popup)
+          this.loadProductCategoryByCategoryId(this.selectedCategoryId);
+          this.closeFileUploadPopup();
+          this.toastr.success('Nhập File thành công', 'Thành công');
+        },
+        error: (error) => {
+          console.error('Error importing product', error);
+          // Add error handling here
+          this.toastr.error('Nhập File thất bại', 'Thất bại');
 
-    console.log('FormData:', formData);
-    this.adminService.importProduct(formData).subscribe({
-      next: (response) => {
-        console.log('Product imported successfully', response);
-        // Add success handling here (e.g., display a message, close popup)
-        this.closeFileUploadPopup();
-        this.toastr.success('Nhập File thành công', 'Thành công');
-
-      },
-      error: (error) => {
-        console.error('Error importing product', error);
-        // Add error handling here
-        this.toastr.error('Nhập File thất bại', 'Thất bại');
-
-      }
-    });
+        }
+      });
+    } else {
+      this.toastr.error('Chọn danh mục trước khi nhập file', 'Thất bại');
+    }
   }
+
 
   // lấy dữ liệu từ product và category
 
@@ -322,17 +321,21 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadProductCategoryByCategoryId(categoryId: string) {
-    this.adminService.getProductCategoryByCategoryId(categoryId).subscribe({
-      next: (response: any) => {
-        console.log('Product loaded successfully', response.result_data);
-        this.productsCategories = response.result_data;
-        this.filteredProductCategories = this.productsCategories;
-      },
-      error: (error) => {
-        console.error('Failed to load products', error);
-      }
-    });
+  loadProductCategoryByCategoryId(categoryId: string | null) {
+    if (categoryId) {
+      this.adminService.getProductCategoryByCategoryId(categoryId).subscribe({
+        next: (response: any) => {
+          console.log('Product loaded successfully', response.result_data);
+          this.productsCategories = response.result_data;
+          this.filteredProductCategories = this.productsCategories;
+        },
+        error: (error) => {
+          console.error('Failed to load products', error);
+        }
+      });
+    } else {
+      this.loadProductCategory();
+    }
   }
 
   addKeyword(keyword: string) {
@@ -357,14 +360,14 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
 
   filterProducts(event: any) {
     const searchTerm = event.target.value.toLowerCase();
-    this.filteredProducts = this.products.filter(product => 
+    this.filteredProducts = this.products.filter(product =>
       product.product_name.toLowerCase().includes(searchTerm)
     );
   }
 
   filterCategories(event: any) {
     const searchTerm = event.target.value.toLowerCase();
-    this.filteredCategories = this.categories.filter(category => 
+    this.filteredCategories = this.categories.filter(category =>
       category.category_name.toLowerCase().includes(searchTerm)
     );
   }
@@ -383,9 +386,9 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
 
   clearProductSelection() {
     this.selectedProduct = null;
-    this.idProduct='';
+    this.idProduct = '';
   }
-  
+
   clearCategorySelection() {
     this.selectedCategory = null;
     this.idCategory = '';
@@ -396,7 +399,7 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
       this.filteredProductCategories = this.productsCategories;
     } else {
       this.filteredProductCategories = this.productsCategories.filter(category =>
-        category.product_name.toLowerCase().includes(this.searchTerm.toLowerCase()) 
+        category.product_name.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
     }
   }

@@ -102,6 +102,12 @@ export class AdminServiceService {
     return this.httpClient.post(`${this.productApiUrl}/import`, formData)
   }
 
+  importProductCategory(categoryId: string | null, formData: FormData): Observable<any> {
+    console.log('formData', formData);
+
+    return this.httpClient.post(`${this.productCategoryApiUrl}/import/${categoryId}`, formData)
+  }
+
 
 
 

@@ -17,7 +17,7 @@ export class SidebarComponent implements OnInit {
   isDropdownOpen = false;
   isSidebarCollapsed = false;
   isCategoryMenuOpen = true;
-  productCategories : ProductCategory[]=[];
+  categories : Category[]=[];
   selectedCategory: any = null;
   activeMenu: string = '';
 
@@ -71,10 +71,10 @@ export class SidebarComponent implements OnInit {
   }
   
   loadCategory() {
-    this.adminService.getProductCategory().subscribe({
+    this.adminService.getCategory().subscribe({
       next: (response: any) => {
-        console.log('Category loaded successfully', response.result_data);
-        this.productCategories = response.result_data;
+        console.log('Category loaded successfully 123', response.result_data);
+        this.categories = response.result_data;
       },
       error: (error) => {
         console.error('Failed to load category', error);
