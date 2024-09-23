@@ -21,6 +21,8 @@ import { RouterModule } from '@angular/router';
 import { ProductCategoryComponent } from './admin/product-category/product-category/product-category.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
+import { CustomCurrencyPipe } from './pipe/custom-currency.pipe';
+import { PlaceOrderComponent } from './order/place-order/place-order.component';
 
 
 @NgModule({
@@ -34,6 +36,8 @@ import { FormsModule } from '@angular/forms';
     LoginComponent,
     RegisterComponent,
     ProductCategoryComponent,
+    CustomCurrencyPipe,
+    PlaceOrderComponent,
   ],
   imports: [
     RouterModule,

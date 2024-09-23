@@ -9,11 +9,13 @@ import { Observable, of, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import { ActiveMenuService } from '../../../util/active-menu-service';
 import { Subscription } from 'rxjs';
+import { CustomCurrencyPipe } from 'src/app/pipe/custom-currency.pipe';
 
 @Component({
   selector: 'app-product-category',
   templateUrl: './product-category.component.html',
-  styleUrls: ['./product-category.component.css']
+  styleUrls: ['./product-category.component.css'],
+  providers: [CustomCurrencyPipe]
 })
 export class ProductCategoryComponent implements OnInit, OnDestroy {
 

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {  Router } from '@angular/router';
+import { CartService } from 'src/app/util/Cart.service';
 
 @Component({
   selector: 'app-navigation',
@@ -9,10 +10,14 @@ import {  Router } from '@angular/router';
 export class NavigationComponent implements OnInit {
   currentRoute: string = '';
   getCurrentRoute: string = '';
-  constructor(private router: Router) { }
+  cartCount: number = 0;
+  constructor(private router: Router, private cartService: CartService) { }
 
   ngOnInit(): void {
     this.gerRouter();
+    this.cartService.cartCount$.subscribe(count => {
+      this.cartCount = count;
+    });
   }
 
   gerRouter(){
@@ -25,6 +30,9 @@ export class NavigationComponent implements OnInit {
     }
     if (this.getCurrentRoute === '' || this.getCurrentRoute === 'home') {
       this.currentRoute ='DANH MỤC SẢN PHẨM';
+    }
+    if (this.getCurrentRoute === 'cart') {
+      this.currentRoute ='GIỎ HÀNG';
     }
   }
 

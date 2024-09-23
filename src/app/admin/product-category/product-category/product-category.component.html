@@ -34,7 +34,7 @@
                                     <th class="py-2 px-4 border-b text-left">ID</th>
                                     <th class="py-2 px-4 border-b text-left">Tên loại hàng</th>
                                     <th class="py-2 px-4 border-b text-left">Số lượng</th>
-                                    <th class="py-2 px-4 border-b text-left">Giá</th>
+                                    <th class="py-2 px-6 border-b text-left w-32">Giá</th>
                                     <th class="py-2 px-4 border-b text-left">Ngưỡng thấp</th>
                                     <th class="py-2 px-4 border-b text-left">Ngưỡng cao</th>
                                     <th class="py-2 px-4 border-b text-left">Ngày tạo</th>
@@ -46,7 +46,7 @@
                                     <td class="py-2 px-4 border-b">{{ productsCategory.product_id }}</td>
                                     <td class="py-2 px-4 border-b">{{ productsCategory.product_name }}</td>
                                     <td class="py-2 px-4 border-b">{{ productsCategory.quantity }}</td>
-                                    <td class="py-2 px-4 border-b">{{ productsCategory.price }}</td>
+                                    <td class="py-2 px-6 border-b w-32 text-left">{{ productsCategory.price | customCurrency }}</td>
                                     <td class="py-2 px-4 border-b">{{ productsCategory.min_limit }}</td>
                                     <td class="py-2 px-4 border-b">{{ productsCategory.max_limit }}</td>
                                     <td class="py-2 px-4 border-b">{{ productsCategory.create_date }}</td>
