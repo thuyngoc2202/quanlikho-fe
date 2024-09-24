@@ -23,6 +23,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
 import { CustomCurrencyPipe } from './pipe/custom-currency.pipe';
 import { PlaceOrderComponent } from './order/place-order/place-order.component';
+import { CheckoutComponent } from './checkout/checkout/checkout.component';
 
 
 @NgModule({
@@ -38,6 +39,7 @@ import { PlaceOrderComponent } from './order/place-order/place-order.component';
     ProductCategoryComponent,
     CustomCurrencyPipe,
     PlaceOrderComponent,
+    CheckoutComponent,
   ],
   imports: [
     RouterModule,

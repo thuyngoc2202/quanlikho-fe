@@ -16,12 +16,15 @@ import { OrderDetails } from 'src/app/model/cart-detail.model';
 export class IndexComponent implements OnInit {
 
   categories: Category[] = [];
+  activeCategory: any;
   productsCategories: ProductCategory[] = [];
   filteredProductsCategories: any[] = [];
   searchQuery: string = '';
   activeMenu: string = '';
   idCategory: string = '';
+  quantity: number = 1;
   cartCount: number = 0;
+  productQuantities: { [key: string]: number } = {};
 
   constructor(
     private userService: UserServiceService,
@@ -31,51 +34,86 @@ export class IndexComponent implements OnInit {
 
   ngOnInit(): void {
     this.updateCartCount();
-    this.getProductCategory();
     if (this.idCategory) {
       this.getProductCategoryByCategoryId(this.idCategory);
-    } else {
-      this.getProductCategory();
     }
     this.getCategory();
   }
 
   updateCartCount(): void {
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    this.cartCount = cart.length;
+    this.cartCount = cart.reduce((total: number, item: any) => total + (item.quantity || 0), 0);
     this.cartService.updateCartCount(this.cartCount);
+  }
+
+  decreaseQuantity(product: any) {
+    if (!this.productQuantities[product.product_id]) {
+      this.productQuantities[product.product_id] = 0;
+    }
+    if (this.productQuantities[product.product_id] > 0) {
+      this.productQuantities[product.product_id]--;
+    }
+  }
+
+  increaseQuantity(product: any) {
+    if (!this.productQuantities[product.product_id]) {
+      this.productQuantities[product.product_id] = 0;
+    }
+    this.productQuantities[product.product_id]++;
+  }
+
+  onQuantityChange(product: any): void {
+    if (this.productQuantities[product.product_id] === null || 
+        this.productQuantities[product.product_id] === undefined) {
+      this.productQuantities[product.product_id] = 0;
+    } else if (this.productQuantities[product.product_id] < 0) {
+      this.productQuantities[product.product_id] = 0;
+    }
   }
 
   addToCart(product: any): void {
     let orderCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const quantity = this.productQuantities[product.product_id] || 1;
 
-    const orderProduct = orderCart.find((item: any) => item.product_id == product.product_id);
+    const orderProduct = orderCart.find((item: any) => item.product_id === product.product_id);
     if (orderProduct) {
-      orderProduct.quantity += 1;
+      orderProduct.quantity += quantity;
     } else {
       const orderDetail = new OrderDetails();
-      orderDetail.product_id = product.product_id;
+      orderDetail.product_category_id = product.product_category_id;
       orderDetail.product_name = product.product_name;
-      orderDetail.quantity = 1;
+      orderDetail.quantity = quantity;
       orderDetail.price = product.price;
-      orderCart.push(orderDetail)
+      orderDetail.category_id = product.category_id;
+      orderDetail.category_name = product.category_name;
+      orderCart.push(orderDetail);
     }
 
     localStorage.setItem('cart', JSON.stringify(orderCart));
     this.updateCartCount();
+    
+    // Reset quantity after adding to cart
+    this.productQuantities[product.product_id] = 0;
   }
 
+  getQuantity(product: any): number {
+    return this.productQuantities[product.product_id] || 0;
+  }
 
   getProductCategory() {
     this.userService.getProductCategory().subscribe((data: any) => {
       this.productsCategories = data.result_data;
       this.filteredProductsCategories = this.productsCategories
+      
     });
   }
 
   getCategory() {
     this.userService.getCategory().subscribe((data: any) => {
       this.categories = data.result_data;
+      if (this.categories.length > 0) {
+        this.setActiveCategory(this.categories[0]);
+      }
     });
   }
 
@@ -95,6 +133,7 @@ export class IndexComponent implements OnInit {
         console.log('Product loaded successfully', response.result_data);
         this.productsCategories = response.result_data;
         this.filteredProductsCategories = this.productsCategories;
+        console.log('filteredProductsCategories',this.filteredProductsCategories);
       },
       error: (error) => {
         console.error('Failed to load products', error);
@@ -104,6 +143,11 @@ export class IndexComponent implements OnInit {
 
   setActiveMenu(menuItem: string) {
     this.activeMenu = menuItem;
+  }
+  setActiveCategory(category: any): void {
+    this.activeCategory = category;
+    this.activeMenu = category.category_name;
+    this.selectCategory(category);
   }
 
   selectCategory(category: any) {

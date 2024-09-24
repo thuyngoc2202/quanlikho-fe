@@ -7,6 +7,7 @@ import { LoginComponent } from './login/login/login.component';
 import { RegisterComponent } from './register/register/register.component';
 import { ProductCategoryComponent } from './admin/product-category/product-category/product-category.component';
 import { PlaceOrderComponent } from './order/place-order/place-order.component';
+import { CheckoutComponent } from './checkout/checkout/checkout.component';
 
 const routes: Routes = [
   { path: '', component: IndexComponent },
@@ -19,6 +20,7 @@ const routes: Routes = [
   { path: 'admin/product-category', component: ProductCategoryComponent },
   { path: 'admin/product-category/:id', component: ProductCategoryComponent },
   { path: 'cart', component: PlaceOrderComponent },
+  { path: 'checkout', component: CheckoutComponent },
 ];
 
 @NgModule({

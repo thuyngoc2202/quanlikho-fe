@@ -16,13 +16,20 @@ export class ActiveMenuService {
   }
   
   private selectedCategoryIdSource = new BehaviorSubject<string | null>(null);
+  private selectedCategoryNameSource = new BehaviorSubject<string | null>(null);
   selectedCategoryId$ = this.selectedCategoryIdSource.asObservable();
+  selectedCategoryName$ = this.selectedCategoryNameSource.asObservable();
 
   setSelectedCategoryId(categoryId: string) {
     this.selectedCategoryIdSource.next(categoryId);
   }
 
+  setSelectedCategoryName(categoryName: string) {
+    this.selectedCategoryNameSource.next(categoryName);
+  }
+
   clearSelectedCategory() {
     this.selectedCategoryIdSource.next(null);
+    this.selectedCategoryNameSource.next(null);
   }
 }

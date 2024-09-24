@@ -15,12 +15,19 @@
                     <div class="text-red-500 font-bold mr-4">
                         {{ item.price | customCurrency }}
                     </div>
-                    <div class="flex items-center">
-                        <button class="border px-2 py-1" (click)="decreaseQuantity(item)">
+                    <div class="flex items-center space-x-2">
+                        <button (click)="decreaseQuantity(item)"
+                            class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-2 rounded transition duration-300 ease-in-out">
                             -
                         </button>
-                        <input class="w-12 text-center border-t border-b py-1" type="text" [value]="item.quantity" />
-                        <button class="border px-2 py-1" (click)="increaseQuantity(item)">
+                        <input type="number" [ngModel]="getQuantity(item)"
+                            (ngModelChange)="productQuantities[item.product_id] = $event; onQuantityChange(item)"
+                            class="w-12 text-center border rounded py-1 px-1 text-sm" min="0" style="
+                          -moz-appearance: textfield;
+                          appearance: textfield;
+                        "oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                        <button (click)="increaseQuantity(item)"
+                            class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-2 rounded transition duration-300 ease-in-out">
                             +
                         </button>
                     </div>
@@ -33,7 +40,7 @@
                     <label class="block mb-2" for="order-notes">
                         Ghi chú đơn hàng
                     </label>
-                    <textarea class="w-full border p-2 rounded" id="order-notes" rows="3"></textarea>
+                    <textarea [(ngModel)]="orderNotes" (ngModelChange)="updateOrderNotes($event)" name="orderNotes" class="w-full border p-2 rounded" id="order-notes" rows="3"></textarea>
                 </div>
             </div>
             <div class="w-full lg:w-1/3 bg-gray-50 p-4 rounded shadow mt-4 lg:mt-0 lg:ml-4">
@@ -45,39 +52,19 @@
                         {{getTotal() | customCurrency}}
                     </span>
                 </div>
-                <button class="w-full bg-red-500 text-white py-2 rounded font-bold uppercase transition duration-300 ease-in-out hover:bg-red-600" (click)="openModal()">
+                <button
+                    class="w-full bg-red-500 text-white py-2 rounded font-bold uppercase transition duration-300 ease-in-out hover:bg-red-600"
+                    (click)="checkout()">
                     Thanh Toán
                 </button>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Modal -->
-<div *ngIf="isModalOpen" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white p-6 rounded shadow-lg w-96">
-        <h2 class="text-xl font-bold mb-4">Thông tin thanh toán</h2>
-        <form (ngSubmit)="submitOrder()">
-            <div class="mb-4">
-                <label class="block mb-2" for="name">Tên</label>
-                <input class="w-full border p-2 rounded" id="name" [(ngModel)]="orderInfo.name" name="name" required />
-            </div>
-            <div class="mb-4">
-                <label class="block mb-2" for="address">Địa chỉ</label>
-                <input class="w-full border p-2 rounded" id="address" [(ngModel)]="orderInfo.address" name="address" required />
-            </div>
-            <div class="mb-4">
-                <label class="block mb-2" for="email">Email</label>
-                <input class="w-full border p-2 rounded" id="email" [(ngModel)]="orderInfo.email" name="email" type="email" required />
-            </div>
-            <div class="mb-4">
-                <label class="block mb-2" for="phone">Số điện thoại</label>
-                <input class="w-full border p-2 rounded" id="phone" [(ngModel)]="orderInfo.phone" name="phone" type="tel" required />
-            </div>
-            <div class="flex justify-end">
-                <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded mr-2" (click)="closeModal()">Hủy</button>
-                <button type="submit" class="bg-red-500 text-white py-2 px-4 rounded">Xác nhận</button>
-            </div>
-        </form>
-    </div>
-</div>
+<style>
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+  </style>

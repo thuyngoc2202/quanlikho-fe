@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { UserServiceService } from 'src/app/service/user-service.service';
 import { CartService } from 'src/app/util/Cart.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-place-order',
@@ -12,31 +14,52 @@ export class PlaceOrderComponent implements OnInit {
   productCart: any[] = [];
   items: any;
   totalPrice: number = 0;
-  constructor(private cartService: CartService) { }
+  productQuantities: { [key: string]: number } = {};
+  orderNotes: string = '';
+
+  constructor(private cartService: CartService, private userService: UserServiceService, private router: Router) { }
 
   ngOnInit(): void {
     this.cartService.cartCount$.subscribe(count => {
       this.cartCount = count;
     });
-
+    this.updateCartCount();
     this.getProductCart();
+    this.initializeProductQuantities();
+  }
+
+  initializeProductQuantities() {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    this.productQuantities = cart.reduce((quantities: { [key: string]: number }, item: any) => {
+      quantities[item.product_id] = item.quantity;
+      return quantities;
+    }, {});
   }
 
   getProductCart() {
     this.productCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    this.orderNotes = localStorage.getItem('orderNotes') || '';
   }
 
-  decreaseQuantity(item: any) {
-    if (item.quantity > 1) {
-      item.quantity--;
+  decreaseQuantity(product: any) {
+    if (!this.productQuantities[product.product_id]) {
+      this.productQuantities[product.product_id] = 0;
+    }
+    if (this.productQuantities[product.product_id] > 0) {
+      this.productQuantities[product.product_id]--;
       this.updateLocalStorage();
+      this.updateCartCount();
     }
   }
 
-  increaseQuantity(item: any) {
-    item.quantity++;
+  increaseQuantity(product: any) {
+
+    this.productQuantities[product.product_id]++;
     this.updateLocalStorage();
+    this.updateCartCount();
   }
+
+
 
   removeItem(item: any) {
     const index = this.productCart.indexOf(item);
@@ -44,10 +67,43 @@ export class PlaceOrderComponent implements OnInit {
       this.productCart.splice(index, 1);
     }
     this.updateLocalStorage();
+    this.updateCartCount();
+  }
+
+  getQuantity(product: any): number {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const cartItem = cart.find((item: any) => item.product_id === product.product_id);
+    return cartItem ? cartItem.quantity : 0;
+  }
+
+  onQuantityChange(product: any): void {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const cartItem = cart.find((item: any) => item.product_id === product.product_id);
+
+    if (cartItem) {
+      if (product.quantity === null || product.quantity === undefined || product.quantity < 0) {
+        cartItem.quantity = 0;
+      } else {
+        cartItem.quantity = product.quantity;
+      }
+      this.updateLocalStorage();
+      this.updateCartCount();
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
   }
 
   updateLocalStorage() {
-    localStorage.setItem('cart', JSON.stringify(this.productCart));
+    const cart = this.productCart.map(item => ({
+      ...item,
+      quantity: this.productQuantities[item.product_id] || item.quantity
+    }));
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }
+
+  updateCartCount(): void {
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    this.cartCount = cart.reduce((total: number, item: any) => total + (item.quantity || 0), 0);
+    this.cartService.updateCartCount(this.cartCount);
   }
 
   getTotal() {
@@ -58,29 +114,15 @@ export class PlaceOrderComponent implements OnInit {
 
       total += item.price * item.quantity;
     }
+    localStorage.setItem('total', total.toString());
     return total;
   }
-
-  isModalOpen = false;
-  orderInfo = {
-    name: '',
-    address: '',
-    email: '',
-    phone: ''
-  };
-
-  openModal() {
-    this.isModalOpen = true;
+  updateOrderNotes(newNotes: string) {
+    localStorage.setItem('orderNotes', newNotes);
   }
 
-  closeModal() {
-    this.isModalOpen = false;
-  }
-
-  submitOrder() {
-    // Handle order submission logic here
-    console.log('Order Info:', this.orderInfo);
-    this.closeModal();
+  checkout() {
+    this.router.navigate(['/checkout']);
   }
 
 }

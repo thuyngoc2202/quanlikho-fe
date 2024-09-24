@@ -3,7 +3,6 @@ import { HttpBackend, HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product } from '../model/product.model';
 import { Category } from '../model/category.model';
-import { Attribute } from '../model/attribute.model';
 import { map, tap } from 'rxjs/operators';
 import { ProductCategory } from '../model/product-category.model';
 
