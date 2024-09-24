@@ -42,6 +42,7 @@ export class IndexComponent implements OnInit {
       this.getProductCategoryByCategoryId(this.idCategory);
     }
     this.getCategory();
+    this.getTotalQuantity();
   }
 
   updateCartCount(): void {
@@ -51,35 +52,59 @@ export class IndexComponent implements OnInit {
   }
 
   decreaseQuantity(product: any) {
-    if (!this.productQuantities[product.product_id]) {
-      this.productQuantities[product.product_id] = 0;
+    if (!this.productQuantities[product.product_category_id]) {
+      this.productQuantities[product.product_category_id] = 1;
     }
-    if (this.productQuantities[product.product_id] > 0) {
-      this.productQuantities[product.product_id]--;
+    if (this.productQuantities[product.product_category_id] > 1) {
+      this.productQuantities[product.product_category_id]--;
     }
   }
 
   increaseQuantity(product: any) {
-    if (!this.productQuantities[product.product_id]) {
-      this.productQuantities[product.product_id] = 0;
+    if (!this.productQuantities[product.product_category_id]) {
+      this.productQuantities[product.product_category_id] = 1;
     }
-    this.productQuantities[product.product_id]++;
+    this.productQuantities[product.product_category_id]++;
+  }
+
+  handleInputChange(event: Event, item: any): void {
+    const input = event.target as HTMLInputElement;
+    input.value = input.value.replace(/[^0-9]/g, '');
+    
+    if (input.value === '') {
+      input.value = '1';
+    }
+    
+    this.handleQuantityChange(item, input.value);
+  }
+  
+  handleQuantityChange(item: any, value: string): void {
+    let newQuantity = parseInt(value, 10);
+  
+    if (isNaN(newQuantity) || newQuantity < 1) {
+      newQuantity = 1;
+    }
+  
+    this.productQuantities[item.product_category_id] = newQuantity;
+    item.quantity = newQuantity;
+  
+    this.onQuantityChange(item);
   }
 
   onQuantityChange(product: any): void {
-    if (this.productQuantities[product.product_id] === null || 
-        this.productQuantities[product.product_id] === undefined) {
-      this.productQuantities[product.product_id] = 0;
-    } else if (this.productQuantities[product.product_id] < 0) {
-      this.productQuantities[product.product_id] = 0;
+    if (this.productQuantities[product.product_category_id] === null ||
+      this.productQuantities[product.product_category_id] === undefined) {
+      this.productQuantities[product.product_category_id] = 0;
+    } else if (this.productQuantities[product.product_category_id] < 0) {
+      this.productQuantities[product.product_category_id] = 0;
     }
   }
 
   addToCart(product: any): void {
     let orderCart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const quantity = this.productQuantities[product.product_id] || 1;
+    const quantity = this.productQuantities[product.product_category_id] || 1;
 
-    const orderProduct = orderCart.find((item: any) => item.product_id === product.product_id);
+    const orderProduct = orderCart.find((item: any) => item.product_category_id === product.product_category_id);
     if (orderProduct) {
       orderProduct.quantity += quantity;
     } else {
@@ -92,12 +117,12 @@ export class IndexComponent implements OnInit {
       orderDetail.category_name = product.category_name;
       orderCart.push(orderDetail);
     }
-
+    this.getTotalQuantity();
     localStorage.setItem('cart', JSON.stringify(orderCart));
     this.updateCartCount();
-    
+
     // Reset quantity after adding to cart
-    this.productQuantities[product.product_id] = 0;
+    this.productQuantities[product.product_category_id] = 0;
 
     // Hiển thị popup
     this.selectedProduct = product;
@@ -108,14 +133,14 @@ export class IndexComponent implements OnInit {
   }
 
   getQuantity(product: any): number {
-    return this.productQuantities[product.product_id] || 0;
+    return this.productQuantities[product.product_category_id] || 1;
   }
 
   getProductCategory() {
     this.userService.getProductCategory().subscribe((data: any) => {
       this.productsCategories = data.result_data;
       this.filteredProductsCategories = this.productsCategories
-      
+
     });
   }
 
@@ -144,7 +169,7 @@ export class IndexComponent implements OnInit {
         console.log('Product loaded successfully', response.result_data);
         this.productsCategories = response.result_data;
         this.filteredProductsCategories = this.productsCategories;
-        console.log('filteredProductsCategories',this.filteredProductsCategories);
+        console.log('filteredProductsCategories', this.filteredProductsCategories);
       },
       error: (error) => {
         console.error('Failed to load products', error);
@@ -172,6 +197,20 @@ export class IndexComponent implements OnInit {
   }
 
   continueShopping() {
+    this.showPopup = false;
+    this.router.navigate(['/checkout']);
+  }
+
+  getTotalQuantity() {
+    let countItem;
+    this.cartService.cartCount$.subscribe(count => {
+      countItem = count;
+    });
+    return countItem;
+  }
+
+  closePopup(event: MouseEvent) {
+    // Đóng popup
     this.showPopup = false;
   }
 }

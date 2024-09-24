@@ -31,7 +31,7 @@ export class PlaceOrderComponent implements OnInit {
   initializeProductQuantities() {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
     this.productQuantities = cart.reduce((quantities: { [key: string]: number }, item: any) => {
-      quantities[item.product_id] = item.quantity;
+      quantities[item.product_category_id] = item.quantity;
       return quantities;
     }, {});
   }
@@ -42,24 +42,24 @@ export class PlaceOrderComponent implements OnInit {
   }
 
   decreaseQuantity(product: any) {
-    if (!this.productQuantities[product.product_id]) {
-      this.productQuantities[product.product_id] = 0;
+    if (!this.productQuantities[product.product_category_id]) {
+      this.productQuantities[product.product_category_id] = 1;
     }
-    if (this.productQuantities[product.product_id] > 0) {
-      this.productQuantities[product.product_id]--;
+    if (this.productQuantities[product.product_category_id] > 1) {
+      this.productQuantities[product.product_category_id]--;
       this.updateLocalStorage();
       this.updateCartCount();
-    }
+      this.getTotalQuantity();
+    } 
   }
 
   increaseQuantity(product: any) {
 
-    this.productQuantities[product.product_id]++;
+    this.productQuantities[product.product_category_id]++;
     this.updateLocalStorage();
     this.updateCartCount();
+    this.getTotalQuantity();
   }
-
-
 
   removeItem(item: any) {
     const index = this.productCart.indexOf(item);
@@ -68,34 +68,55 @@ export class PlaceOrderComponent implements OnInit {
     }
     this.updateLocalStorage();
     this.updateCartCount();
+    this.getTotalQuantity();
   }
 
   getQuantity(product: any): number {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const cartItem = cart.find((item: any) => item.product_id === product.product_id);
+    const cartItem = cart.find((item: any) => item.product_category_id === product.product_category_id);
     return cartItem ? cartItem.quantity : 0;
+  }
+
+  handleInputChange(event: Event, item: any): void {
+    const input = event.target as HTMLInputElement;
+    input.value = input.value.replace(/[^0-9]/g, '');
+    
+    if (input.value === '') {
+      input.value = '1';
+    }
+    
+    this.handleQuantityChange(item, input.value);
+  }
+
+  handleQuantityChange(item: any, value: string): void {
+    let newQuantity = parseInt(value, 10);
+
+    if (isNaN(newQuantity) || newQuantity < 1) {
+      newQuantity = 1;
+    }
+
+    this.productQuantities[item.product_category_id] = newQuantity;
+    item.quantity = newQuantity;
+
+    this.onQuantityChange(item);
   }
 
   onQuantityChange(product: any): void {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const cartItem = cart.find((item: any) => item.product_id === product.product_id);
+    const cartItem = cart.find((item: any) => item.product_category_id === product.product_category_id);
 
     if (cartItem) {
-      if (product.quantity === null || product.quantity === undefined || product.quantity < 0) {
-        cartItem.quantity = 0;
-      } else {
-        cartItem.quantity = product.quantity;
-      }
+      cartItem.quantity = product.quantity;
       this.updateLocalStorage();
       this.updateCartCount();
-      localStorage.setItem('cart', JSON.stringify(cart));
+      this.getTotalQuantity();
     }
   }
 
   updateLocalStorage() {
     const cart = this.productCart.map(item => ({
       ...item,
-      quantity: this.productQuantities[item.product_id] || item.quantity
+      quantity: this.productQuantities[item.product_category_id] || item.quantity
     }));
     localStorage.setItem('cart', JSON.stringify(cart));
   }

@@ -21,11 +21,11 @@
                             -
                         </button>
                         <input type="number" [ngModel]="getQuantity(item)"
-                            (ngModelChange)="productQuantities[item.product_id] = $event; onQuantityChange(item)"
-                            class="w-12 text-center border rounded py-1 px-1 text-sm" min="0" style="
-                          -moz-appearance: textfield;
-                          appearance: textfield;
-                        "oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                            (ngModelChange)="handleQuantityChange(item, $event)"
+                            class="w-12 text-center border rounded py-1 px-1 text-sm" 
+                            min="1" 
+                            style="-moz-appearance: textfield; appearance: textfield;"
+                            (input)="handleInputChange($event, item)">
                         <button (click)="increaseQuantity(item)"
                             class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-2 rounded transition duration-300 ease-in-out">
                             +
@@ -49,7 +49,7 @@
                         TỔNG CỘNG
                     </span>
                     <span class="text-red-500 font-bold">
-                        {{getTotalQuantity()}}
+                        {{ cartCount}}
                     </span>
                 </div>
                 <button
