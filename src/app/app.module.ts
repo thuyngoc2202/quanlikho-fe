@@ -24,6 +24,7 @@ import { FormsModule } from '@angular/forms';
 import { CustomCurrencyPipe } from './pipe/custom-currency.pipe';
 import { PlaceOrderComponent } from './order/place-order/place-order.component';
 import { CheckoutComponent } from './checkout/checkout/checkout.component';
+import { UnthorizedComponent } from './unauthorized/unthorized/unthorized.component';
 
 
 @NgModule({
@@ -40,6 +41,7 @@ import { CheckoutComponent } from './checkout/checkout/checkout.component';
     CustomCurrencyPipe,
     PlaceOrderComponent,
     CheckoutComponent,
+    UnthorizedComponent,
   ],
   imports: [
     RouterModule,

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import {  Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { CartService } from 'src/app/util/Cart.service';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-navigation',
@@ -11,13 +12,33 @@ export class NavigationComponent implements OnInit {
   currentRoute: string = '';
   getCurrentRoute: string = '';
   cartCount: number = 0;
-  constructor(private router: Router, private cartService: CartService) { }
+  isAdmin: boolean = false;
+  isLoggedIn: boolean = false;
+  userName: string = '';
+
+  constructor(private router: Router, private cartService: CartService, private authService: AuthService) { }
 
   ngOnInit(): void {
     this.gerRouter();
     this.cartService.cartCount$.subscribe(count => {
       this.cartCount = count;
+      this.updateAuthStatus();
     });
+ 
+  }
+
+  updateAuthStatus() {
+    this.isLoggedIn = this.authService.isLoggedIn();
+    if (this.isLoggedIn) {
+      const role = this.authService.getRole();
+      console.log('role', role);
+      this.userName = this.authService.getUserName() || 'nam';
+      this.isAdmin = role === '1';
+    } else {
+      this.isAdmin = false;
+      this.userName = '';
+      this.isLoggedIn = false;
+    }
   }
 
   gerRouter(){
@@ -36,4 +57,9 @@ export class NavigationComponent implements OnInit {
     }
   }
 
+  logout() {
+    this.authService.logout();
+    this.updateAuthStatus();
+    this.router.navigate(['/home']); 
+  }
 }

@@ -38,8 +38,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let product of filteredProducts" class="text-sm md:text-base">
-                                    <td class="py-2 px-4 border-b">{{ product.product_id }}</td>
+                                <tr *ngFor="let product of filteredProducts; let i = index" class="text-sm md:text-base">
+                                    <td class="py-2 px-4 border-b">{{ i + 1 }}</td>
                                     <td class="py-2 px-4 border-b">{{ product.product_name }}</td>
                                     <td class="py-2 px-4 border-b">
                                         <select class="border border-gray-300 rounded px-2 py-1 w-full" 

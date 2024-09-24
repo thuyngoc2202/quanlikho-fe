@@ -3,6 +3,7 @@ import { HttpBackend, HttpClient, HttpHeaders } from '@angular/common/http';
 import { User } from '../model/user.model';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,8 @@ export class LoginServiceService {
   headers = new HttpHeaders({
     'Content-Type': 'application/json'
   });
-  constructor(private backend: HttpBackend) {
+
+  constructor(private backend: HttpBackend, private authService: AuthService) {
     this.httpClient = new HttpClient(backend);
   }
 
@@ -25,11 +27,12 @@ export class LoginServiceService {
     return this.httpClient.post(`${this.apiUrl}/signin`, user, { headers: this.headers })
       .pipe(
         tap((response: any) => {
-          console.log('respónse', response);
+          console.log('response', response);
           
-          if (response) {
-            localStorage.setItem('token', response.result_data.token);
-            localStorage.setItem('role', response.result_data.roleId); // 
+          if (response && response.result_data) {
+            sessionStorage.setItem('token', response.result_data.token);
+            const encodedRole = this.authService.encodeRole(response.result_data.roleId);
+            sessionStorage.setItem('encodedRole', encodedRole);
           }
         })
       );

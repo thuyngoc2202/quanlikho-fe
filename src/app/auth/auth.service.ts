@@ -2,51 +2,51 @@ import { HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(private jwtHelper: JwtHelperService) {}
+  constructor(private jwtHelper: JwtHelperService) { }
   public removeToken() {
     localStorage.removeItem('token');
     localStorage.removeItem('email');
     localStorage.removeItem('user_id');
     localStorage.removeItem('file');
     localStorage.removeItem('user');
-    return localStorage.removeItem('roles');
+    return localStorage.removeItem('role');
   }
-  public getToken(): string {
-    return localStorage.getItem('token') || 'null';
-  }
-
-  public setToken(token: string) {
-    return localStorage.setItem('token', token);
+  logout() {
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('encodedRole');
   }
 
-
-  public setRoles(roles: string) {
-    return localStorage.setItem('roles', roles);
+  public getToken(): string | null {
+    return sessionStorage.getItem('token') || 'null';
   }
 
-  public getRoles() {
-    return JSON.parse(localStorage.getItem('roles') || '[]');
+  public getRole() {
+    const encodedRole = sessionStorage.getItem('encodedRole');
+    return encodedRole ? this.decodeRole(encodedRole) : null;
   }
 
-  public setId(user_id: string) {
-    return localStorage.setItem('user_id', user_id);
+  getUserName() {
+    return sessionStorage.getItem('user');
   }
 
-  public getId() {
-    return localStorage.getItem('user_id') || "";
+  isLoggedIn(): boolean {
+    const token = sessionStorage.getItem('token');
+    console.log('Token in sessionStorage:', token); // Thêm dòng này
+    return !!token;
   }
 
-  public setEmail(email: string) {
-    return localStorage.setItem('email', email);
+  public encodeRole(role: string): string {
+    return btoa(role);
   }
 
-  public getEmail() {
-    return JSON.parse(localStorage.getItem('email') || "");
+  private decodeRole(encodedRole: string): string {
+    return atob(encodedRole);
   }
 
 
