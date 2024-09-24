@@ -19,7 +19,6 @@ export class AddressService {
       tap((data: any) => {
         this.addressData = data;
         this.dataLoaded$.next(true);
-        console.log('Loaded address data:', this.addressData);
       }),
       catchError((error) => {
         console.error('Error loading address data', error);
@@ -62,7 +61,6 @@ export class AddressService {
           
           return of(cities);
         } else {
-          console.log('Address data not loaded yet');
           return of([]);
         }
       })
@@ -83,7 +81,6 @@ export class AddressService {
             }
           }
         }
-        console.log('City data not found or not loaded yet');
         return of([]);
       })
     );
@@ -101,7 +98,6 @@ export class AddressService {
             }
           }
         }
-        console.log('Ward data not found or not loaded yet');
         return of([]);
       })
     );

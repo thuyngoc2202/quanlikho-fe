@@ -40,7 +40,6 @@ export class LoginComponent implements OnInit {
   }
 
   Login() {
-    console.log('alo',this.form);
     
     if (this.form.valid) {
 
@@ -49,7 +48,6 @@ export class LoginComponent implements OnInit {
       
       this.LoginService.login(this.form.value).subscribe({
         next: (response) => {
-          console.log('Login successful', response);
           this.router.navigate(['../home'], { relativeTo: this.route });
           this.loading = false;
         },
@@ -59,7 +57,6 @@ export class LoginComponent implements OnInit {
         }
       });
     } else {
-      console.log('Form is invalid');
     }
   }
 }

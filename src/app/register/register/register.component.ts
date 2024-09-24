@@ -55,11 +55,9 @@ export class RegisterComponent implements OnInit {
       // Thêm cờ để tránh gọi nhiều lần
       if (this.loading) return;
       this.loading = true;
-      console.log('userData', userData);
       
       this.LoginService.register(userData).subscribe({
         next: (response) => {
-          console.log('Registration successful', response);
           this.router.navigate(['../login'], { relativeTo: this.route });
           this.loading = false;
         },
@@ -69,7 +67,6 @@ export class RegisterComponent implements OnInit {
         }
       });
     } else {
-      console.log('Form is invalid');
     }
   }
 }

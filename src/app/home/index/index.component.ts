@@ -166,10 +166,8 @@ export class IndexComponent implements OnInit {
   getProductCategoryByCategoryId(categoryId: string) {
     this.userService.getProductCategoryByCategoryId(categoryId).subscribe({
       next: (response: any) => {
-        console.log('Product loaded successfully', response.result_data);
         this.productsCategories = response.result_data;
         this.filteredProductsCategories = this.productsCategories;
-        console.log('filteredProductsCategories', this.filteredProductsCategories);
       },
       error: (error) => {
         console.error('Failed to load products', error);

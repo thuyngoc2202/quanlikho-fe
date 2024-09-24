@@ -31,7 +31,6 @@ export class NavigationComponent implements OnInit {
     this.isLoggedIn = this.authService.isLoggedIn();
     if (this.isLoggedIn) {
       const role = this.authService.getRole();
-      console.log('role', role);
       this.userName = this.authService.getUserName() || 'nam';
       this.isAdmin = role === '1';
     } else {

@@ -101,7 +101,6 @@ export class ProductComponent implements OnInit {
     if (this.formProduct.valid) {
       this.adminService.createProduct(productData).subscribe({
         next: (response) => {
-          console.log('Product created successfully', response);
           this.isConfirmCreatePopupOpen = false;
           this.isCreatePopupOpen = false;
           this.loadProducts();
@@ -115,7 +114,6 @@ export class ProductComponent implements OnInit {
         }
       });
     } else {
-      console.log('Form is not valid');
       this.isConfirmCreatePopupOpen = false;
       this.toastr.error(`Thiếu trường`, 'Thất bại');
     }
@@ -129,7 +127,6 @@ export class ProductComponent implements OnInit {
     if (this.formProduct.valid) {
       this.adminService.updateProduct(productData).subscribe({
         next: (response) => {
-          console.log('Product updated successfully', response);
           this.isConfirmUpdatePopupOpen = false;
           this.isUpdatePopupOpen = false;
           this.loadProducts();
@@ -143,7 +140,6 @@ export class ProductComponent implements OnInit {
         }
       });
     } else {
-      console.log('Form is not valid');
       this.isConfirmUpdatePopupOpen = false;
       this.toastr.error(`Thiếu trường`, 'Thất bại');
     }
@@ -152,7 +148,6 @@ export class ProductComponent implements OnInit {
   loadProducts() {
     this.adminService.getProduct().subscribe({
       next: (response: any) => {
-        console.log('Products loaded successfully', response.result_data);
         this.products = response.result_data;
         this.filteredProducts = this.products;
       },
@@ -170,7 +165,6 @@ export class ProductComponent implements OnInit {
   deleteProduct() {
     this.adminService.deleteProduct(this.idProduct).subscribe({
       next: (response) => {
-        console.log('Product deleted successfully', response);
         this.loadProducts();
         this.toastr.success('Xóa sản phẩm thành công', 'Thành công');
         this.idProduct = '';
@@ -196,9 +190,7 @@ export class ProductComponent implements OnInit {
     const file = event.target.files[0];
     if (file) {
       this.selectedFile = file;
-      console.log('Selected file:', this.selectedFile);
     } else {
-      console.log('No file selected');
       this.selectedFile = null;
     }
   }
@@ -212,10 +204,8 @@ export class ProductComponent implements OnInit {
     const formData = new FormData();
     formData.append('file', this.selectedFile);
 
-    console.log('FormData:', formData);
     this.adminService.importProduct(formData).subscribe({
       next: (response) => {
-        console.log('Product imported successfully', response);
         this.closeFileUploadPopup();
         this.loadProducts();
         this.toastr.success('Nhập sản phẩm thành công', 'Thành công');
@@ -232,7 +222,6 @@ export class ProductComponent implements OnInit {
     if (keyword && keyword.trim() !== '') {
       this.newKeywords.push(keyword.trim());
     }
-    console.log('newKeywords', this.newKeywords);
   }
 
   removeKeyword(index: number) {

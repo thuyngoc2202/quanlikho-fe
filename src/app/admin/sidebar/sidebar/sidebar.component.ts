@@ -57,7 +57,6 @@ export class SidebarComponent implements OnInit {
   }
 
   toggleCategoryMenu() {
-    console.log('alo');
     this.activeMenuService.clearSelectedCategory();
     this.isCategoryMenuOpen = !this.isCategoryMenuOpen;
   }
@@ -70,7 +69,6 @@ export class SidebarComponent implements OnInit {
   loadCategory() {
     this.adminService.getCategory().subscribe({
       next: (response: any) => {
-        console.log('Category loaded successfully 123', response.result_data);
         this.categories = response.result_data;
       },
       error: (error) => {
@@ -86,7 +84,6 @@ export class SidebarComponent implements OnInit {
   }
 
   logout() {
-    console.log('Logging out...');
     localStorage.clear();
     this.router.navigate(['/login']);
   }

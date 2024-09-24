@@ -34,23 +34,17 @@ export class AdminServiceService {
       .set('Authorization', `Bearer ${this.token}`)
       .set('Content-Type', 'application/json');
 
-    return this.httpClient.post<Product>(`${this.adminProductApiUrl}/create`, product, { headers }).pipe(
-      tap(response => console.log('Create response:', response))
-    );
+    return this.httpClient.post<Product>(`${this.adminProductApiUrl}/create`, product, { headers });
   }
 
   updateProduct(product: Product): Observable<Product> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
-    return this.httpClient.post<Product>(`${this.adminProductApiUrl}/product_update`, product, { headers }).pipe(
-      tap(response => console.log('Create response:', response))
-    );;
+    return this.httpClient.post<Product>(`${this.adminProductApiUrl}/product_update`, product, { headers })
   }
 
   deleteProduct(id: string): Observable<void> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
-    return this.httpClient.delete<void>(`${this.adminProductApiUrl}/delete/${id}`, { headers }).pipe(
-      tap(response => console.log('Create response:', response))
-    );;;
+    return this.httpClient.delete<void>(`${this.adminProductApiUrl}/delete/${id}`, { headers })
   }
 
   createCategory(category: Category): Observable<Category> {
@@ -64,8 +58,7 @@ export class AdminServiceService {
   deleteCategory(id: string): Observable<any> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
 
-    return this.httpClient.delete(`${this.adminApiUrl}/delete/${id}`, { headers }).pipe(
-      tap(response => console.log('Delete response:', response)));
+    return this.httpClient.delete(`${this.adminApiUrl}/delete/${id}`, { headers })
   }
 
   getCategory(): Observable<Category[]> {
@@ -86,9 +79,7 @@ export class AdminServiceService {
 
   deleteProductCategory(id: string): Observable<void> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
-    return this.httpClient.delete<void>(`${this.adminProductCategoryApiUrl}/delete/${id}`, { headers }).pipe(
-      tap(response => console.log('Delete response:', response))
-    );
+    return this.httpClient.delete<void>(`${this.adminProductCategoryApiUrl}/delete/${id}`, { headers });
   }
 
   getProductCategoryByCategoryId(categoryId: string): Observable<ProductCategory[]> {
@@ -96,13 +87,11 @@ export class AdminServiceService {
   }
 
   importProduct(formData: FormData): Observable<any> {
-    console.log('formData', formData);
 
     return this.httpClient.post(`${this.productApiUrl}/import`, formData)
   }
 
   importProductCategory(categoryId: string | null, formData: FormData): Observable<any> {
-    console.log('formData', formData);
 
     return this.httpClient.post(`${this.productCategoryApiUrl}/import/${categoryId}`, formData)
   }

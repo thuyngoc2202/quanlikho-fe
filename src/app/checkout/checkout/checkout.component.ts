@@ -53,7 +53,6 @@ export class CheckoutComponent implements OnInit {
       this.addressService.getDistrictsByCity(this.selectedCity).subscribe(
         (districts: any) => {
           this.districts = districts;
-          console.log(this.districts);
         }
       );
     }
@@ -64,7 +63,6 @@ export class CheckoutComponent implements OnInit {
       this.addressService.getWardsByDistrict(this.selectedCity, this.selectedDistrict).subscribe(
         (wards: any) => {
           this.wards = wards;
-          console.log(this.wards);
         }
       );
     }
@@ -81,7 +79,6 @@ export class CheckoutComponent implements OnInit {
     if (this.cartItems.length > 0) {
       this.userService.placeOrder(this.orderUser).subscribe({
         next: (order: any) => {
-          console.log(order);
           const orderDetails = this.cartItems.map((cartItem: any) => ({
             product_order_id: order.result_data.productOrderId,           
             product_category_id: cartItem.product_category_id,
@@ -96,7 +93,6 @@ export class CheckoutComponent implements OnInit {
 
           this.userService.placeOrderDetail(orderDetailsRequest.orderDetails[0]).subscribe({
             next: (orderDetail: any) => {
-              console.log(orderDetail);
               localStorage.removeItem('cart');
               localStorage.removeItem('orderNotes');
               this.resetForm();

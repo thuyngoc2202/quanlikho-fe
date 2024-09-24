@@ -131,7 +131,6 @@ export class PlaceOrderComponent implements OnInit {
     var total = 0;
     for (var i = 0; i < this.productCart.length; i++) {
       var item = this.productCart[i];
-      console.log(item);
 
       total += item.price * item.quantity;
     }

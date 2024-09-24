@@ -140,12 +140,10 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
     productCategoryData.category_id = this.idCategory;
     productCategoryData.product_category_id = this.idProductCategory;
 
-    console.log('productData', productCategoryData);
 
     if (this.formProduct.valid) {
       this.adminService.updateProductCategory(productCategoryData).subscribe({
         next: (response) => {
-          console.log('Category created successfully', response);
           this.isConfirmUpdatePopupOpen = false;
           this.isUpdatePopupOpen = false;
           this.loadProductCategory();
@@ -154,13 +152,11 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
           this.toastr.success('Sửa sản phẩm thành công', 'Thành công');
         },
         error: (error) => {
-          console.error('Failed to create category', error);
           this.isConfirmCreatePopupOpen = false;
           this.toastr.error(`${error.error.result_data.msg}`, 'Thất bại');
         }
       });
     } else {
-      console.log('form in not valid')
       this.isConfirmCreatePopupOpen = false;
       this.toastr.error(`Thiếu trường`, 'Thất bại');
     }
@@ -189,11 +185,9 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
     productCategorytData.product_id = this.idProduct;
     productCategorytData.category_id = this.idCategory;
 
-    console.log('producCategorytData', productCategorytData);
     if (this.formProduct.valid) {
       this.adminService.createProductCategory(productCategorytData).subscribe({
         next: (response) => {
-          console.log('Category created successfully', response);
           this.isConfirmCreatePopupOpen = false;
           this.isCreatePopupOpen = false;
           this.loadProductCategory();
@@ -208,7 +202,6 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
         }
       });
     } else {
-      console.log('form in not valid')
       this.isConfirmCreatePopupOpen = false;
       this.toastr.error(`Thiếu trường`, 'Thất bại');
     }
@@ -217,7 +210,6 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
   loadProductCategory() {
     this.adminService.getProductCategory().subscribe({
       next: (response: any) => {
-        console.log('Product loaded successfully', response.result_data);
         this.productsCategories = response.result_data;
         this.filteredProductCategories = this.productsCategories;
       },
@@ -230,7 +222,6 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
   deleteProductCategory() {
     this.adminService.deleteProductCategory(this.idProductCategory).subscribe({
       next: (response) => {
-        console.log('Product deleted successfully', response);
         this.loadProductCategory();
         this.toastr.success('Xóa sản phẩm thành công', 'Thành công');
         this.idProductCategory = '';
@@ -260,9 +251,7 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
     const file = event.target.files[0];
     if (file) {
       this.selectedFile = file;
-      console.log('Selected file:', this.selectedFile);
     } else {
-      console.log('No file selected');
       this.selectedFile = null;
     }
   }
@@ -275,10 +264,8 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
     const formData = new FormData();
     formData.append('file', this.selectedFile);
     if (this.selectedCategoryId !== null) {
-      console.log('selectedCategoryId', this.selectedCategoryId);
       this.adminService.importProductCategory(this.selectedCategoryId, formData).subscribe({
         next: (response) => {
-          console.log('Product imported successfully', response);
           // Add success handling here (e.g., display a message, close popup)
           this.loadProductCategoryByCategoryId(this.selectedCategoryId);
           this.closeFileUploadPopup();
@@ -302,7 +289,6 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
   loadProduct() {
     this.adminService.getProduct().subscribe({
       next: (response: any) => {
-        console.log('Products loaded successfully', response.result_data);
         this.products = response.result_data;
         this.filteredProducts = this.products;
       },
@@ -315,7 +301,6 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
   loadCategory() {
     this.adminService.getCategory().subscribe({
       next: (response: any) => {
-        console.log('Category loaded successfully', response.result_data);
         this.categories = response.result_data;
         this.filteredCategories = this.categories;
       },
@@ -329,7 +314,6 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
     if (categoryId) {
       this.adminService.getProductCategoryByCategoryId(categoryId).subscribe({
         next: (response: any) => {
-          console.log('Product loaded successfully', response.result_data);
           this.productsCategories = response.result_data;
           this.filteredProductCategories = this.productsCategories;
         },
@@ -346,7 +330,6 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
     if (keyword && keyword.trim() !== '') {
       this.newKeywords.push(keyword.trim());
     }
-    console.log('newKeywords', this.newKeywords);
 
   }
 

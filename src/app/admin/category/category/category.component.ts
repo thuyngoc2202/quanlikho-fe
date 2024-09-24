@@ -67,12 +67,10 @@ export class CategoryComponent implements OnInit {
   }
 
   addCategory() {
-    console.log(this.formProduct.value);
 
     if (this.formProduct.valid) {
       this.adminService.createCategory(this.formProduct.value).subscribe({
         next: (response) => {
-          console.log('Category created successfully', response);
           this.isConfirmCreatePopupOpen = false;
           this.isCreatePopupOpen = false;
           this.loadCategory();
@@ -86,7 +84,6 @@ export class CategoryComponent implements OnInit {
         }
       });
     } else {
-      console.log('form in not valid')
       this.isConfirmCreatePopupOpen = false;
       this.toastr.error(`Thiếu trường`, 'Thất bại');
     }
@@ -103,7 +100,6 @@ export class CategoryComponent implements OnInit {
   loadCategory() {
     this.adminService.getCategory().subscribe({
       next: (response: any) => {
-        console.log('Category loaded successfully', response.result_data);
         this.categories = response.result_data;
         this.filteredCategories = this.categories
       },
@@ -120,7 +116,6 @@ export class CategoryComponent implements OnInit {
 
     this.adminService.updateCategory(categoryData).subscribe({
       next: (response) => {
-        console.log('Category updated successfully', response);
         this.loadCategory();
         this.isConfirmUpdatePopupOpen = false;
         this.isUpdatePopupOpen = false;
@@ -138,7 +133,6 @@ export class CategoryComponent implements OnInit {
   deleteCategory() {
     this.adminService.deleteCategory(this.idCategory).subscribe({
       next: (response) => {
-        console.log('Category deleted successfully', response);
         this.loadCategory();
         this.toastr.success('Xoá danh mục hàng thành công', 'Thành công');
         this.idCategory = '';

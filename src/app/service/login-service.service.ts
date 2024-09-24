@@ -26,9 +26,7 @@ export class LoginServiceService {
   login(user: User) {
     return this.httpClient.post(`${this.apiUrl}/signin`, user, { headers: this.headers })
       .pipe(
-        tap((response: any) => {
-          console.log('response', response);
-          
+        tap((response: any) => {          
           if (response && response.result_data) {
             sessionStorage.setItem('token', response.result_data.token);
             const encodedRole = this.authService.encodeRole(response.result_data.roleId);

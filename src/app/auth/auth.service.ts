@@ -37,7 +37,6 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     const token = sessionStorage.getItem('token');
-    console.log('Token in sessionStorage:', token); // Thêm dòng này
     return !!token;
   }
 
