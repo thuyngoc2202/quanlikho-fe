@@ -117,6 +117,13 @@ export class PlaceOrderComponent implements OnInit {
     localStorage.setItem('total', total.toString());
     return total;
   }
+  getTotalQuantity(): number {
+    let totalQuantity = 0;
+    for (let item of this.productCart) {
+      totalQuantity += item.quantity;
+    }
+    return totalQuantity;
+  }
   updateOrderNotes(newNotes: string) {
     localStorage.setItem('orderNotes', newNotes);
   }

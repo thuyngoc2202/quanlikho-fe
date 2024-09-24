@@ -6,6 +6,7 @@ import { ActiveMenuService } from 'src/app/util/active-menu-service';
 import { CustomCurrencyPipe } from 'src/app/pipe/custom-currency.pipe';
 import { CartService } from 'src/app/util/Cart.service';
 import { OrderDetails } from 'src/app/model/cart-detail.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-index',
@@ -25,11 +26,14 @@ export class IndexComponent implements OnInit {
   quantity: number = 1;
   cartCount: number = 0;
   productQuantities: { [key: string]: number } = {};
+  showPopup: boolean = false;
+  selectedProduct: any = {};
 
   constructor(
     private userService: UserServiceService,
     private activeMenuService: ActiveMenuService,
-    private cartService: CartService
+    private cartService: CartService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -94,6 +98,13 @@ export class IndexComponent implements OnInit {
     
     // Reset quantity after adding to cart
     this.productQuantities[product.product_id] = 0;
+
+    // Hiển thị popup
+    this.selectedProduct = product;
+    this.selectedProduct.quantity = quantity;
+    this.showPopup = true;
+
+    // Ẩn popup sau 3 giây (tùy chọn)
   }
 
   getQuantity(product: any): number {
@@ -153,5 +164,14 @@ export class IndexComponent implements OnInit {
   selectCategory(category: any) {
     this.idCategory = category.category_id;
     this.getProductCategoryByCategoryId(this.idCategory);
+  }
+
+  goToCart() {
+    this.showPopup = false;
+    this.router.navigate(['/cart']);
+  }
+
+  continueShopping() {
+    this.showPopup = false;
   }
 }
