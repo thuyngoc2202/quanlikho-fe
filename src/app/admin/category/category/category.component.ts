@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Category } from 'src/app/model/category.model';
 import { AdminServiceService } from 'src/app/service/admin-service.service';
 import { ToastrService } from 'ngx-toastr';
-import * as XLSX from 'xlsx';
+
 
 @Component({
   selector: 'app-category',
@@ -101,7 +101,6 @@ export class CategoryComponent implements OnInit {
     this.adminService.getCategory().subscribe({
       next: (response: any) => {
         this.categories = response.result_data;
-        this.filteredCategories = this.categories
       },
       error: (error) => {
         console.error('Failed to load category', error);
@@ -168,14 +167,17 @@ export class CategoryComponent implements OnInit {
     }
   }
 
-
-  searchCategories() {
-    if (!this.searchTerm) {
-      this.filteredCategories = this.categories;
-    } else {
-      this.filteredCategories = this.categories.filter(category =>
-        category.category_name.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
-    }
+  isMatchingSearch(category_name: string): boolean {
+    return this.searchTerm ? category_name.toLowerCase().includes(this.searchTerm.toLowerCase()) : false;
   }
+
+  // searchCategories() {
+  //   if (!this.searchTerm) {
+  //     this.filteredCategories = this.categories;
+  //   } else {
+  //     this.filteredCategories = this.categories.filter(category =>
+  //       category.category_name.toLowerCase().includes(this.searchTerm.toLowerCase())
+  //     );
+  //   }
+  // }
 }

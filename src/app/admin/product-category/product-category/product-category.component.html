@@ -10,7 +10,7 @@
                         </h1>
                         <div class="w-full lg:w-1/2 px-4">
                             <input class="w-full p-2 border rounded" placeholder="Tìm kiếm..." type="text"
-                                [(ngModel)]="searchTerm" (input)="searchProductCategories()" />
+                                [(ngModel)]="searchTerm" />
                         </div>
                         <div class="flex flex-col sm:flex-row w-full lg:w-1/4 space-y-2 sm:space-y-0 sm:space-x-2">
                             <button (click)="openFileUploadPopup()"
@@ -38,10 +38,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let productsCategory of filteredProductCategories; let i = index"
+                                <tr *ngFor="let productsCategory of productsCategories; let i = index"
                                     class="text-sm md:text-base">
                                     <td class="py-2 px-4 border-b">{{ i + 1}}</td>
-                                    <td class="py-2 px-4 border-b">{{ productsCategory.product_name }}</td>
+                                    <td class="py-2 px-4 border-b" [ngClass]="{'highlight': isMatchingSearch(productsCategory.product_name)}">
+                                        {{ productsCategory.product_name }}
+                                    </td>
                                     <td class="py-2 px-4 border-b">{{ productsCategory.quantity }}</td>
                                     <td class="py-2 px-6 border-b w-32 text-left">{{ productsCategory.price |
                                         customCurrency }}</td>
@@ -76,10 +78,12 @@
                                     <label class="block mb-1 text-gray-400">Sản phẩm</label>
                                     <div class="relative">
                                         <input type="text" name="product_id"
-                                            class="border border-gray-300 p-2 w-full rounded pr-8"
+                                            class="border bg-gray-200 border-gray-300 p-2 w-full rounded pr-8"
                                             (focus)="showProductDropdown = true" (input)="filterProducts($event)"
-                                            [value]="selectedProduct?.product_name || ''" />
-                                        <button *ngIf="selectedProduct" (click)="clearProductSelection()"
+                                            [value]="selectedProduct?.product_name || ''"
+                                            [disabled]="!!selectedCategory"
+                                            />
+                                        <button *ngIf="selectedProduct && !selectedCategory" (click)="clearProductSelection()"
                                             class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
                                             &#x2715;
                                         </button>
@@ -99,7 +103,7 @@
                                     <label class="block mb-1 text-gray-400">Danh mục hàng</label>
                                     <div class="relative">
                                         <input type="text" name="category_id"
-                                            class="border border-gray-300 p-2 w-full rounded pr-8"
+                                            class="border bg-gray-200 border-gray-300 p-2 w-full rounded pr-8"
                                             (focus)="showCategoryDropdown = true" (input)="filterCategories($event)"
                                             [value]="selectedCategory?.category_name || ''"
                                             [disabled]="!!selectedCategory" />

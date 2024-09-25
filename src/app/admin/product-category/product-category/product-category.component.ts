@@ -211,7 +211,6 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
     this.adminService.getProductCategory().subscribe({
       next: (response: any) => {
         this.productsCategories = response.result_data;
-        this.filteredProductCategories = this.productsCategories;
       },
       error: (error) => {
         console.error('Failed to load category', error);
@@ -315,7 +314,6 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
       this.adminService.getProductCategoryByCategoryId(categoryId).subscribe({
         next: (response: any) => {
           this.productsCategories = response.result_data;
-          this.filteredProductCategories = this.productsCategories;
         },
         error: (error) => {
           console.error('Failed to load products', error);
@@ -380,14 +378,17 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
     this.selectedCategory = null;
     this.idCategory = '';
   }
-
-  searchProductCategories() {
-    if (!this.searchTerm) {
-      this.filteredProductCategories = this.productsCategories;
-    } else {
-      this.filteredProductCategories = this.productsCategories.filter(category =>
-        category.product_name.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
-    }
+  isMatchingSearch(product_category_name: string): boolean {
+    return this.searchTerm ? product_category_name.toLowerCase().includes(this.searchTerm.toLowerCase()) : false;
   }
+
+  // searchProductCategories() {
+  //   if (!this.searchTerm) {
+  //     this.filteredProductCategories = this.productsCategories;
+  //   } else {
+  //     this.filteredProductCategories = this.productsCategories.filter(category =>
+  //       category.product_name.toLowerCase().includes(this.searchTerm.toLowerCase())
+  //     );
+  //   }
+  // }
 }

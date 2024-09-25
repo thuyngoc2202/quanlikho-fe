@@ -12,8 +12,7 @@
                             <input class="w-full p-2 border rounded" 
                                    placeholder="Tìm kiếm..." 
                                    type="text"
-                                   [(ngModel)]="searchTerm"
-                                   (ngModelChange)="searchProducts()" />
+                                   [(ngModel)]="searchTerm"/>
                         </div>
                         <div class="flex flex-col sm:flex-row w-full lg:w-1/4 space-y-2 sm:space-y-0 sm:space-x-2">
                             <button (click)="openFileUploadPopup()"
@@ -38,9 +37,11 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let product of filteredProducts; let i = index" class="text-sm md:text-base">
+                                <tr *ngFor="let product of products; let i = index" class="text-sm md:text-base">
                                     <td class="py-2 px-4 border-b">{{ i + 1 }}</td>
-                                    <td class="py-2 px-4 border-b">{{ product.product_name }}</td>
+                                    <td class="py-2 px-4 border-b" [ngClass]="{'highlight': isMatchingSearch(product.product_name)}">
+                                        {{ product.product_name }}
+                                    </td>
                                     <td class="py-2 px-4 border-b">
                                         <select class="border border-gray-300 rounded px-2 py-1 w-full" 
                                                 [title]="product.keywords.join(', ')">

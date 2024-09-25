@@ -149,7 +149,6 @@ export class ProductComponent implements OnInit {
     this.adminService.getProduct().subscribe({
       next: (response: any) => {
         this.products = response.result_data;
-        this.filteredProducts = this.products;
       },
       error: (error) => {
         console.error('Failed to load products', error);
@@ -228,14 +227,18 @@ export class ProductComponent implements OnInit {
     this.newKeywords.splice(index, 1);
   }
 
-  // Search Products
-  searchProducts() {
-    if (!this.searchTerm) {
-      this.filteredProducts = this.products;
-    } else {
-      this.filteredProducts = this.products.filter(product =>
-        product.product_name.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
-    }
+  isMatchingSearch(product_name: string): boolean {
+    return this.searchTerm ? product_name.toLowerCase().includes(this.searchTerm.toLowerCase()) : false;
   }
+
+  // Search Products
+  // searchProducts() {
+  //   if (!this.searchTerm) {
+  //     this.filteredProducts = this.products;
+  //   } else {
+  //     this.filteredProducts = this.products.filter(product =>
+  //       product.product_name.toLowerCase().includes(this.searchTerm.toLowerCase())
+  //     );
+  //   }
+  // }
 }
