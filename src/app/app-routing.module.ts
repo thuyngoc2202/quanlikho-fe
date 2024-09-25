@@ -10,6 +10,7 @@ import { PlaceOrderComponent } from './order/place-order/place-order.component';
 import { CheckoutComponent } from './checkout/checkout/checkout.component';
 import { AuthGuard } from './auth/AuthGuard';
 import { UnthorizedComponent } from './unauthorized/unthorized/unthorized.component';
+import { OrderManagementComponent } from './admin/order/order-management/order-management.component';
 
 const routes: Routes = [
   { path: '', component: IndexComponent },
@@ -21,6 +22,7 @@ const routes: Routes = [
   { path: 'admin/categories', component: CategoryComponent, canActivate: [AuthGuard] },
   { path: 'admin/product-category', component: ProductCategoryComponent, canActivate: [AuthGuard] },
   { path: 'admin/product-category/:id', component: ProductCategoryComponent, canActivate: [AuthGuard] },
+  { path: 'admin/order-management', component: OrderManagementComponent, canActivate: [AuthGuard] },
   { path: 'cart', component: PlaceOrderComponent },
   { path: 'checkout', component: CheckoutComponent },
   { path: 'unauthorized', component: UnthorizedComponent },

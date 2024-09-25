@@ -68,3 +68,36 @@ export class PlaceOrderDetail {
     this.subtotal = 0;
   }
 }
+
+export class OrderManagement {
+  id: number;
+  full_name: string;
+  email: string;
+  product_order_id: string;
+  phone_number: string;
+  shipping_address: string;
+  total_amount: number;
+  note: string;
+  order_date: string;
+  status: string;
+  user_id: string;
+  tracking_number: string;
+  product_order_detail_list_responses: PlaceOrderDetail[];
+
+  constructor() {
+
+    this.id = 0;
+    this.full_name = '';
+    this.email = '';
+    this.product_order_id = '';
+    this.phone_number = '';
+    this.shipping_address = '';
+    this.total_amount = 0;
+    this.note = '';
+    this.order_date = '';
+    this.status = '';
+    this.user_id = '';
+    this.tracking_number = '';
+    this.product_order_detail_list_responses = [];
+  }
+}

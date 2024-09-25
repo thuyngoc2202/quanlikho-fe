@@ -5,6 +5,7 @@ import { AdminServiceService } from 'src/app/service/admin-service.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { ActiveMenuService } from '../../../util/active-menu-service';
 import { ProductCategory } from 'src/app/model/product-category.model';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -21,7 +22,7 @@ export class SidebarComponent implements OnInit {
   selectedCategory: any = null;
   activeMenu: string = '';
 
-  constructor(private router: Router, private adminService: AdminServiceService, private activeMenuService: ActiveMenuService) {}
+  constructor(private router: Router, private adminService: AdminServiceService, private activeMenuService: ActiveMenuService, private authService: AuthService) {}
 
   @HostListener('window:resize', ['$event'])
   onResize() {
@@ -84,8 +85,8 @@ export class SidebarComponent implements OnInit {
   }
 
   logout() {
-    localStorage.clear();
-    this.router.navigate(['/login']);
+    this.authService.logout();
+    this.router.navigate(['/home']);
   }
 
   setActiveMenu(menuItem: string) {

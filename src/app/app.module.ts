@@ -25,6 +25,9 @@ import { CustomCurrencyPipe } from './pipe/custom-currency.pipe';
 import { PlaceOrderComponent } from './order/place-order/place-order.component';
 import { CheckoutComponent } from './checkout/checkout/checkout.component';
 import { UnthorizedComponent } from './unauthorized/unthorized/unthorized.component';
+import { OrderManagementComponent } from './admin/order/order-management/order-management.component';
+import { StatusOrderPipe } from './pipe/status-order.pipe';
+import { HighlightPipe } from './pipe/highlight.pipe';
 
 
 @NgModule({
@@ -42,6 +45,9 @@ import { UnthorizedComponent } from './unauthorized/unthorized/unthorized.compon
     PlaceOrderComponent,
     CheckoutComponent,
     UnthorizedComponent,
+    OrderManagementComponent,
+    StatusOrderPipe,
+    HighlightPipe,
   ],
   imports: [
     RouterModule,

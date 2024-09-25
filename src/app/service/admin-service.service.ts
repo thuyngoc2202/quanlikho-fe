@@ -5,6 +5,7 @@ import { Product } from '../model/product.model';
 import { Category } from '../model/category.model';
 import { map, tap } from 'rxjs/operators';
 import { ProductCategory } from '../model/product-category.model';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,9 +17,14 @@ export class AdminServiceService {
   private adminProductApiUrl = 'http://localhost:8083/api/v1/admin/product';
   private productCategoryApiUrl = 'http://localhost:8083/api/v1/un_auth/product_category';
   private adminProductCategoryApiUrl = 'http://localhost:8083/api/v1/admin/product_category';
+  private orderApiUrl = 'http://localhost:8083/api/v1/un_auth/product_order';
+  private adminOrderApiUrl = 'http://localhost:8083/api/v1/admin/product_order';
+  private orderDetailApiUrl = 'http://localhost:8083/api/v1/un_auth/product_order_detail';
+  private orderDetailStatus ='http://localhost:8083/api/v1/un_auth/product_order_status';
+
   private httpClient: HttpClient;
-  token = localStorage.getItem('token');
-  constructor(private backend: HttpBackend) {
+  token = this.authService.getToken();
+  constructor(private backend: HttpBackend, private authService: AuthService) {
     this.httpClient = new HttpClient(backend);
   }
   headers = new HttpHeaders({
@@ -96,6 +102,28 @@ export class AdminServiceService {
     return this.httpClient.post(`${this.productCategoryApiUrl}/import/${categoryId}`, formData)
   }
 
+  getAllOrder(): Observable<any> {
+    return this.httpClient.get<any>(`${this.orderApiUrl}/product_order_list`, { headers: this.headers });
+  }
+
+  getOrderDetail(product_order_id: string): Observable<any> {
+    return this.httpClient.get<any>(`${this.orderApiUrl}/${product_order_id}`, { headers: this.headers });
+  }
+
+  getOrderStatus(product_order_id: string): Observable<any> {
+    return this.httpClient.get<any>(`${this.orderDetailStatus}/${product_order_id}`, { headers: this.headers });
+  }
+
+  updateOrder(order: any): Observable<any> {
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
+
+    return this.httpClient.post<any>(`${this.adminOrderApiUrl}/product_order_update`, order, { headers });
+  }
+
+  deleteOrder(product_order_id: string): Observable<any> {
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
+    return this.httpClient.delete<any>(`${this.adminOrderApiUrl}/delete/${product_order_id}`, { headers });
+  }
 
 
 
