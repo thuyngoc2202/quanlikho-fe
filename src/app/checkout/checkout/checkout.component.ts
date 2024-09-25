@@ -22,6 +22,8 @@ export class CheckoutComponent implements OnInit {
   selectedDistrict: string = '';
   selectedWard: string = '';
   orderNotes: string = '';
+  showSuccessModal: boolean = false;
+
   constructor(private addressService: AddressService, private userService: UserServiceService, private router: Router) { }
 
   ngOnInit() {
@@ -50,28 +52,41 @@ export class CheckoutComponent implements OnInit {
     this.selectedDistrict = '';
     this.selectedWard = '';
     if (this.selectedCity) {
-      this.addressService.getDistrictsByCity(this.selectedCity).subscribe(
-        (districts: any) => {
-          this.districts = districts;
-        }
-      );
+      // Tìm city object dựa trên selectedCity (name)
+      const selectedCityObject = this.cities.find(city => city.name === this.selectedCity);
+      if (selectedCityObject) {
+        this.addressService.getDistrictsByCity(selectedCityObject.id).subscribe(
+          (districts: any) => {
+            this.districts = districts;
+          }
+        );
+      }
     }
   }
 
   onDistrictChange() {
+    this.wards = [];
+    this.selectedWard = '';
     if (this.selectedCity && this.selectedDistrict) {
-      this.addressService.getWardsByDistrict(this.selectedCity, this.selectedDistrict).subscribe(
-        (wards: any) => {
-          this.wards = wards;
-        }
-      );
+      // Tìm city object dựa trên selectedCity (name)
+      const selectedCityObject = this.cities.find(city => city.name === this.selectedCity);
+      // Tìm district object dựa trên selectedDistrict (name)
+      const selectedDistrictObject = this.districts.find(district => district.name.name === this.selectedDistrict);
+      
+      if (selectedCityObject && selectedDistrictObject) {
+        this.addressService.getWardsByDistrict(selectedCityObject.id, selectedDistrictObject.id).subscribe(
+          (wards: any) => {
+            this.wards = wards;
+          }
+        );
+      }
     }
   }
 
   placeOrder() {
     this.orderUser.totalAmount = this.total;
     this.orderUser.note = this.orderNotes;
-    this.orderUser.shipping_address = this.orderUser.shipping_address + ', ' + this.selectedWard + ', ' + this.selectedDistrict + ', ' + this.selectedCity;
+    this.orderUser.shipping_address = this.orderUser.shipping_address + ', Phường ' + this.selectedWard + ', Quận ' + this.selectedDistrict + ', ' + this.selectedCity;
     this.orderUser.full_name = this.orderUser.full_name;
     this.orderUser.email = this.orderUser.email;
     this.orderUser.phone_number = this.orderUser.phone_number;
@@ -84,20 +99,22 @@ export class CheckoutComponent implements OnInit {
             product_category_id: cartItem.product_category_id,
             product_name: cartItem.product_name,
             price: cartItem.price,
+            quantity: cartItem.quantity,
             subtotal: this.total
           }));
 
           const orderDetailsRequest = {
-            orderDetails: orderDetails
+            detail_requests: orderDetails
           };
+          console.log('orderDetailsRequest', orderDetailsRequest);
 
-          this.userService.placeOrderDetail(orderDetailsRequest.orderDetails[0]).subscribe({
+          
+          this.userService.placeOrderDetail(orderDetailsRequest).subscribe({
             next: (orderDetail: any) => {
               localStorage.removeItem('cart');
               localStorage.removeItem('orderNotes');
               this.resetForm();
-
-              // this.router.navigate(['/order-success']);
+              this.showSuccessModal = true;
             },
             error: (error: any) => {
               console.error(error);
@@ -112,6 +129,12 @@ export class CheckoutComponent implements OnInit {
       console.error('No items in cart');
     }
   }
+
+  closeSuccessModal() {
+    this.showSuccessModal = false;
+    this.router.navigate(['/home']);
+  }
+
   resetForm() {
     this.cartItems = [];
     this.total = 0;

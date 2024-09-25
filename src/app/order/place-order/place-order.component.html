@@ -22,8 +22,7 @@
                         </button>
                         <input type="number" [ngModel]="getQuantity(item)"
                             (ngModelChange)="handleQuantityChange(item, $event)"
-                            class="w-12 text-center border rounded py-1 px-1 text-sm" 
-                            min="1" 
+                            class="w-12 text-center border rounded py-1 px-1 text-sm" min="1"
                             style="-moz-appearance: textfield; appearance: textfield;"
                             (input)="handleInputChange($event, item)">
                         <button (click)="increaseQuantity(item)"
@@ -40,7 +39,8 @@
                     <label class="block mb-2" for="order-notes">
                         Ghi chú đơn hàng
                     </label>
-                    <textarea [(ngModel)]="orderNotes" (ngModelChange)="updateOrderNotes($event)" name="orderNotes" class="w-full border p-2 rounded" id="order-notes" rows="3"></textarea>
+                    <textarea [(ngModel)]="orderNotes" (ngModelChange)="updateOrderNotes($event)" name="orderNotes"
+                        class="w-full border p-2 rounded" id="order-notes" rows="3"></textarea>
                 </div>
             </div>
             <div class="w-full lg:w-1/3 bg-gray-50 p-4 rounded shadow mt-4 lg:mt-0 lg:ml-4">
@@ -49,7 +49,7 @@
                         TỔNG CỘNG
                     </span>
                     <span class="text-red-500 font-bold">
-                        {{ cartCount}}
+                        {{ cartCount }} sản phẩm
                     </span>
                 </div>
                 <button
@@ -62,9 +62,9 @@
     </div>
 </div>
 <style>
-    input[type=number]::-webkit-inner-spin-button, 
-    input[type=number]::-webkit-outer-spin-button { 
-      -webkit-appearance: none; 
-      margin: 0; 
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
     }
-  </style>
+</style>

@@ -40,7 +40,6 @@ export class OrderUser {
   shipping_address: string;
   totalAmount: number;
   note: string;
-  orderDetails: PlaceOrderDetail[];
 
   constructor() {
     this.full_name = '';
@@ -49,7 +48,6 @@ export class OrderUser {
     this.shipping_address = '';
     this.totalAmount = 0;
     this.note = '';
-    this.orderDetails = [];
   }
 }
 
@@ -57,6 +55,7 @@ export class PlaceOrderDetail {
   product_order_id: string;
   product_category_id: string;
   product_name: string;
+  quantity: number;
   price: number;
   subtotal: number;
   
@@ -65,6 +64,7 @@ export class PlaceOrderDetail {
     this.product_category_id = '';
     this.product_name = '';
     this.price = 0;
+    this.quantity = 0;
     this.subtotal = 0;
   }
 }

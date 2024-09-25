@@ -31,7 +31,6 @@ export class IndexComponent implements OnInit, OnDestroy {
   selectedProduct: any = {};
   private categorySubscription!: Subscription;
 
-
   constructor(
     private userService: UserServiceService,
     private activeMenuService: ActiveMenuService,
@@ -229,5 +228,27 @@ export class IndexComponent implements OnInit, OnDestroy {
   closePopup(event: MouseEvent) {
     // Đóng popup
     this.showPopup = false;
+  }
+
+  buyNow(product: any) {
+    let orderCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const quantity = this.productQuantities[product.product_category_id] || 1;
+
+    const orderProduct = orderCart.find((item: any) => item.product_category_id === product.product_category_id);
+    if (orderProduct) {
+      orderProduct.quantity += quantity;
+    } else {
+      const orderDetail = new OrderDetails();
+      orderDetail.product_category_id = product.product_category_id;
+      orderDetail.product_name = product.product_name;
+      orderDetail.quantity = quantity;
+      orderDetail.price = product.price;
+      orderDetail.category_id = product.category_id;
+      orderDetail.category_name = product.category_name;
+      orderCart.push(orderDetail);
+    }
+    localStorage.setItem('cart', JSON.stringify(orderCart));
+    // Navigate to checkout
+    this.router.navigate(['/checkout']);
   }
 }

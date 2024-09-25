@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { ProductCategory } from '../model/product-category.model';
 import { HttpBackend, HttpClient, HttpHeaders } from '@angular/common/http';
 import { Category } from '../model/category.model';
-import { Order, PlaceOrderDetail } from '../model/cart-detail.model';
+import { Order, OrderDetails, PlaceOrderDetail } from '../model/cart-detail.model';
 
 @Injectable({
   providedIn: 'root'
@@ -39,8 +39,8 @@ export class UserServiceService {
     return this.httpClient.post<Order>(`${this.orderApiUrl}/create`, order, { headers: this.headers });
   }
   
-  placeOrderDetail(orderDetail: any): Observable<any> {
-    return this.httpClient.post(`${this.orderDetailApiUrl}/create`, orderDetail, { headers: this.headers });
+  placeOrderDetail(orderDetail: any): Observable<PlaceOrderDetail[]> {
+    return this.httpClient.post<PlaceOrderDetail[]>(`${this.orderDetailApiUrl}/create`, orderDetail, { headers: this.headers });
   }
 
 }
