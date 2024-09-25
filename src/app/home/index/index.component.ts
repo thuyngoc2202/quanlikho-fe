@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Category } from 'src/app/model/category.model';
 import { ProductCategory } from 'src/app/model/product-category.model';
 import { UserServiceService } from 'src/app/service/user-service.service';
@@ -7,6 +7,7 @@ import { CustomCurrencyPipe } from 'src/app/pipe/custom-currency.pipe';
 import { CartService } from 'src/app/util/Cart.service';
 import { OrderDetails } from 'src/app/model/cart-detail.model';
 import { Router } from '@angular/router';
+import { retry, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-index',
@@ -14,7 +15,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./index.component.css'],
   providers: [CustomCurrencyPipe]
 })
-export class IndexComponent implements OnInit {
+export class IndexComponent implements OnInit, OnDestroy {
 
   categories: Category[] = [];
   activeCategory: any;
@@ -28,6 +29,8 @@ export class IndexComponent implements OnInit {
   productQuantities: { [key: string]: number } = {};
   showPopup: boolean = false;
   selectedProduct: any = {};
+  private categorySubscription!: Subscription;
+
 
   constructor(
     private userService: UserServiceService,
@@ -39,10 +42,21 @@ export class IndexComponent implements OnInit {
   ngOnInit(): void {
     this.updateCartCount();
     if (this.idCategory) {
-      this.getProductCategoryByCategoryId(this.idCategory);
+      this.loadProductCategoryByCategoryId(this.idCategory);
     }
     this.getCategory();
     this.getTotalQuantity();
+    this.categorySubscription = this.activeMenuService.selectedCategoryId$.subscribe(
+      categoryId => {
+        this.loadProductCategoryByCategoryId(categoryId);
+      }
+    );
+  }
+
+  ngOnDestroy() {
+    if (this.categorySubscription) {
+      this.categorySubscription.unsubscribe();
+    }
   }
 
   updateCartCount(): void {
@@ -70,24 +84,24 @@ export class IndexComponent implements OnInit {
   handleInputChange(event: Event, item: any): void {
     const input = event.target as HTMLInputElement;
     input.value = input.value.replace(/[^0-9]/g, '');
-    
+
     if (input.value === '') {
       input.value = '1';
     }
-    
+
     this.handleQuantityChange(item, input.value);
   }
-  
+
   handleQuantityChange(item: any, value: string): void {
     let newQuantity = parseInt(value, 10);
-  
+
     if (isNaN(newQuantity) || newQuantity < 1) {
       newQuantity = 1;
     }
-  
+
     this.productQuantities[item.product_category_id] = newQuantity;
     item.quantity = newQuantity;
-  
+
     this.onQuantityChange(item);
   }
 
@@ -163,16 +177,21 @@ export class IndexComponent implements OnInit {
     }
   }
 
-  getProductCategoryByCategoryId(categoryId: string) {
-    this.userService.getProductCategoryByCategoryId(categoryId).subscribe({
-      next: (response: any) => {
-        this.productsCategories = response.result_data;
-        this.filteredProductsCategories = this.productsCategories;
-      },
-      error: (error) => {
-        console.error('Failed to load products', error);
-      }
-    });
+  loadProductCategoryByCategoryId(categoryId: string | null) {
+    if (categoryId) {
+      
+      this.userService.getProductCategoryByCategoryId(categoryId).subscribe({
+        next: (response: any) => {
+          this.productsCategories = response.result_data;
+          this.filteredProductsCategories = this.productsCategories;
+        },
+        error: (error) => {
+          console.error('Failed to load products', error);
+        }
+      });
+    } else {
+      return;
+    }
   }
 
   setActiveMenu(menuItem: string) {
@@ -186,7 +205,7 @@ export class IndexComponent implements OnInit {
 
   selectCategory(category: any) {
     this.idCategory = category.category_id;
-    this.getProductCategoryByCategoryId(this.idCategory);
+    this.loadProductCategoryByCategoryId(this.idCategory);
   }
 
   goToCart() {
