@@ -16,7 +16,6 @@ import { LoginServiceService } from './service/login-service.service';
 import { TokenInterceptor } from './auth/token.interceptor';
 import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ToastrModule } from 'ngx-toastr';
 import { RouterModule } from '@angular/router';
 import { ProductCategoryComponent } from './admin/product-category/product-category/product-category.component';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -28,6 +27,15 @@ import { UnthorizedComponent } from './unauthorized/unthorized/unthorized.compon
 import { OrderManagementComponent } from './admin/order/order-management/order-management.component';
 import { StatusOrderPipe } from './pipe/status-order.pipe';
 import { HighlightPipe } from './pipe/highlight.pipe';
+import { ReportComponent } from './admin/report/report/report.component';
+import { ToastrModule } from 'ngx-toastr';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCalendarBody } from '@angular/material/datepicker';
 
 
 @NgModule({
@@ -48,6 +56,8 @@ import { HighlightPipe } from './pipe/highlight.pipe';
     OrderManagementComponent,
     StatusOrderPipe,
     HighlightPipe,
+    ReportComponent
+    
   ],
   imports: [
     RouterModule,
@@ -58,11 +68,13 @@ import { HighlightPipe } from './pipe/highlight.pipe';
     BrowserAnimationsModule,
     NgSelectModule,
     FormsModule,
-    ToastrModule.forRoot({
-      timeOut: 3000,
-      positionClass: 'toast-top-right',
-      preventDuplicates: true,
-    }),
+    ToastrModule.forRoot(),
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
+    MatButtonModule
   ],
   providers: [
     {
@@ -71,7 +83,6 @@ import { HighlightPipe } from './pipe/highlight.pipe';
     { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },
     JwtHelperService,
     LoginServiceService,
-    
   ],
   bootstrap: [AppComponent]
 })

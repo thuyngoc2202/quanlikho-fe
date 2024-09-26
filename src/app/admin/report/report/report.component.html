@@ -1,0 +1,83 @@
+<div class="flex h-screen overflow-hidden">
+    <app-sidebar></app-sidebar>
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
+            <div class="container mx-auto px-6 py-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="flex flex-col lg:flex-row justify-between items-center mb-6 space-y-4 lg:space-y-0">
+                        <h1 class="text-2xl font-bold w-full lg:w-1/4">
+                            Báo cáo và nhập bù
+                        </h1>
+                    </div>
+                    <div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white">
+                                <thead>
+                                    <tr>
+                                        <th class="py-2 px-4 border-b text-left">Tệp báo cáo</th>
+                                        <th class="py-2 px-4 border-b text-left">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="text-sm md:text-base">
+                                        <td class="py-2 px-4 border-b">Xuất file báo cáo</td>
+                                        <td class="py-2 px-4 border-b">
+                                            <button (click)="openExportPopup()"
+                                                class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded w-full sm:w-auto">
+                                                Xuất file
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="text-sm md:text-base">
+                                        <td class="py-2 px-4 border-b">Xuất file nhập bù</td>
+                                        <td class="py-2 px-4 border-b">
+                                            <button
+                                                class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded w-full sm:w-auto">
+                                                Xuất file
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Popup chọn ngày -->
+<div *ngIf="isExportPopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-[665px]"> <!-- Increased max-width -->
+        <h2 class="text-xl font-semibold mb-4 text-gray-800">Xuất file báo cáo</h2>
+        <div class="flex space-x-4">
+            <mat-calendar #startCalendar class="custom-calendar" [(selected)]="startDate"
+                (selectedChange)="onStartDateSelected($event)" [dateClass]="dateClass">
+            </mat-calendar>
+            <mat-calendar #endCalendar class="custom-calendar" [(selected)]="endDate" [startAt]="endDateCalendarStart"
+                (selectedChange)="onEndDateSelected($event)" [dateClass]="dateClass">
+            </mat-calendar>
+        </div>
+        <div class="mt-4 flex justify-between">
+            <div>
+                <span>Từ ngày: {{startDate | date:'dd/MM/yyyy'}}</span>
+                <span class="ml-4">Đến ngày: {{endDate | date:'dd/MM/yyyy'}}</span>
+            </div>
+            <!-- <div>
+                <button mat-button (click)="clearDateRange()">Clear</button>
+                <button mat-raised-button color="primary" (click)="applyDateRange()">Apply</button>
+            </div> -->
+        </div>
+        <div class="flex justify-end space-x-4 mt-4">
+            <button (click)="closeExportPopup()"
+                class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium px-4 py-2 rounded-md transition duration-300 ease-in-out">
+                Hủy
+            </button>
+            <button (click)="exportReport()"
+                class="bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-md transition duration-300 ease-in-out">
+                Xuất file
+            </button>
+        </div>
+    </div>
+</div>

@@ -50,6 +50,13 @@
             <i class="fas fa-list mr-2"></i>
             <span [ngClass]="{'hidden': isSidebarCollapsed}">Quản lý đơn hàng</span>
         </a>
+        <a class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 flex items-center" 
+           (click)="setActiveMenu('report')"
+           [ngClass]="{'bg-gray-700': activeMenu === 'report'}"
+           [routerLink]="['/admin/report']">
+            <i class="fas fa-list mr-2"></i>
+            <span [ngClass]="{'hidden': isSidebarCollapsed}">Báo cáo và nhập bù</span>
+        </a>
     </nav>
     <div class="p-4">
         <div class="relative">

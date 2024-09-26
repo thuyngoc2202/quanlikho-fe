@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpBackend, HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpBackend, HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product } from '../model/product.model';
 import { Category } from '../model/category.model';
@@ -21,6 +21,7 @@ export class AdminServiceService {
   private adminOrderApiUrl = 'http://localhost:8083/api/v1/admin/product_order';
   private orderDetailApiUrl = 'http://localhost:8083/api/v1/un_auth/product_order_detail';
   private orderDetailStatus ='http://localhost:8083/api/v1/un_auth/product_order_status';
+  private reportApiUrl = 'http://localhost:8083/api/v1/un_auth/report';
 
   private httpClient: HttpClient;
   token = this.authService.getToken();
@@ -127,4 +128,14 @@ export class AdminServiceService {
 
 
 
+  getTopSellingProducts(startDate: string, endDate: string): Observable<Blob> {
+    let params = new HttpParams()
+      .set('startDate', startDate)
+      .set('endDate', endDate);
+
+    return this.httpClient.get<Blob>(`${this.reportApiUrl}/top-selling-products`, {
+      params: params,
+      responseType: 'blob' as 'json'
+    });
+  }
 }

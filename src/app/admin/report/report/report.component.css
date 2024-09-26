@@ -1,0 +1,25 @@
+
+.custom-daterangepicker::placeholder {
+    color: #000;
+    opacity: 1;
+}
+
+.custom-daterangepicker::-webkit-input-placeholder {
+    color: #000;
+    opacity: 1;
+}
+
+.custom-daterangepicker::-moz-placeholder {
+    color: #000;
+    opacity: 1;
+}
+.custom-daterangepicker:-ms-input-placeholder {
+    color: #000;
+    opacity: 1;
+}
+
+.custom-daterangepicker:-moz-placeholder {
+    color: #000;
+    opacity: 1;
+}
+

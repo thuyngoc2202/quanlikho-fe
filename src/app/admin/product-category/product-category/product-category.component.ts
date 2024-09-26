@@ -146,7 +146,7 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
         next: (response) => {
           this.isConfirmUpdatePopupOpen = false;
           this.isUpdatePopupOpen = false;
-          this.loadProductCategory();
+          this.loadProductCategoryByCategoryId(this.selectedCategoryId);
           this.createForm();
           this.resetProductForm();
           this.toastr.success('Sửa sản phẩm thành công', 'Thành công');
@@ -190,7 +190,7 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
         next: (response) => {
           this.isConfirmCreatePopupOpen = false;
           this.isCreatePopupOpen = false;
-          this.loadProductCategory();
+          this.loadProductCategoryByCategoryId(this.selectedCategoryId);
           this.createForm();
           this.resetProductForm();
           this.toastr.success('Thêm sản phẩm thành công', 'Thành công');

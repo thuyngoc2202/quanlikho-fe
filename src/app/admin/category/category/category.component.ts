@@ -139,7 +139,7 @@ export class CategoryComponent implements OnInit {
       },
       error: (error) => {
         console.error('Failed to delete category', error);
-        this.toastr.error(`${error.error.result_data.msg}`, 'Thất bại');
+        this.toastr.error(`Xoá danh mục hàng thất bại`, 'Thất bại');
       }
     });
   }

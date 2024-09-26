@@ -1,1 +1,56 @@
 @import 'ngx-toastr/toastr';
+
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+
+.mat-date-range-picker {
+    display: flex !important;
+}
+
+.mat-calendar {
+    width: 300px !important;
+}
+
+.mat-date-range-picker-actions {
+    justify-content: flex-end;
+    padding: 0 8px 8px;
+}
+
+.cdk-overlay-pane {
+    max-width: 650px !important;
+}
+/* Ngày được chọn (bắt đầu và kết thúc của range) */
+.mat-calendar-body-selected {
+    background-color: #3f51b5 !important;
+    color: white !important;
+  }
+  
+  /* Các ngày nằm trong range */
+  .mat-calendar-body-in-range::before {
+    background-color: rgba(63, 81, 181, 0.2);
+  }
+  
+  /* Ngày bắt đầu của range */
+  .mat-calendar-body-range-start:not(.mat-calendar-body-in-comparison-range)::before,
+  .mat-calendar-body-in-range:first-of-type::before {
+    border-top-left-radius: 999px;
+    border-bottom-left-radius: 999px;
+  }
+  
+  /* Ngày kết thúc của range */
+  .mat-calendar-body-range-end:not(.mat-calendar-body-in-comparison-range)::before,
+  .mat-calendar-body-in-range:last-of-type::before {
+    border-top-right-radius: 999px;
+    border-bottom-right-radius: 999px;
+  }
+  
+  /* Hiệu ứng hover cho các ngày trong range */
+  .mat-calendar-body-in-range:not(.mat-calendar-body-disabled):hover > .mat-calendar-body-cell-content {
+    background-color: rgba(63, 81, 181, 0.3);
+  }
+  
+  /* Đảm bảo ngày được chọn luôn hiển thị đúng */
+  .mat-calendar-body-selected.mat-calendar-body-in-range {
+    background-color: #3f51b5 !important;
+    color: white !important;
+  }

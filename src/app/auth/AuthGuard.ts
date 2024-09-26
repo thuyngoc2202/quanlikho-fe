@@ -14,7 +14,7 @@ export class AuthGuard implements CanActivate {
     if (this.authService.getRole()) {
       return true;
     } else {
-      this.router.navigate(['/unauthorized']);
+      this.router.navigate(['/home']);
       return false;
     }
   }
