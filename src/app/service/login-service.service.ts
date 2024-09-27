@@ -4,14 +4,20 @@ import { User } from '../model/user.model';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { AuthService } from '../auth/auth.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoginServiceService {
-  private apiUrl = 'http://localhost:8083/api/v1/un_auth';
+  private readonly API_CONFIG = {
+    auth: {
+      unAuth: `${environment.apiBaseUrl}/un_auth`,
+    }
+  };
+
   private httpClient: HttpClient;
-  headers = new HttpHeaders({
+  private headers = new HttpHeaders({
     'Content-Type': 'application/json'
   });
 
@@ -19,12 +25,12 @@ export class LoginServiceService {
     this.httpClient = new HttpClient(backend);
   }
 
-  register(user: User) {
-    return this.httpClient.post(`${this.apiUrl}/signup/user`, user, { headers: this.headers });
+  register(user: User): Observable<any> {
+    return this.httpClient.post(`${this.API_CONFIG.auth.unAuth}/signup/user`, user, { headers: this.headers });
   }
 
-  login(user: User) {
-    return this.httpClient.post(`${this.apiUrl}/signin`, user, { headers: this.headers })
+  login(user: User): Observable<any> {
+    return this.httpClient.post(`${this.API_CONFIG.auth.unAuth}/signin`, user, { headers: this.headers })
       .pipe(
         tap((response: any) => {          
           if (response && response.result_data) {
