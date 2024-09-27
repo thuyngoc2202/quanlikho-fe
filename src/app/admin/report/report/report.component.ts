@@ -6,11 +6,13 @@ import { MatCalendar, MatDateRangePicker } from '@angular/material/datepicker';
 import { saveAs } from 'file-saver';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { MatCalendarCellCssClasses } from '@angular/material/datepicker';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-report',
   templateUrl: './report.component.html',
-  styleUrls: ['./report.component.css']
+  styleUrls: ['./report.component.css'],
+  providers: [DatePipe]
 })
 export class ReportComponent implements OnInit {
   @ViewChild('picker') picker!: MatDateRangePicker<Date>;
@@ -21,19 +23,35 @@ export class ReportComponent implements OnInit {
   startDate: Date | null = null;
   endDate: Date | null = null;
   endDateCalendarStart: Date | null = null;
-
+  showCalendar = false;
+  tempStartDate: Date | null = null;
+  tempEndDate: Date | null = null;
   private dateClassFunc: (date: Date) => MatCalendarCellCssClasses;
+  
+  isExportBuPopupOpen = false;
+  startDateBu!: Date;
+  endDateBu!: Date;
 
   constructor(
-    private adminService: AdminServiceService, 
+    private adminService: AdminServiceService,
     private toastr: ToastrService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private datePipe: DatePipe
   ) {
     this.dateClassFunc = this.updateDateClass();
   }
 
   ngOnInit() {
     // Không cần gọi updateDateClass() ở đây nữa
+  }
+
+  getDateRangeString(): string {
+    if (this.startDate && this.endDate) {
+      const start = moment(this.startDate).format('DD/MM/YYYY');
+      const end = moment(this.endDate).format('DD/MM/YYYY');
+      return `${start} - ${end}`;
+    }
+    return '';
   }
 
   updateDateClass(): (date: Date) => MatCalendarCellCssClasses {
@@ -77,7 +95,7 @@ export class ReportComponent implements OnInit {
       this.startDate = event;
       this.endDateCalendarStart = new Date(event);
       this.endDateCalendarStart.setMonth(this.endDateCalendarStart.getMonth() + 1);
-      
+
       if (this.endDate && this.endDate < event) {
         this.endDate = null;
       }
@@ -88,11 +106,11 @@ export class ReportComponent implements OnInit {
     this.dateClassFunc = this.updateDateClass();
     this.updateCalendars();
   }
-  
+
   onEndDateSelected(event: Date | null) {
     this.endDate = event;
     console.log('endDate', this.endDate);
-    
+
     this.dateClassFunc = this.updateDateClass();
     this.updateCalendars();
   }
@@ -109,7 +127,7 @@ export class ReportComponent implements OnInit {
 
   applyDateRange() {
     console.log('Date range:', this.startDate, this.endDate);
-    // Implement your logic here
+    this.showCalendar = false;
   }
 
   exportReport() {
@@ -143,4 +161,64 @@ export class ReportComponent implements OnInit {
     }
   }
 
+  toggleCalendar() {
+    this.showCalendar = !this.showCalendar;
+    if (this.showCalendar) {
+      this.tempStartDate = this.startDate;
+      this.tempEndDate = this.endDate;
+    }
+  }
+
+  cancelDateSelection() {
+    this.tempStartDate = this.startDate;
+    this.tempEndDate = this.endDate;
+    this.showCalendar = false;
+  }
+  openExportBuPopup() {
+    this.isExportBuPopupOpen = true;
+    this.initializeBuDates();
+  }
+
+  closeExportBuPopup() {
+    this.isExportBuPopupOpen = false;
+  }
+
+  getDateRangeStringBu(): string {
+    const start = this.datePipe.transform(this.startDateBu, 'dd/MM/yyyy');
+    const end = this.datePipe.transform(this.endDateBu, 'dd/MM/yyyy');
+    return `${start} - ${end}`;
+  }
+
+  exportBuReport() {
+    // Implement the logic to export the "nhập bù" report
+    console.log('Exporting "nhập bù" report...');
+    console.log('Start date:', this.startDateBu);
+    console.log('End date:', this.endDateBu);
+    this.adminService.getBuReport().subscribe({
+      next: (response) => {
+        if (response instanceof Blob) {
+          const contentDisposition = response.type;
+          let fileName = 'report-bu.csv';
+          if (contentDisposition) {
+            const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/i);
+            if (fileNameMatch && fileNameMatch.length === 2)
+              fileName = fileNameMatch[1];
+          }
+          const blob = new Blob([response], { type: 'text/csv' });
+          saveAs(blob, fileName);
+          this.toastr.success('Xuất báo cáo nhập bù thành công', 'Thành công');
+          this.closeExportBuPopup();
+        }
+      },
+      error: (err) => {
+        this.toastr.error('Xuất báo cáo nhập bù thất bại', 'Thất bại');
+      }
+    });
+  }
+
+  initializeBuDates() {
+    this.endDateBu = new Date(); // Today
+    this.startDateBu = new Date(this.endDateBu);
+    this.startDateBu.setMonth(this.startDateBu.getMonth() - 1); // 1 month ago
+  }
 }

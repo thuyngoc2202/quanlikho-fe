@@ -143,4 +143,10 @@ export class AdminServiceService {
       responseType: 'blob' as 'json'
     });
   }
+
+  getBuReport(): Observable<Blob> {
+    return this.httpClient.get<Blob>(`${this.API_CONFIG.report}/restock-product-category`, {
+      responseType: 'blob' as 'json'
+    });
+  }
 }
