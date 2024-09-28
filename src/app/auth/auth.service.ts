@@ -18,25 +18,25 @@ export class AuthService {
     return localStorage.removeItem('role');
   }
   logout() {
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('encodedRole');
+    localStorage.removeItem('token');
+    localStorage.removeItem('encodedRole');
   }
 
   public getToken(): string | null {
-    return sessionStorage.getItem('token') || 'null';
+    return localStorage.getItem('token') || 'null';
   }
 
   public getRole() {
-    const encodedRole = sessionStorage.getItem('encodedRole');
+    const encodedRole = localStorage.getItem('encodedRole');
     return encodedRole ? this.decodeRole(encodedRole) : null;
   }
 
   getUserName() {
-    return sessionStorage.getItem('user');
+    return localStorage.getItem('username');
   }
 
   isLoggedIn(): boolean {
-    const token = sessionStorage.getItem('token');
+    const token = localStorage.getItem('token');
     return !!token;
   }
 

@@ -36,6 +36,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCalendarBody } from '@angular/material/datepicker';
+import { PriceDisplayPipe } from './pipe/price-display-pipe.pipe';
 
 
 @NgModule({
@@ -56,8 +57,8 @@ import { MatCalendarBody } from '@angular/material/datepicker';
     OrderManagementComponent,
     StatusOrderPipe,
     HighlightPipe,
-    ReportComponent
-    
+    ReportComponent,
+    PriceDisplayPipe
   ],
   imports: [
     RouterModule,

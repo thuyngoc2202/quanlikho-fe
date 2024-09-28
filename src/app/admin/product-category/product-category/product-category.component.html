@@ -28,26 +28,26 @@
                         <table class="min-w-full bg-white">
                             <thead>
                                 <tr>
-                                    <th class="py-2 px-4 border-b text-left w-16">ID</th>
-                                    <th class="py-2 px-4 border-b text-left w-1/4">Tên loại hàng</th>
-                                    <th class="py-2 px-4 border-b text-left w-24">Số lượng</th>
-                                    <th class="py-2 px-6 border-b text-left w-32">Giá</th>
-                                    <th class="py-2 px-4 border-b text-left w-28">Ngưỡng thấp</th>
-                                    <th class="py-2 px-4 border-b text-left w-28">Ngưỡng cao</th>
-                                    <th class="py-2 px-4 border-b text-left w-40">Ngày cập nhật</th>
+                                    <th class="py-1 px-4 border-b text-left w-16">ID</th>
+                                    <th class="py-1 px-4 border-b text-left w-1/4">Tên loại hàng</th>
+                                    <th class="py-1 px-4 border-b text-left w-24">Số lượng</th>
+                                    <th class="py-1 px-6 border-b text-left w-32">Giá</th>
+                                    <th class="py-1 px-4 border-b text-left w-28">Ngưỡng thấp</th>
+                                    <th class="py-1 px-4 border-b text-left w-28">Ngưỡng cao</th>
+                                    <th class="py-1 px-4 border-b text-left w-52">Ngày cập nhật</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let productsCategory of productsCategories; let i = index" class="text-sm md:text-base"
                                     [ngClass]="{'highlight': isMatchingSearch(productsCategory.product_name)}">
-                                    <td class="py-2 px-4 border-b text-left w-16">{{ i + 1}}</td>
-                                    <td class="py-2 px-4 border-b text-left w-1/4">{{ productsCategory.product_name }}</td>
-                                    <td class="py-2 px-4 border-b text-left w-24">{{ productsCategory.quantity }}</td>
-                                    <td class="py-2 px-6 border-b text-left w-32">{{ productsCategory.price | customCurrency }}</td>
-                                    <td class="py-2 px-4 border-b text-left w-28">{{ productsCategory.min_limit }}</td>
-                                    <td class="py-2 px-4 border-b text-left w-28">{{ productsCategory.max_limit }}</td>
-                                    <td class="py-2 px-4 border-b text-left w-40">{{ productsCategory.modify_date | date:'dd/MM/yyyy HH:mm' }}</td>
-                                    <td class="py-2 px-4 border-b">
+                                    <td class="py-1 px-4 border-b text-left w-16">{{ i + 1}}</td>
+                                    <td class="py-1 px-4 border-b text-left w-1/4">{{ productsCategory.product_name }}</td>
+                                    <td class="py-1 px-4 border-b text-left w-24">{{ productsCategory.quantity }}</td>
+                                    <td class="py-1 px-6 border-b text-left w-32">{{ productsCategory.price | customCurrency }}</td>
+                                    <td class="py-1 px-4 border-b text-left w-28">{{ productsCategory.min_limit }}</td>
+                                    <td class="py-1 px-4 border-b text-left w-28">{{ productsCategory.max_limit }}</td>
+                                    <td class="py-1 px-4 border-b text-left w-52">{{ productsCategory.modify_date | date:'dd/MM/yyyy HH:mm' }}</td>
+                                    <td class="py-1 px-4 border-b">
                                         <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                                             <button
                                                 class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded w-full sm:w-auto"
@@ -274,6 +274,35 @@
                         </div>
                     </div>
 
+                    <!-- New Products Popup -->
+                    <div *ngIf="showNewProductsPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl">
+                            <h2 class="text-xl font-semibold mb-4">Sản phẩm mới chưa có trong danh sách sản phẩm</h2>
+                            <div class="max-h-96 overflow-y-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr>
+                                            <th class="px-4 py-2 text-left">#</th>
+                                            <th class="px-4 py-2 text-left">Tên sản phẩm</th>
+                                            <!-- Add more headers as needed -->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let product of newProducts; let i = index">
+                                            <td class="px-4 py-2">{{ i + 1 }}</td>
+                                            <td class="px-4 py-2">{{ product }}</td>
+                                            <!-- Add more cells as needed -->
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-4 flex justify-end">
+                                <button (click)="closeNewProductsPopup()" class="bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-md transition duration-300 ease-in-out">
+                                    Đóng
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Popup xác nhận -->
                     <div *ngIf="isConfirmUpdatePopupOpen"
                         class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">

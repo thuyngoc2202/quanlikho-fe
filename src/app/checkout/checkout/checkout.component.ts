@@ -113,7 +113,7 @@ export class CheckoutComponent implements OnInit {
             next: (orderDetail: any) => {
               localStorage.removeItem('cart');
               localStorage.removeItem('orderNotes');
-              this.resetForm();
+
               this.showSuccessModal = true;
             },
             error: (error: any) => {
@@ -131,6 +131,7 @@ export class CheckoutComponent implements OnInit {
   }
 
   closeSuccessModal() {
+    this.resetForm();
     this.showSuccessModal = false;
     this.router.navigate(['/home']);
   }

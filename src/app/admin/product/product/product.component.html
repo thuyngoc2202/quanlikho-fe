@@ -9,10 +9,8 @@
                             Quản lý sản phẩm
                         </h1>
                         <div class="w-full lg:w-1/2 px-4">
-                            <input class="w-full p-2 border rounded" 
-                                   placeholder="Tìm kiếm..." 
-                                   type="text"
-                                   [(ngModel)]="searchTerm"/>
+                            <input class="w-full p-2 border rounded" placeholder="Tìm kiếm..." type="text"
+                                [(ngModel)]="searchTerm" (input)="onSearch($event)" />
                         </div>
                         <div class="flex flex-col sm:flex-row w-full lg:w-1/4 space-y-2 sm:space-y-0 sm:space-x-2">
                             <button (click)="openFileUploadPopup()"
@@ -32,19 +30,20 @@
                                 <tr>
                                     <th class="py-2 px-4 border-b text-left">ID</th>
                                     <th class="py-2 px-4 border-b text-left">Tên sản phẩm</th>
-                                    <th class="py-2 px-4 border-b text-left">Từ khoá</th>
+                                    <th class="py-2 px-4 border-b text-left">Keyword</th>
                                     <th class="py-2 px-4 border-b text-left">Ngày cập nhật</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let product of products; let i = index" class="text-sm md:text-base">
+                                <tr *ngFor="let product of products; let i = index" class="text-sm md:text-base"
+                                    [ngClass]="{'highlight': isMatchingSearch(product)}">
                                     <td class="py-2 px-4 border-b">{{ i + 1 }}</td>
-                                    <td class="py-2 px-4 border-b" [ngClass]="{'highlight': isMatchingSearch(product.product_name)}">
+                                    <td class="py-2 px-4 border-b ">
                                         {{ product.product_name }}
                                     </td>
-                                    <td class="py-2 px-4 border-b">
-                                        <select class="border border-gray-300 rounded px-2 py-1 w-full" 
-                                                [title]="product.keywords.join(', ')">
+                                    <td class="py-2 px-4 border-b  product-keywords">
+                                        <select class="border border-gray-300 rounded px-2 py-1 w-full product-keywords"
+                                            [title]="product.keywords.join(', ')">
                                             <option *ngFor="let keyword of product.keywords" [value]="keyword">
                                                 {{ keyword }}
                                             </option>
@@ -83,7 +82,7 @@
                                 </div>
                                 <div class="col-span-2">
                                     <label class="block mb-1 text-gray-400">Từ khóa</label>
-                                    
+
                                     <div class="flex mb-2">
                                         <input type="text" #newKeywordInput
                                             (keyup.enter)="addKeyword(newKeywordInput.value); newKeywordInput.value = ''"
@@ -131,7 +130,7 @@
                                 </div>
                                 <div class="col-span-2">
                                     <label class="block mb-1 text-gray-400">Từ khóa</label>
-                                    
+
                                     <div class="flex mb-2">
                                         <input type="text" #newKeywordInput
                                             (keyup.enter)="addKeyword(newKeywordInput.value); newKeywordInput.value = ''"
@@ -228,13 +227,16 @@
                             </div>
                         </div>
                     </div>
-                    <div *ngIf="isConfirmDeletePopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div *ngIf="isConfirmDeletePopupOpen"
+                        class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                         <div class="bg-white p-6 rounded-lg shadow-lg w-96">
                             <h2 class="text-lg font-bold mb-4">Xác nhận xoá sản phẩm</h2>
                             <p>Bạn có chắc chắn muốn xoá sản phẩm này?</p>
                             <div class="flex justify-end mt-4">
-                                <button (click)="deleteProduct()" class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded">Có</button>
-                                <button (click)="closeConfirmPopup()" class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Không</button>
+                                <button (click)="deleteProduct()"
+                                    class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded">Có</button>
+                                <button (click)="closeConfirmPopup()"
+                                    class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Không</button>
                             </div>
                         </div>
                     </div>

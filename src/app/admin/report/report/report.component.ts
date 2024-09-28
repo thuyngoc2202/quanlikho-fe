@@ -140,7 +140,7 @@ export class ReportComponent implements OnInit {
         next: (response) => {
           if (response instanceof Blob) {
             const contentDisposition = response.type;
-            let fileName = 'report.csv';
+            let fileName = `Báo cáo bán hàng ${formattedStartDate} ${formattedEndDate}.csv`;
             if (contentDisposition) {
               const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/i);
               if (fileNameMatch && fileNameMatch.length === 2)
@@ -198,7 +198,7 @@ export class ReportComponent implements OnInit {
       next: (response) => {
         if (response instanceof Blob) {
           const contentDisposition = response.type;
-          let fileName = 'report-bu.csv';
+          let fileName = 'Nhập bù Hàng.csv';
           if (contentDisposition) {
             const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/i);
             if (fileNameMatch && fileNameMatch.length === 2)

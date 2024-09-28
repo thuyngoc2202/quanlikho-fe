@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { SelectedCategoryService } from 'src/app/util/categoryService';
 import { Category } from 'src/app/model/category.model';
 import { ProductCategory } from 'src/app/model/product-category.model';
 import { UserServiceService } from 'src/app/service/user-service.service';
@@ -8,12 +9,13 @@ import { CartService } from 'src/app/util/Cart.service';
 import { OrderDetails } from 'src/app/model/cart-detail.model';
 import { Router } from '@angular/router';
 import { retry, Subscription } from 'rxjs';
+import { PriceDisplayPipe } from 'src/app/pipe/price-display-pipe.pipe';
 
 @Component({
   selector: 'app-index',
   templateUrl: './index.component.html',
   styleUrls: ['./index.component.css'],
-  providers: [CustomCurrencyPipe]
+  providers: [CustomCurrencyPipe, PriceDisplayPipe]
 })
 export class IndexComponent implements OnInit, OnDestroy {
 
@@ -35,7 +37,8 @@ export class IndexComponent implements OnInit, OnDestroy {
     private userService: UserServiceService,
     private activeMenuService: ActiveMenuService,
     private cartService: CartService,
-    private router: Router
+    private router: Router,
+    private sltCategory: SelectedCategoryService
   ) { }
 
   ngOnInit(): void {
@@ -50,7 +53,13 @@ export class IndexComponent implements OnInit, OnDestroy {
         this.loadProductCategoryByCategoryId(categoryId);
       }
     );
+    this.categorySubscription = this.sltCategory.selectedCategory$.subscribe(category => {
+      if (category) {
+        this.setActiveCategory(category);
+      }
+    });
   }
+
 
   ngOnDestroy() {
     if (this.categorySubscription) {
@@ -160,8 +169,9 @@ export class IndexComponent implements OnInit, OnDestroy {
   getCategory() {
     this.userService.getCategory().subscribe((data: any) => {
       this.categories = data.result_data;
-      if (this.categories.length > 0) {
-        this.setActiveCategory(this.categories[0]);
+
+      if ((this.router.url === '/home' || this.router.url === '/') && !this.sltCategory.hasSelectedCategory() && this.categories.length > 0) {
+        this.selectCategory(this.categories[0]);
       }
     });
   }
@@ -178,7 +188,7 @@ export class IndexComponent implements OnInit, OnDestroy {
 
   loadProductCategoryByCategoryId(categoryId: string | null) {
     if (categoryId) {
-      
+
       this.userService.getProductCategoryByCategoryId(categoryId).subscribe({
         next: (response: any) => {
           this.productsCategories = response.result_data;
@@ -199,12 +209,14 @@ export class IndexComponent implements OnInit, OnDestroy {
   setActiveCategory(category: any): void {
     this.activeCategory = category;
     this.activeMenu = category.category_name;
-    this.selectCategory(category);
+    this.idCategory = category.category_id;
+    this.loadProductCategoryByCategoryId(this.idCategory);
   }
 
   selectCategory(category: any) {
-    this.idCategory = category.category_id;
-    this.loadProductCategoryByCategoryId(this.idCategory);
+    if (this.activeCategory?.category_id !== category.category_id) {
+      this.sltCategory.setSelectedCategory(category);
+    }
   }
 
   goToCart() {

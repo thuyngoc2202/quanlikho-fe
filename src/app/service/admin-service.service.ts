@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpBackend, HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject, tap } from 'rxjs';
 import { Product } from '../model/product.model';
 import { Category } from '../model/category.model';
 import { ProductCategory } from '../model/product-category.model';
@@ -43,6 +43,14 @@ export class AdminServiceService {
     'Content-Type': 'application/json'
   });
 
+  private dataChangedSubject = new Subject<void>();
+
+  dataChanged$ = this.dataChangedSubject.asObservable();
+
+  notifyDataChanged() {
+    this.dataChangedSubject.next();
+  }
+
   getProduct(): Observable<Product[]> {
     return this.httpClient.get<Product[]>(`${this.API_CONFIG.product.unAuth}/product_list`);
   }
@@ -66,16 +74,25 @@ export class AdminServiceService {
   }
 
   createCategory(category: Category): Observable<Category> {
-    return this.httpClient.post<Category>(`${this.API_CONFIG.category.unAuth}/category_create`, category, { headers: this.headers });
+    return this.httpClient.post<Category>(`${this.API_CONFIG.category.unAuth}/category_create`, category, { headers: this.headers })
+      .pipe(
+        tap(() => this.notifyDataChanged())
+      );
   }
 
   updateCategory(category: Category): Observable<Category> {
-    return this.httpClient.post<Category>(`${this.API_CONFIG.category.unAuth}/category_update`, category, { headers: this.headers });
+    return this.httpClient.post<Category>(`${this.API_CONFIG.category.unAuth}/category_update`, category, { headers: this.headers })
+    .pipe(
+      tap(() => this.notifyDataChanged())
+    );
   }
 
   deleteCategory(id: string): Observable<any> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
-    return this.httpClient.delete(`${this.API_CONFIG.category.admin}/delete/${id}`, { headers });
+    return this.httpClient.delete(`${this.API_CONFIG.category.admin}/delete/${id}`, { headers })
+      .pipe(
+        tap(() => this.notifyDataChanged())
+      );
   }
 
   getCategory(): Observable<Category[]> {
@@ -87,11 +104,17 @@ export class AdminServiceService {
   }
 
   createProductCategory(productCategory: ProductCategory): Observable<ProductCategory> {
-    return this.httpClient.post<ProductCategory>(`${this.API_CONFIG.productCategory.unAuth}/create`, productCategory, { headers: this.headers });
+    return this.httpClient.post<ProductCategory>(`${this.API_CONFIG.productCategory.unAuth}/create`, productCategory, { headers: this.headers })
+      .pipe(
+        tap(() => this.notifyDataChanged())
+      );
   }
 
   updateProductCategory(productCategory: ProductCategory): Observable<ProductCategory> {
-    return this.httpClient.post<ProductCategory>(`${this.API_CONFIG.productCategory.unAuth}/update`, productCategory, { headers: this.headers });
+    return this.httpClient.post<ProductCategory>(`${this.API_CONFIG.productCategory.unAuth}/update`, productCategory, { headers: this.headers })
+      .pipe(
+        tap(() => this.notifyDataChanged())
+      );
   }
 
   deleteProductCategory(id: string): Observable<void> {

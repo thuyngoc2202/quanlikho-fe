@@ -7,9 +7,9 @@ import { Product } from 'src/app/model/product.model';
 import { AdminServiceService } from 'src/app/service/admin-service.service';
 import { Observable, of, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
-import { ActiveMenuService } from '../../../util/active-menu-service';
 import { Subscription } from 'rxjs';
 import { CustomCurrencyPipe } from 'src/app/pipe/custom-currency.pipe';
+import { ActiveCategoryService } from 'src/app/util/active-category-service';
 
 @Component({
   selector: 'app-product-category',
@@ -19,8 +19,9 @@ import { CustomCurrencyPipe } from 'src/app/pipe/custom-currency.pipe';
 })
 export class ProductCategoryComponent implements OnInit, OnDestroy {
 
-  private categorySubscription!: Subscription;
-  selectedCategoryId: string | null = '';
+  categoryIdSubscription: Subscription | undefined;
+  categoryNameSubscription: Subscription | undefined;
+  selectedCategoryId: string | null = null;
   selectedCategoryName: string | null = '';
   productsCategories: ProductCategory[] = [];
   products: Product[] = [];
@@ -49,10 +50,14 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
   filteredProductCategories: any[] = [];
   searchTerm: string = '';
 
+  // New products popup
+  newProducts: any[] = [];
+  showNewProductsPopup = false;
+
   constructor(private formBuilder: FormBuilder,
     private adminService: AdminServiceService,
     private toastr: ToastrService,
-    private activeMenuService: ActiveMenuService
+    private activeCategoryService: ActiveCategoryService
   ) { }
 
   ngOnInit(): void {
@@ -60,22 +65,40 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
     this.loadProductCategory();
     this.loadProduct();
     this.loadCategory();
-    this.categorySubscription = this.activeMenuService.selectedCategoryId$.subscribe(
+
+   this.selectedCategoryId = this.activeCategoryService.getStoredCategoryId();
+    this.selectedCategoryName = this.activeCategoryService.getStoredCategoryName();
+
+    // Nếu có categoryId đã lưu, load sản phẩm
+    if (this.selectedCategoryId) {
+      this.loadProductCategoryByCategoryId(this.selectedCategoryId);
+    }
+
+    // Đăng ký để nhận các thay đổi trong tương lai
+    this.categoryIdSubscription = this.activeCategoryService.selectedCategoryId$.subscribe(
       categoryId => {
-        this.selectedCategoryId = categoryId;
-        this.loadProductCategoryByCategoryId(categoryId);
+        if (categoryId && categoryId !== this.selectedCategoryId) {
+          this.selectedCategoryId = categoryId;
+          this.loadProductCategoryByCategoryId(categoryId);
+        }
       }
     );
-    this.categorySubscription = this.activeMenuService.selectedCategoryName$.subscribe(
+
+    this.categoryNameSubscription = this.activeCategoryService.selectedCategoryName$.subscribe(
       categoryName => {
-        this.selectedCategoryName = categoryName;
+        if (categoryName) {
+          this.selectedCategoryName = categoryName;
+        }
       }
     );
   }
 
   ngOnDestroy() {
-    if (this.categorySubscription) {
-      this.categorySubscription.unsubscribe();
+    if (this.categoryIdSubscription) {
+      this.categoryIdSubscription.unsubscribe();
+    }
+    if (this.categoryNameSubscription) {
+      this.categoryNameSubscription.unsubscribe();
     }
   }
 
@@ -266,9 +289,12 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
       this.adminService.importProductCategory(this.selectedCategoryId, formData).subscribe({
         next: (response) => {
           // Add success handling here (e.g., display a message, close popup)
-          this.loadProductCategoryByCategoryId(this.selectedCategoryId);
-          this.closeFileUploadPopup();
           this.toastr.success('Nhập File thành công', 'Thành công');
+          // Check if there are new products
+        if (response.result_data.import_success && response.result_data.import_success.length > 0) {
+          this.newProducts = response.result_data.import_success;
+          this.showNewProductsPopup = true;
+        }
         },
         error: (error) => {
           console.error('Error importing product', error);
@@ -280,6 +306,12 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
     } else {
       this.toastr.error('Chọn danh mục trước khi nhập file', 'Thất bại');
     }
+  }
+  closeNewProductsPopup(): void {
+    this.showNewProductsPopup = false;
+    this.newProducts = [];
+    this.closeFileUploadPopup();
+    this.loadProductCategoryByCategoryId(this.selectedCategoryId);
   }
 
 
@@ -381,6 +413,8 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
   isMatchingSearch(product_category_name: string): boolean {
     return this.searchTerm ? product_category_name.toLowerCase().includes(this.searchTerm.toLowerCase()) : false;
   }
+
+ 
 
   // searchProductCategories() {
   //   if (!this.searchTerm) {

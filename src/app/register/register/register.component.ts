@@ -50,7 +50,7 @@ export class RegisterComponent implements OnInit {
     if (this.form.valid) {
       const userData = {
         ...this.form.value,
-        role_id: "user"
+        role_id: "2"
       };
       // Thêm cờ để tránh gọi nhiều lần
       if (this.loading) return;

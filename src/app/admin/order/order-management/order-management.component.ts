@@ -143,4 +143,70 @@ export class OrderManagementComponent implements OnInit {
       }
     });
   }
+
+  readonly orderStatuses = [
+    'PENDING',
+    'CONFIRMED',
+    'SHIPPING',
+    'DELIVERED',
+    'CANCELLED',
+    'RETURNED',
+    'COMPLETED'
+  ];
+
+  getStatusAvailability(currentStatus: string): { status: string; available: boolean }[] {
+    const availableStatuses = new Set<string>();
+    
+    switch (currentStatus) {
+      case 'PENDING':
+        availableStatuses.add('PENDING');
+        availableStatuses.add('CONFIRMED');
+        availableStatuses.add('SHIPPING');
+        availableStatuses.add('DELIVERED');
+        availableStatuses.add('CANCELLED');
+        availableStatuses.add('RETURNED');
+        availableStatuses.add('COMPLETED');
+        break;
+      case 'CONFIRMED':
+        availableStatuses.add('CONFIRMED');
+        availableStatuses.add('SHIPPING');
+        availableStatuses.add('DELIVERED');
+        availableStatuses.add('CANCELLED');
+        availableStatuses.add('RETURNED');
+        availableStatuses.add('COMPLETED');
+        break;
+      case 'SHIPPING':
+        availableStatuses.add('SHIPPING');
+        availableStatuses.add('DELIVERED');
+        availableStatuses.add('CANCELLED');
+        availableStatuses.add('RETURNED');
+        availableStatuses.add('COMPLETED');
+        break;
+      case 'DELIVERED':
+        availableStatuses.add('DELIVERED');
+        availableStatuses.add('CANCELLED');
+        availableStatuses.add('RETURNED');
+        availableStatuses.add('COMPLETED');
+        break;
+      case 'CANCELLED':
+        availableStatuses.add('CANCELLED');
+        availableStatuses.add('RETURNED');
+        availableStatuses.add('COMPLETED');
+        break;
+      case 'RETURNED':
+        availableStatuses.add('RETURNED');
+        availableStatuses.add('COMPLETED');
+        break;
+      case 'COMPLETED':
+        availableStatuses.add('COMPLETED');
+        break;
+      default:
+        this.orderStatuses.forEach(status => availableStatuses.add(status));
+    }
+
+    return this.orderStatuses.map(status => ({
+      status,
+      available: availableStatuses.has(status)
+    }));
+  }
 }

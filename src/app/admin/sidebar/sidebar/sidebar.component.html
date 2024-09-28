@@ -1,7 +1,7 @@
 <div class="bg-gray-900 text-white h-screen transition-all duration-300 flex flex-col" 
      [ngClass]="{'w-64': !isSidebarCollapsed, 'w-16': isSidebarCollapsed}">
     <div class="p-4 flex justify-between items-center">
-        <h1 class="text-2xl font-bold" [ngClass]="{'hidden': isSidebarCollapsed}">Admin One</h1>
+        <h1 class="text-2xl font-bold" [ngClass]="{'hidden': isSidebarCollapsed}">{{nameUser}}</h1>
         <button (click)="toggleSidebar()" class="text-white focus:outline-none">
             <i class="fas" [ngClass]="{'fa-bars': isSidebarCollapsed, 'fa-times': !isSidebarCollapsed}"></i>
         </button>

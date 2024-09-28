@@ -5,6 +5,7 @@ import { AuthService } from 'src/app/auth/auth.service';
 import { UserServiceService } from 'src/app/service/user-service.service';
 import { Category } from 'src/app/model/category.model';
 import { ActiveMenuService } from 'src/app/util/active-menu-service';
+import { SelectedCategoryService } from 'src/app/util/categoryService';
 
 @Component({
   selector: 'app-navigation',
@@ -20,7 +21,7 @@ export class NavigationComponent implements OnInit {
   userName: string = '';
   categories: Category[] = [];
 
-  constructor(private activeMenuService: ActiveMenuService, private router: Router, private cartService: CartService, private authService: AuthService, private userService: UserServiceService) { }
+  constructor(private activeMenuService: ActiveMenuService, private router: Router, private cartService: CartService, private authService: AuthService, private userService: UserServiceService, private sltCategory: SelectedCategoryService) { }
 
   ngOnInit(): void {
     this.gerRouter();
@@ -72,8 +73,8 @@ export class NavigationComponent implements OnInit {
     });
   }
 
-
-  selectCategory(productCategory: any) {
-    this.activeMenuService.setSelectedCategoryId(productCategory.category_id);
+  selectCategory(category: any) {
+    this.sltCategory.setSelectedCategory(category);
+    this.router.navigate(['/home']);
   }
 }

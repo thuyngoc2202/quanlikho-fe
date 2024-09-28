@@ -29,6 +29,7 @@ export class ProductComponent implements OnInit {
   isConfirmDeletePopupOpen = false;
   showFileUploadPopup = false;
 
+
   constructor(
     private formBuilder: FormBuilder,
     private adminService: AdminServiceService,
@@ -227,8 +228,29 @@ export class ProductComponent implements OnInit {
     this.newKeywords.splice(index, 1);
   }
 
-  isMatchingSearch(product_name: string): boolean {
-    return this.searchTerm ? product_name.toLowerCase().includes(this.searchTerm.toLowerCase()) : false;
+  isMatchingSearch(product: any): boolean {
+    if (!this.searchTerm) return false; // Không highlight nếu không có từ khóa tìm kiếm
+
+    const searchLower = this.searchTerm.toLowerCase();
+    console.log(searchLower);
+    
+    // Kiểm tra tên sản phẩm
+    if (product.product_name.toLowerCase().includes(searchLower)) {
+      return true;
+    }
+
+    // Kiểm tra từ khóa (nếu có)
+    if (product.keywords && Array.isArray(product.keywords)) {
+      return product.keywords.some((keyword: string) => 
+        keyword.toLowerCase().includes(searchLower)
+      );
+    }
+
+    return false;
+  }
+
+  onSearch(event: any) {
+    this.searchTerm = event.target.value;
   }
 
   // Search Products

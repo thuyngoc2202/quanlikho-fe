@@ -10,7 +10,7 @@
                 <li *ngFor="let category of categories"
                     class="flex justify-between items-center hover:bg-gray-300 p-2 rounded-lg cursor-pointer"
                     [ngClass]="{'bg-gray-300': activeMenu === category.category_name}"
-                    (click)="setActiveMenu(category.category_name); selectCategory(category); setActiveCategory(category)">
+                    (click)="selectCategory(category)">
                     <span class="text-gray-600 hover:text-gray-800">
                         {{ category.category_name }}
                     </span>
@@ -58,7 +58,7 @@
                             <td class="p-2 whitespace-nowrap font-medium text-gray-900">{{ productsCategory.product_name
                                 }}</td>
                             <td class="p-2 whitespace-nowrap text-gray-500">{{ productsCategory.category_name }}</td>
-                            <td class="p-2 whitespace-nowrap text-gray-500">{{ productsCategory.price | customCurrency
+                            <td class="p-2 whitespace-nowrap text-gray-500">{{ productsCategory.price | priceDisplay | customCurrency
                                 }}</td>
                             <td class="p-2 whitespace-nowrap">
                                 <div class="flex items-center space-x-1">
@@ -100,10 +100,10 @@
     </div>
 </div>
 <div *ngIf="showPopup" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" (click)="closePopup($event)">
-    <div class="bg-white rounded-lg shadow-lg w-80" (click)="$event.stopPropagation()">
+    <div class="bg-white rounded-lg shadow-lg w-96" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between p-4 border-b">
             <div class="flex items-center text-green-600">
-                <svg class="w-6 h-6 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-9 h-9 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="12" cy="12" r="11" fill="#4CAF50" />
                     <path d="M7 13l3 3 7-7" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <animate
@@ -131,15 +131,14 @@
             </div>
             <div class="mt-4 flex justify-between items-center mt-1">
                 <p class="text-sm text-gray-600">Giỏ hàng hiện có:</p>
-                    <!-- <span class="text-red-600 font-bold text-lg">{{ getTotal() | customCurrency }}</span> -->
                     <span class="text-gray-500 text-sm ">{{ getTotalQuantity() }} sản phẩm</span>
 
             </div>
-            <div class="mt-4 flex justify-between">
-                <button (click)="continueShopping()" class="px-4 py-2 bg-white text-blue-500 border border-blue-500 rounded hover:bg-blue-50 transition-colors duration-300">
+            <div class="mt-4 flex justify-between space-x-2">
+                <button (click)="continueShopping()" class="flex-1 px-4 py-2 bg-white text-blue-500 border border-blue-500 rounded hover:bg-blue-50 transition-colors duration-300">
                     Thanh toán
                 </button>
-                <button (click)="goToCart()" class="px-4 py-2 bg-yellow-700 text-white rounded hover:bg-yellow-600 transition-colors duration-300">
+                <button (click)="goToCart()" class="flex-1 px-4 py-2 bg-yellow-700 text-white rounded hover:bg-yellow-600 transition-colors duration-300">
                     Xem giỏ hàng
                 </button>
             </div>

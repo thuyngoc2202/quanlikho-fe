@@ -1,18 +1,19 @@
-import { Component, HostListener, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, HostListener, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Category } from 'src/app/model/category.model';
 import { AdminServiceService } from 'src/app/service/admin-service.service';
 import { ChangeDetectorRef } from '@angular/core';
-import { ActiveMenuService } from '../../../util/active-menu-service';
 import { ProductCategory } from 'src/app/model/product-category.model';
 import { AuthService } from 'src/app/auth/auth.service';
+import { Subscription } from 'rxjs';
+import { ActiveCategoryService } from 'src/app/util/active-category-service';
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, OnDestroy {
   @Output() sidebarToggled = new EventEmitter<boolean>();
   
   isDropdownOpen = false;
@@ -20,9 +21,10 @@ export class SidebarComponent implements OnInit {
   isCategoryMenuOpen = true;
   categories : Category[]=[];
   selectedCategory: any = null;
-  activeMenu: string = '';
-
-  constructor(private router: Router, private adminService: AdminServiceService, private activeMenuService: ActiveMenuService, private authService: AuthService) {}
+  activeMenu: string | null = null;
+  private dataChangedSubscription!: Subscription;
+  nameUser: string | null = null;
+  constructor(private router: Router, private adminService: AdminServiceService, private activeCategoryService: ActiveCategoryService, private authService: AuthService) {}
 
   @HostListener('window:resize', ['$event'])
   onResize() {
@@ -39,7 +41,19 @@ export class SidebarComponent implements OnInit {
   ngOnInit() {
     this.checkScreenSize();
     this.loadCategory();
-    this.activeMenu = this.activeMenuService.getActiveMenu();
+    this.activeMenu = this.activeCategoryService.getActiveMenu();
+    console.log(this.activeMenu);
+    this.loadCategory();
+    this.dataChangedSubscription = this.adminService.dataChanged$.subscribe(() => {
+      this.loadCategory();
+    });
+    this.nameUser = this.authService.getUserName();
+  }
+
+  ngOnDestroy() {
+    if (this.dataChangedSubscription) {
+      this.dataChangedSubscription.unsubscribe();
+    }
   }
 
   checkScreenSize() {
@@ -58,10 +72,9 @@ export class SidebarComponent implements OnInit {
   }
 
   toggleCategoryMenu() {
-    this.activeMenuService.clearSelectedCategory();
+    this.activeCategoryService.clearSelectedCategory();
     this.isCategoryMenuOpen = !this.isCategoryMenuOpen;
   }
-
 
   isRouteActive(route: string): boolean {
     return this.router.isActive(route, false);
@@ -80,8 +93,7 @@ export class SidebarComponent implements OnInit {
   
   selectCategory(productCategory: any) {
     this.setActiveMenu('category-' + productCategory.id);
-    this.activeMenuService.setSelectedCategoryId(productCategory.category_id);
-    this.activeMenuService.setSelectedCategoryName(productCategory.category_name);
+    this.activeCategoryService.setSelectedCategory(productCategory.category_id, productCategory.category_name);
   }
 
   logout() {
@@ -91,6 +103,7 @@ export class SidebarComponent implements OnInit {
 
   setActiveMenu(menuItem: string) {
     this.activeMenu = menuItem;
-    this.activeMenuService.setActiveMenu(menuItem);
+    this.activeCategoryService.setActiveMenu(menuItem);
   }
+
 }

@@ -34,9 +34,10 @@ export class LoginServiceService {
       .pipe(
         tap((response: any) => {          
           if (response && response.result_data) {
-            sessionStorage.setItem('token', response.result_data.token);
+            localStorage.setItem('token', response.result_data.token);
             const encodedRole = this.authService.encodeRole(response.result_data.roleId);
-            sessionStorage.setItem('encodedRole', encodedRole);
+            localStorage.setItem('encodedRole', encodedRole);
+            localStorage.setItem('username', response.result_data.username);
           }
         })
       );
