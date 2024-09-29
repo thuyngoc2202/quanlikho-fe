@@ -106,11 +106,10 @@
                                 <div>
                                     <label class="block mb-1 text-gray-400">Trạng thái đơn hàng</label>
                                     <select [(ngModel)]="selectedOrder.status" name="status" required
-                                            class="border border-gray-300 p-2 w-full rounded">
-                                        <option *ngFor="let statusInfo of getStatusAvailability(selectedOrder.status)"
-                                                [value]="statusInfo.status"
-                                                [disabled]="!statusInfo.available">
-                                            {{ statusInfo.status | statusOrder }}
+                                        class="border border-gray-300 p-2 w-full rounded">
+                                        <option *ngFor="let status of getAvailableStatuses()"
+                                            [value]="status">
+                                            {{ status | statusOrder }}
                                         </option>
                                     </select>
                                 </div>

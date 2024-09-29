@@ -66,7 +66,8 @@
             </button>
             <div *ngIf="isDropdownOpen" 
                  class="absolute left-0 bottom-full mb-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" (click)="logout()">Đăng xuất</a>
+                <a [routerLink]="['/home']" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200">Trang chủ</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200" (click)="logout()">Đăng xuất</a>
             </div>
         </div>
     </div>

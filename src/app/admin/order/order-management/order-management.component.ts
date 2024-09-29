@@ -30,6 +30,7 @@ export class OrderManagementComponent implements OnInit {
   isDetailPopupOpen: boolean = false;
   selectedOrder: OrderManagement = new OrderManagement();
   idOrder: string = '';
+  isUpdating: boolean = false;
 
   constructor(private adminService: AdminServiceService, private toastr: ToastrService) { }
 
@@ -42,6 +43,7 @@ export class OrderManagementComponent implements OnInit {
       this.orders = res.result_data.productOrderListResponse;
     });
   }
+
   isMatchingSearch(fullName: string): boolean {
     return this.searchTerm ? fullName.toLowerCase().includes(this.searchTerm.toLowerCase()) : false;
   }
@@ -91,6 +93,8 @@ export class OrderManagementComponent implements OnInit {
     this.isUpdatePopupOpen = true;
     this.adminService.getOrderStatus(order.product_order_id).subscribe((res) => {
       this.selectedOrder = res.result_data;
+      this.currentStatus = res.result_data.status; 
+      console.log('Current status:', this.currentStatus);
     });
   }
 
@@ -108,6 +112,7 @@ export class OrderManagementComponent implements OnInit {
   }
 
   updateOrderStatus() {
+
     this.adminService.updateOrder(this.selectedOrder).subscribe({
       next: (response: any) => {
         this.getAllOrder();
@@ -116,6 +121,7 @@ export class OrderManagementComponent implements OnInit {
         this.toastr.success('Cập nhật đơn hàng thành công');
       },
       error: (error) => {
+
         this.toastr.error('Cập nhật đơn hàng thất bại');
       }
     });
@@ -154,59 +160,31 @@ export class OrderManagementComponent implements OnInit {
     'COMPLETED'
   ];
 
-  getStatusAvailability(currentStatus: string): { status: string; available: boolean }[] {
-    const availableStatuses = new Set<string>();
-    
+  currentStatus: string = ''; 
+
+  getAvailableStatuses(): string[] {
+    return this.getAllowedStatuses(this.currentStatus);
+  }
+
+  private getAllowedStatuses(currentStatus: string): string[] {
     switch (currentStatus) {
       case 'PENDING':
-        availableStatuses.add('PENDING');
-        availableStatuses.add('CONFIRMED');
-        availableStatuses.add('SHIPPING');
-        availableStatuses.add('DELIVERED');
-        availableStatuses.add('CANCELLED');
-        availableStatuses.add('RETURNED');
-        availableStatuses.add('COMPLETED');
-        break;
+        return this.orderStatuses; 
       case 'CONFIRMED':
-        availableStatuses.add('CONFIRMED');
-        availableStatuses.add('SHIPPING');
-        availableStatuses.add('DELIVERED');
-        availableStatuses.add('CANCELLED');
-        availableStatuses.add('RETURNED');
-        availableStatuses.add('COMPLETED');
-        break;
+        return ['CONFIRMED', 'SHIPPING', 'DELIVERED', 'CANCELLED', 'RETURNED', 'COMPLETED'];
       case 'SHIPPING':
-        availableStatuses.add('SHIPPING');
-        availableStatuses.add('DELIVERED');
-        availableStatuses.add('CANCELLED');
-        availableStatuses.add('RETURNED');
-        availableStatuses.add('COMPLETED');
-        break;
+        return ['SHIPPING', 'DELIVERED', 'CANCELLED', 'RETURNED', 'COMPLETED'];
       case 'DELIVERED':
-        availableStatuses.add('DELIVERED');
-        availableStatuses.add('CANCELLED');
-        availableStatuses.add('RETURNED');
-        availableStatuses.add('COMPLETED');
-        break;
+        return ['DELIVERED', 'CANCELLED', 'RETURNED', 'COMPLETED'];
       case 'CANCELLED':
-        availableStatuses.add('CANCELLED');
-        availableStatuses.add('RETURNED');
-        availableStatuses.add('COMPLETED');
-        break;
+        return ['CANCELLED', 'RETURNED', 'COMPLETED'];
       case 'RETURNED':
-        availableStatuses.add('RETURNED');
-        availableStatuses.add('COMPLETED');
-        break;
+        return ['RETURNED', 'COMPLETED'];
       case 'COMPLETED':
-        availableStatuses.add('COMPLETED');
-        break;
+        return ['COMPLETED'];
       default:
-        this.orderStatuses.forEach(status => availableStatuses.add(status));
+        return this.orderStatuses;
     }
-
-    return this.orderStatuses.map(status => ({
-      status,
-      available: availableStatuses.has(status)
-    }));
   }
+
 }
