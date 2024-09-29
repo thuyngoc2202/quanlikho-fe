@@ -150,7 +150,8 @@ export class IndexComponent implements OnInit, OnDestroy {
     this.selectedProduct = product;
     this.selectedProduct.quantity = quantity;
     this.showPopup = true;
-
+    this.cartService.updateCart();
+    
     // Ẩn popup sau 3 giây (tùy chọn)
   }
 

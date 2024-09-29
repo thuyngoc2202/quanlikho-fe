@@ -291,8 +291,8 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
           // Add success handling here (e.g., display a message, close popup)
           this.toastr.success('Nhập File thành công', 'Thành công');
           // Check if there are new products
-        if (response.result_data.import_success && response.result_data.import_success.length > 0) {
-          this.newProducts = response.result_data.import_success;
+        if (response.result_data.import_fail && response.result_data.import_fail.length > 0) {
+          this.newProducts = response.result_data.import_fail;
           this.showNewProductsPopup = true;
         }
         },
