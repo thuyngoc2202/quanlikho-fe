@@ -4,6 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Observable } from 'rxjs';
+import { Router } from '@angular/router'; // Add this import
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +12,10 @@ import { Observable } from 'rxjs';
 export class AuthService {
   private loggedIn = new BehaviorSubject<boolean>(this.hasToken());
 
-  constructor(private jwtHelper: JwtHelperService) { }
+  constructor(
+    private jwtHelper: JwtHelperService,
+    private router: Router // Inject Router
+  ) { }
 
   private hasToken(): boolean {
     return !!localStorage.getItem('token');
@@ -19,20 +23,33 @@ export class AuthService {
 
   public removeToken() {
     localStorage.removeItem('token');
-    localStorage.removeItem('email');
-    localStorage.removeItem('user_id');
-    localStorage.removeItem('file');
-    localStorage.removeItem('user');
+    localStorage.removeItem('username');
+    localStorage.removeItem('tokenExpiration');
+    localStorage.removeItem('encodedRole');
+    localStorage.removeItem('activeMenu');
     return localStorage.removeItem('role');
   }
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('encodedRole');
     this.loggedIn.next(false);
+    this.router.navigate(['/login']);
   }
 
   public getToken(): string | null {
-    return localStorage.getItem('token') || 'null';
+    const token = localStorage.getItem('token');
+    const expiration = localStorage.getItem('tokenExpiration');
+    
+    if (token && expiration) {
+      const expirationTime = parseInt(expiration, 10);
+      if (new Date().getTime() > expirationTime) {
+        this.removeToken();
+        this.loggedIn.next(false);
+        return null;
+      }
+    }
+    
+    return token || null;
   }
 
   public getRole() {
@@ -73,5 +90,27 @@ export class AuthService {
   public retryFailedRequests(): void {
     // retry the requests. this method can
     // be called after the token is refreshed
+  }
+
+  public login(token: string): void {
+    this.setTokenWithExpiration(token);
+    this.loggedIn.next(true);
+  }
+
+  public setTokenWithExpiration(token: string): void {
+    localStorage.setItem('token', token);
+    const expirationTime = new Date().getTime() + 24 * 60 * 60 * 1000;
+    localStorage.setItem('tokenExpiration', expirationTime.toString());
+    this.scheduleTokenClear(expirationTime);
+  }
+
+  private scheduleTokenClear(expirationTime: number): void {
+    const timeUntilExpiration = expirationTime - new Date().getTime();
+    setTimeout(() => {
+      this.removeToken();
+      this.loggedIn.next(false);
+      console.log('Token cleared after 10 seconds (test mode)');
+      this.router.navigate(['/home']); 
+    }, timeUntilExpiration);
   }
 }

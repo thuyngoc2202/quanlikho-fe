@@ -114,7 +114,6 @@ export class NavigationComponent implements OnInit {
   logout() {
     this.authService.logout();
     this.updateAuthStatus();
-    this.router.navigate(['/home']);
   }
 
   getCategory() {
