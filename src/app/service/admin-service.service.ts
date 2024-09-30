@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { HttpBackend, HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, Subject, tap } from 'rxjs';
+import { HttpBackend, HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
+import { catchError, Observable, Subject, tap, throwError } from 'rxjs';
 import { Product } from '../model/product.model';
 import { Category } from '../model/category.model';
 import { ProductCategory } from '../model/product-category.model';
 import { AuthService } from '../auth/auth.service';
 import { environment } from '../../environments/environment';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -35,13 +36,14 @@ export class AdminServiceService {
   private httpClient: HttpClient;
   token = this.authService.getToken();
 
-  constructor(private backend: HttpBackend, private authService: AuthService) {
+  constructor(private backend: HttpBackend, private authService: AuthService, private router: Router) {
     this.httpClient = new HttpClient(backend);
   }
 
   private headers = new HttpHeaders({
     'Content-Type': 'application/json'
   });
+
 
   private dataChangedSubject = new Subject<void>();
 
@@ -65,12 +67,18 @@ export class AdminServiceService {
 
   updateProduct(product: Product): Observable<Product> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
-    return this.httpClient.post<Product>(`${this.API_CONFIG.product.admin}/product_update`, product, { headers });
+    return this.httpClient.post<Product>(`${this.API_CONFIG.product.admin}/product_update`, product, { headers })
+    .pipe(
+      catchError((error:any) => this.handleError(error))
+    );
   }
 
   deleteProduct(id: string): Observable<void> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
-    return this.httpClient.delete<void>(`${this.API_CONFIG.product.admin}/delete/${id}`, { headers });
+    return this.httpClient.delete<void>(`${this.API_CONFIG.product.admin}/delete/${id}`, { headers })
+    .pipe(
+      catchError(error => this.handleError(error))
+    );
   }
 
   createCategory(category: Category): Observable<Category> {
@@ -91,6 +99,7 @@ export class AdminServiceService {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
     return this.httpClient.delete(`${this.API_CONFIG.category.admin}/delete/${id}`, { headers })
       .pipe(
+        catchError((error:any) => this.handleError(error)),
         tap(() => this.notifyDataChanged())
       );
   }
@@ -119,7 +128,9 @@ export class AdminServiceService {
 
   deleteProductCategory(id: string): Observable<void> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
-    return this.httpClient.delete<void>(`${this.API_CONFIG.productCategory.admin}/delete/${id}`, { headers });
+    return this.httpClient.delete<void>(`${this.API_CONFIG.productCategory.admin}/delete/${id}`, { headers }).pipe(
+      catchError(error => this.handleError(error))
+    );;
   }
 
   getProductCategoryByCategoryId(categoryId: string): Observable<ProductCategory[]> {
@@ -148,12 +159,16 @@ export class AdminServiceService {
 
   updateOrder(order: any): Observable<any> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
-    return this.httpClient.post<any>(`${this.API_CONFIG.order.admin}/product_order_update`, order, { headers });
+    return this.httpClient.post<any>(`${this.API_CONFIG.order.admin}/product_order_update`, order, { headers }).pipe(
+      catchError(error => this.handleError(error))
+    );;
   }
 
   deleteOrder(product_order_id: string): Observable<any> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
-    return this.httpClient.delete<any>(`${this.API_CONFIG.order.admin}/delete/${product_order_id}`, { headers });
+    return this.httpClient.delete<any>(`${this.API_CONFIG.order.admin}/delete/${product_order_id}`, { headers }).pipe(
+      catchError(error => this.handleError(error))
+    );;
   }
 
   getTopSellingProducts(startDate: string, endDate: string): Observable<Blob> {
@@ -171,5 +186,14 @@ export class AdminServiceService {
     return this.httpClient.get<Blob>(`${this.API_CONFIG.report}/restock-product-category`, {
       responseType: 'blob' as 'json'
     });
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    if (error.status === 403) {
+      console.log('Access Forbidden. Token might be expired or invalid.');
+      this.authService.logout();
+      this.router.navigate(['/login']);
+    }
+    return throwError(() => error);
   }
 }

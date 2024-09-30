@@ -1,5 +1,6 @@
 import { HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Observable } from 'rxjs';
@@ -8,7 +9,14 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class AuthService {
+  private loggedIn = new BehaviorSubject<boolean>(this.hasToken());
+
   constructor(private jwtHelper: JwtHelperService) { }
+
+  private hasToken(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
   public removeToken() {
     localStorage.removeItem('token');
     localStorage.removeItem('email');
@@ -20,6 +28,7 @@ export class AuthService {
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('encodedRole');
+    this.loggedIn.next(false);
   }
 
   public getToken(): string | null {
@@ -48,8 +57,6 @@ export class AuthService {
     return atob(encodedRole);
   }
 
-
-
   public isAuthenticated(): boolean {
     // get the token
     const token = this.getToken();
@@ -61,6 +68,7 @@ export class AuthService {
   cachedRequests: Array<HttpRequest<any>> = [];
   public collectFailedRequest(request: HttpRequest<any>): void {
     this.cachedRequests.push(request);
+    console.log('Failed request:', request);
   }
   public retryFailedRequests(): void {
     // retry the requests. this method can

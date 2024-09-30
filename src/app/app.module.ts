@@ -37,7 +37,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCalendarBody } from '@angular/material/datepicker';
 import { PriceDisplayPipe } from './pipe/price-display-pipe.pipe';
-
+import { JwtInterceptor } from './auth/jwt.interceptor';
 
 @NgModule({
   declarations: [
@@ -84,6 +84,7 @@ import { PriceDisplayPipe } from './pipe/price-display-pipe.pipe';
     { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },
     JwtHelperService,
     LoginServiceService,
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })
