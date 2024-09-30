@@ -28,7 +28,9 @@ export class ProductComponent implements OnInit {
   isConfirmCreatePopupOpen = false;
   isConfirmDeletePopupOpen = false;
   showFileUploadPopup = false;
-
+  groupedProducts: { [key: string]: Product[] } = {};
+  groupOrder: string[] = [];
+  productColumns: Product[][] = [];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -39,6 +41,7 @@ export class ProductComponent implements OnInit {
   ngOnInit(): void {
     this.createForm();
     this.loadProducts();
+   
   }
 
   // Form Management
@@ -150,6 +153,7 @@ export class ProductComponent implements OnInit {
     this.adminService.getProduct().subscribe({
       next: (response: any) => {
         this.products = response.result_data;
+        this.organizeProductsIntoColumns();
       },
       error: (error) => {
         console.error('Failed to load products', error);
@@ -157,9 +161,44 @@ export class ProductComponent implements OnInit {
     });
   }
 
-  openDeleteProductPopup(productId: string) {
+  organizeProductsIntoColumns() {
+    const groupedProducts: { [key: string]: Product[] } = {};
+    this.products.forEach(product => {
+      const prefix = product.product_name.split(' ')[0].toUpperCase();
+      if (!groupedProducts[prefix]) {
+        groupedProducts[prefix] = [];
+      }
+      groupedProducts[prefix].push(product);
+    });
+  
+    this.productColumns = [];
+    let currentColumn: Product[] = [];
+    let currentPrefix = '';
+  
+    Object.entries(groupedProducts).forEach(([prefix, group]) => {
+      if (currentPrefix !== prefix) {
+        if (currentColumn.length > 0) {
+          this.productColumns.push(currentColumn);
+          currentColumn = [];
+        }
+        currentPrefix = prefix;
+      }
+  
+      group.forEach(product => {
+        if (currentColumn.length >= 32 ) {
+          this.productColumns.push(currentColumn);
+          currentColumn = [];
+        }
+        currentColumn.push(product);
+      });
+    });
+  
+    if (currentColumn.length > 0) {
+      this.productColumns.push(currentColumn);
+    }
+  }
+  openDeleteProductPopup() {
     this.isConfirmDeletePopupOpen = true;
-    this.idProduct = productId;
   }
 
   deleteProduct() {
@@ -169,6 +208,7 @@ export class ProductComponent implements OnInit {
         this.toastr.success('Xóa sản phẩm thành công', 'Thành công');
         this.idProduct = '';
         this.isConfirmDeletePopupOpen = false;
+        this.isUpdatePopupOpen = false;
       },
       error: (error) => {
         console.error('Failed to delete product', error);
@@ -233,7 +273,7 @@ export class ProductComponent implements OnInit {
 
     const searchLower = this.searchTerm.toLowerCase();
     console.log(searchLower);
-    
+
     // Kiểm tra tên sản phẩm
     if (product.product_name.toLowerCase().includes(searchLower)) {
       return true;
@@ -241,7 +281,7 @@ export class ProductComponent implements OnInit {
 
     // Kiểm tra từ khóa (nếu có)
     if (product.keywords && Array.isArray(product.keywords)) {
-      return product.keywords.some((keyword: string) => 
+      return product.keywords.some((keyword: string) =>
         keyword.toLowerCase().includes(searchLower)
       );
     }
@@ -252,6 +292,7 @@ export class ProductComponent implements OnInit {
   onSearch(event: any) {
     this.searchTerm = event.target.value;
   }
+
 
   // Search Products
   // searchProducts() {

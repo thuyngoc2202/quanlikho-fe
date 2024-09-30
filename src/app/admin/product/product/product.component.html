@@ -24,49 +24,28 @@
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full bg-white">
-                            <thead>
-                                <tr>
-                                    <th class="py-2 px-4 border-b text-left">ID</th>
-                                    <th class="py-2 px-4 border-b text-left">Tên sản phẩm</th>
-                                    <th class="py-2 px-4 border-b text-left">Keyword</th>
-                                    <th class="py-2 px-4 border-b text-left">Ngày cập nhật</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let product of products; let i = index" class="text-sm md:text-base"
-                                    [ngClass]="{'highlight': isMatchingSearch(product)}">
-                                    <td class="py-2 px-4 border-b">{{ i + 1 }}</td>
-                                    <td class="py-2 px-4 border-b ">
-                                        {{ product.product_name }}
-                                    </td>
-                                    <td class="py-2 px-4 border-b  product-keywords">
-                                        <select class="border border-gray-300 rounded px-2 py-1 w-full product-keywords"
-                                            [title]="product.keywords.join(', ')">
-                                            <option *ngFor="let keyword of product.keywords" [value]="keyword">
-                                                {{ keyword }}
-                                            </option>
-                                        </select>
-                                    </td>
-                                    <td class="py-2 px-4 border-b">{{ product.modify_date }}</td>
-                                    <td class="py-2 px-4 border-b">
-                                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                                            <button
-                                                class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded w-full sm:w-auto"
-                                                (click)="selectProductForUpdate(product)">
-                                                Sửa
-                                            </button>
-                                            <button
-                                                class="bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded w-full sm:w-auto"
-                                                (click)="openDeleteProductPopup(product.product_id)">
-                                                Xoá
-                                            </button>
+
+                    <div class="flex">
+                        <div class="overflow-x-auto">
+                            <div class="inline-flex" style="min-width: max-content;">
+                                <div *ngFor="let column of productColumns" class="w-48">
+                                    <div *ngFor="let product of column" class="relative group">
+                                        <div class="cursor-pointer border p-1 hover:bg-gray-100 truncate"
+                                            [ngClass]="{'text-red-500 font-semibold': isMatchingSearch(product)}"
+                                            (click)="selectProductForUpdate(product)">
+                                            {{ product.product_name }}
                                         </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                        <div
+                                            class="absolute z-10 left-0 mt-1 p-2 bg-white border rounded shadow-lg hidden group-hover:block min-w-[150px]">
+                                            <strong>Từ khóa:</strong>
+                                            <div *ngFor="let keyword of product.keywords">
+                                                {{ keyword }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <!-- Popup Cập nhật -->
                     <div *ngIf="isUpdatePopupOpen"
@@ -110,8 +89,11 @@
                                     <button type="submit"
                                         class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded"
                                         (click)="confirmUpdate()">Cập nhật</button>
+                                    <button type="button" (click)="openDeleteProductPopup()"
+                                        class="bg-purple-500 hover:bg-purple-700 text-white mr-4 px-4 py-2 rounded">Xoá</button>
                                     <button type="button" (click)="closePopup()"
                                         class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Đóng</button>
+
                                 </div>
                             </form>
                         </div>
