@@ -113,7 +113,6 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
 
   createForm() {
     this.formProduct = this.formBuilder.group({
-      price: ['', Validators.required],
       quantity: ['', Validators.required],
       min_limit: ['', Validators.required],
       max_limit: ['', Validators.required],
@@ -128,7 +127,6 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
     this.resetProductForm();
     this.isUpdatePopupOpen = true;
     this.formProduct.patchValue({
-      price: productsCategory.price,
       quantity: productsCategory.quantity,
       min_limit: productsCategory.min_limit,
       max_limit: productsCategory.max_limit,

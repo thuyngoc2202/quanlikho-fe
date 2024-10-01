@@ -98,7 +98,6 @@ export class CheckoutComponent implements OnInit {
             product_order_id: order.result_data.productOrderId,           
             product_category_id: cartItem.product_category_id,
             product_name: cartItem.product_name,
-            price: cartItem.price,
             quantity: cartItem.quantity,
             subtotal: this.total
           }));

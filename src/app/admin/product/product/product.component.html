@@ -39,7 +39,7 @@
                                          'bottom-full mb-1': isBottomHalf(product),
                                          'top-full mt-1': !isBottomHalf(product)
                                      }">
-                                    <strong class="block mb-1">Từ khóa:</strong>
+                                    <strong class="block mb-1">Tên dùng chung:</strong>
                                     <div *ngFor="let keyword of product.keywords" class="truncate">
                                         {{ keyword }}
                                     </div>
@@ -60,12 +60,12 @@
                                         formControlName="product_name" />
                                 </div>
                                 <div class="col-span-2">
-                                    <label class="block mb-1 text-gray-400">Từ khóa</label>
+                                    <label class="block mb-1 text-gray-400">Tên dùng chung</label>
 
                                     <div class="flex mb-2">
                                         <input type="text" #newKeywordInput
                                             (keyup.enter)="addKeyword(newKeywordInput.value); newKeywordInput.value = ''"
-                                            placeholder="Thêm từ khóa mới..."
+                                            placeholder="Thêm tên dùng chung mới..."
                                             class="border border-gray-300 p-2 rounded-l flex-grow">
                                         <button (click)="addKeyword(newKeywordInput.value); newKeywordInput.value = ''"
                                             class="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600 focus:outline-none">
@@ -111,12 +111,12 @@
                                         formControlName="product_name" />
                                 </div>
                                 <div class="col-span-2">
-                                    <label class="block mb-1 text-gray-400">Từ khóa</label>
+                                    <label class="block mb-1 text-gray-400">Tên dùng chung</label>
 
                                     <div class="flex mb-2">
                                         <input type="text" #newKeywordInput
                                             (keyup.enter)="addKeyword(newKeywordInput.value); newKeywordInput.value = ''"
-                                            placeholder="Thêm từ khóa mới..."
+                                            placeholder="Thêm tên dùng chung mới..."
                                             class="border border-gray-300 p-2 rounded-l flex-grow">
                                         <button (click)="addKeyword(newKeywordInput.value); newKeywordInput.value = ''"
                                             class="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600 focus:outline-none">

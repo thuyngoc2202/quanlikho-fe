@@ -48,33 +48,6 @@ export class OrderManagementComponent implements OnInit {
     return this.searchTerm ? fullName.toLowerCase().includes(this.searchTerm.toLowerCase()) : false;
   }
 
-  openFileUploadPopup() {
-    throw new Error('Method not implemented.');
-  }
-  openAddProductPopup() {
-    throw new Error('Method not implemented.');
-  }
-
-  addKeyword(arg0: string) {
-    throw new Error('Method not implemented.');
-  }
-  removeKeyword(_t73: number) {
-    throw new Error('Method not implemented.');
-  }
-  confirmCreate() {
-    throw new Error('Method not implemented.');
-  }
-
-  onFileSelected($event: Event) {
-    throw new Error('Method not implemented.');
-  }
-  uploadFile() {
-    throw new Error('Method not implemented.');
-  }
-
-  addProduct() {
-    throw new Error('Method not implemented.');
-  }
 
   openDetailPopup(order: any) {
     this.isDetailPopupOpen = true;
@@ -187,4 +160,20 @@ export class OrderManagementComponent implements OnInit {
     }
   }
 
+  updateQuantity(index: number, event: Event) {
+    const newQuantity = (event.target as HTMLInputElement).value;
+    this.selectedOrder.product_order_detail_list_responses[index].quantity = parseInt(newQuantity, 10);
+    console.log('newQuantity', this.selectedOrder.product_order_detail_list_responses[index]);
+  }
+
+  saveQuantity(index: number) {
+    // const item = this.selectedOrder.product_order_detail_list_responses[index];
+    // if (item.newQuantity !== undefined && item.newQuantity !== item.quantity) {
+    //   // Gọi API để cập nhật số lượng
+    //   // Ví dụ: this.orderService.updateQuantity(item.id, item.newQuantity).subscribe(...)
+    //   console.log(`Cập nhật số lượng cho sản phẩm ${item.product_name}: ${item.newQuantity}`);
+    //   item.quantity = item.newQuantity;
+    //   delete item.newQuantity;
+    // }
+  }
 }

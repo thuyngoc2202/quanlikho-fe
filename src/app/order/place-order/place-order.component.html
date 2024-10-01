@@ -29,9 +29,6 @@
                             {{ item.category_name }}
                         </p>
                     </div>
-                    <div class="text-black font-bold mr-4">
-                        {{ item.price | priceDisplay | customCurrency }}
-                    </div>
                     <div class="flex items-center space-x-2">
                         <button (click)="decreaseQuantity(item)"
                             class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-2 rounded transition duration-300 ease-in-out">

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { SelectedCategoryService } from 'src/app/util/categoryService';
 import { Category } from 'src/app/model/category.model';
 import { ProductCategory } from 'src/app/model/product-category.model';
@@ -11,6 +11,11 @@ import { Router } from '@angular/router';
 import { retry, Subscription } from 'rxjs';
 import { PriceDisplayPipe } from 'src/app/pipe/price-display-pipe.pipe';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { AuthService } from 'src/app/auth/auth.service';
+import { Product } from 'src/app/model/product.model';
+import { AdminServiceService } from 'src/app/service/admin-service.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-index',
@@ -21,6 +26,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 export class IndexComponent implements OnInit, OnDestroy {
 
   categories: Category[] = [];
+  products: Product[] = [];
   activeCategory: any;
   productsCategories: ProductCategory[] = [];
   filteredProductsCategories: any[] = [];
@@ -36,6 +42,19 @@ export class IndexComponent implements OnInit, OnDestroy {
   private breakpointSubscription!: Subscription;
   productsPerRow: number = 8; // Default value
   showPopupCart: boolean = false;
+  isLoggedIn: boolean = false;
+  showEditPopup: boolean = false;
+  editingProduct: ProductCategory = new ProductCategory();
+  filteredProducts: any[] = [];
+  filteredCategories: any[] = [];
+  selectedCategoryUpdate: any;
+  showProductDropdown = false;
+  showCategoryDropdown = false;
+  idProduct: string = '';
+  selectedProductUpdate: any;
+  editForm!: FormGroup;
+  idProductCategory: string = '';
+  isConfirmUpdatePopupOpen: boolean = false;
 
   constructor(
     private userService: UserServiceService,
@@ -43,14 +62,25 @@ export class IndexComponent implements OnInit, OnDestroy {
     private cartService: CartService,
     private router: Router,
     private sltCategory: SelectedCategoryService,
-    private breakpointObserver: BreakpointObserver
+    private authService: AuthService,
+    private adminService: AdminServiceService,
+    private fb: FormBuilder,
+    private toastr: ToastrService,
+
   ) { }
 
   ngOnInit(): void {
     this.updateCartCount();
+    this.loadCategory();
+    this.loadProduct();
     if (this.idCategory) {
       this.loadProductCategoryByCategoryId(this.idCategory);
     }
+    this.authService.isLoggedIn$.subscribe(
+      (isLoggedIn: boolean) => {
+        this.isLoggedIn = isLoggedIn;
+      }
+    );
     this.getCategory();
     this.getTotalQuantity();
     this.categorySubscription = this.activeMenuService.selectedCategoryId$.subscribe(
@@ -63,36 +93,25 @@ export class IndexComponent implements OnInit, OnDestroy {
         this.setActiveCategory(category);
       }
     });
-    this.breakpointSubscription = this.breakpointObserver
-      .observe([
-        Breakpoints.XSmall,
-        Breakpoints.Small,
-        Breakpoints.Medium,
-        Breakpoints.Large,
-        Breakpoints.XLarge
-      ])
-      .subscribe(result => {
-        if (result.breakpoints[Breakpoints.XSmall]) {
-          this.productsPerRow = 2;
-        } else if (result.breakpoints[Breakpoints.Small]) {
-          this.productsPerRow = 4;
-        } else if (result.breakpoints[Breakpoints.Medium]) {
-          this.productsPerRow = 6;
-        } else if (result.breakpoints[Breakpoints.Large]) {
-          this.productsPerRow = 8;
-        } else if (result.breakpoints[Breakpoints.XLarge]) {
-          this.productsPerRow = 10;
-        }
-      });
+    this.validate();
   }
+
 
   ngOnDestroy() {
     if (this.categorySubscription) {
       this.categorySubscription.unsubscribe();
     }
-    if (this.breakpointSubscription) {
-      this.breakpointSubscription.unsubscribe();
-    }
+
+  }
+
+  validate() {
+    this.editForm = this.fb.group({
+      product_name: ['', Validators.required],
+      category_name: ['', Validators.required],
+      quantity: ['', [Validators.required, Validators.min(0)]],
+      min_limit: ['', [Validators.required, Validators.min(0)]],
+      max_limit: ['', [Validators.required, Validators.min(0)]],
+    });
   }
 
   updateCartCount(): void {
@@ -172,7 +191,6 @@ export class IndexComponent implements OnInit, OnDestroy {
       orderDetail.product_category_id = product.product_category_id;
       orderDetail.product_name = product.product_name;
       orderDetail.quantity = quantity;
-      orderDetail.price = product.price;
       orderDetail.category_id = product.category_id;
       orderDetail.category_name = product.category_name;
       orderCart.push(orderDetail);
@@ -226,7 +244,7 @@ export class IndexComponent implements OnInit, OnDestroy {
   }
 
   loadProductCategoryByCategoryId(categoryId: string | null) {
-      if (categoryId) {
+    if (categoryId) {
 
       this.userService.getProductCategoryByCategoryId(categoryId).subscribe({
         next: (response: any) => {
@@ -279,6 +297,8 @@ export class IndexComponent implements OnInit, OnDestroy {
     return countItem;
   }
 
+
+
   closePopup(event: MouseEvent) {
     // Đóng popup
     this.showPopup = false;
@@ -311,7 +331,6 @@ export class IndexComponent implements OnInit, OnDestroy {
       orderDetail.product_category_id = product.product_category_id;
       orderDetail.product_name = product.product_name;
       orderDetail.quantity = quantity;
-      orderDetail.price = product.price;
       orderDetail.category_id = product.category_id;
       orderDetail.category_name = product.category_name;
       orderCart.push(orderDetail);
@@ -327,13 +346,13 @@ export class IndexComponent implements OnInit, OnDestroy {
       this.selectedProduct = product;
       this.getQuantity(product);
       console.log('this.selectedProduct', this.selectedProduct);
-      
+
     }
   }
 
   getProductRows(): (ProductCategory | null)[][] {
     const rows: (ProductCategory | null)[][] = [];
-    
+
     for (let i = 0; i < this.filteredProductsCategories.length; i += this.productsPerRow) {
       const row = this.filteredProductsCategories.slice(i, i + this.productsPerRow);
       // Pad the row with null values if it's not full
@@ -342,7 +361,158 @@ export class IndexComponent implements OnInit, OnDestroy {
       }
       rows.push(row);
     }
-    
+
     return rows;
+  }
+
+  @HostListener('document:click', ['$event'])
+  clickout(event: any) {
+    if (!event.target.closest('.relative')) {
+      this.showProductDropdown = false;
+      this.showCategoryDropdown = false;
+    }
+  }
+
+  resetProductForm() {
+    this.editForm.reset();
+    this.idProduct = '';
+    this.idCategory = '';
+    this.idProductCategory = '';
+    this.selectedProductUpdate = null;
+    this.selectedCategoryUpdate = null;
+  }
+
+  selectProductUpdate(product: any) {
+    this.selectedProductUpdate = product;
+    this.idProduct = product.product_id;
+    this.showProductDropdown = false;
+    console.log('this.selectedProductUpdate', this.selectedProductUpdate);
+
+  }
+
+  selectCategoryUpdate(category: any) {
+    this.selectedCategoryUpdate = category;
+    this.idCategory = category.category_id;
+    this.showCategoryDropdown = false;
+  }
+
+
+  openEditPopup(productsCategory: ProductCategory) {
+    this.resetProductForm();
+    this.showEditPopup = true;
+
+
+    this.editForm.patchValue({
+      quantity: productsCategory.quantity,
+      min_limit: productsCategory.min_limit,
+      max_limit: productsCategory.max_limit,
+    });
+    this.idProduct = productsCategory.product_id;
+    this.idCategory = productsCategory.category_id;
+    this.idProductCategory = productsCategory.product_category_id;
+
+    // Find the corresponding product and category
+    this.selectedProductUpdate = this.products.find(p => p.product_id === this.idProduct);
+    this.selectedCategoryUpdate = this.categories.find(c => c.category_id === this.idCategory);
+
+    // Update the form with product and category names
+    if (this.selectedProductUpdate) {
+      this.editForm.patchValue({ product_name: this.selectedProductUpdate.product_name });
+    }
+    if (this.selectedCategoryUpdate) {
+      this.editForm.patchValue({ category_name: this.selectedCategoryUpdate.category_name });
+    }
+  }
+
+  closeEditPopup(event: Event) {
+    event.stopPropagation();
+    this.showEditPopup = false;
+  }
+  confirmUpdate() {
+    this.updateProductCategory();
+  }
+
+  updateProductCategory() {
+    const productCategoryData = {
+      ...this.editForm.value,
+      product_id: this.idProduct,
+      category_id: this.idCategory,
+      product_category_id: this.idProductCategory,
+    }
+
+
+    if (this.editForm.valid) {
+      this.adminService.updateProductCategory(productCategoryData).subscribe({
+        next: (response) => {
+          this.showEditPopup = false;
+          this.isConfirmUpdatePopupOpen = false;
+          this.loadProductCategoryByCategoryId(this.idCategory);
+          this.resetProductForm();
+          this.toastr.success('Sửa sản phẩm thành công', 'Thành công');
+        },
+        error: (error) => {
+          this.isConfirmUpdatePopupOpen = false;
+          this.toastr.error(`${error.error.result_data.msg}`, 'Thất bại');
+        }
+      });
+    } else {
+      this.isConfirmUpdatePopupOpen = false;
+      this.toastr.error(`Thiếu trường`, 'Thất bại');
+    }
+  }
+  loadCategory() {
+    this.adminService.getCategory().subscribe({
+      next: (response: any) => {
+        this.categories = response.result_data;
+        this.filteredCategories = this.categories;
+      },
+      error: (error: any) => {
+        console.error('Failed to load category', error);
+      }
+    });
+  }
+
+  loadProduct() {
+    this.adminService.getProduct().subscribe({
+      next: (response: any) => {
+        this.products = response.result_data;
+        this.filteredProducts = this.products;
+      },
+      error: (error) => {
+        console.error('Failed to load products', error);
+      }
+    });
+  }
+
+  filterProducts(event: any) {
+    const searchTerm = event.target.value.toLowerCase();
+    this.filteredProducts = this.products.filter(product =>
+      product.product_name.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  filterCategories(event: any) {
+    const searchTerm = event.target.value.toLowerCase();
+
+
+    this.filteredCategories = this.categories.filter(category =>
+      category.category_name.toLowerCase().includes(searchTerm)
+    );
+    console.log('filterCategories', this.filteredCategories);
+  }
+  clearProductSelection() {
+    this.selectedProductUpdate = '';
+    this.idProduct = '';
+  }
+
+  clearCategorySelection() {
+    this.selectedCategoryUpdate = null;
+    this.idCategory = '';
+  }
+  closePopupUpdate(event: MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.showEditPopup = false;
+    this.editForm.reset();
   }
 }

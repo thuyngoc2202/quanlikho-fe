@@ -107,7 +107,6 @@ export class NavigationComponent implements OnInit {
 
   updateCartSummary() {
     this.cartCount = this.cartItems.reduce((total, item) => total + item.quantity, 0);
-    this.totalAmount = this.cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   }
 
   removeItem(item: any) {

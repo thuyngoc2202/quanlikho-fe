@@ -6,7 +6,6 @@ export class ProductCategory {
     quantity: number;
     min_limit: number;
     max_limit: number;
-    price: number;
     create_date: string;
     modify_date: string;
     
@@ -18,7 +17,6 @@ export class ProductCategory {
         this.quantity = 0;
         this.min_limit = 0;
         this.max_limit = 0;
-        this.price = 0;
         this.create_date = '';
         this.modify_date = '';
     }

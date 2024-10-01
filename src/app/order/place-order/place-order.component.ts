@@ -13,7 +13,6 @@ export class PlaceOrderComponent implements OnInit {
   cartCount: number = 0;
   productCart: any[] = [];
   items: any;
-  totalPrice: number = 0;
   productQuantities: { [key: string]: number } = {};
   orderNotes: string = '';
 
@@ -127,16 +126,7 @@ export class PlaceOrderComponent implements OnInit {
     this.cartService.updateCartCount(this.cartCount);
   }
 
-  getTotal() {
-    var total = 0;
-    for (var i = 0; i < this.productCart.length; i++) {
-      var item = this.productCart[i];
 
-      total += item.price * item.quantity;
-    }
-    localStorage.setItem('total', total.toString());
-    return total;
-  }
   getTotalQuantity(): number {
     let totalQuantity = 0;
     for (let item of this.productCart) {

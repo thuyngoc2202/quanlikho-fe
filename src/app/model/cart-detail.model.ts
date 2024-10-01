@@ -22,13 +22,11 @@ export class OrderDetails {
   quantity: number;
   category_id: string;
   category_name: string;
-  price: number;
 
   constructor() {
     this.product_name = '';
     this.product_category_id = '';
     this.quantity = 0;
-    this.price = 0;
     this.category_id = '';
     this.category_name = '';
   }
@@ -56,14 +54,12 @@ export class PlaceOrderDetail {
   product_category_id: string;
   product_name: string;
   quantity: number;
-  price: number;
   subtotal: number;
   
   constructor() {
     this.product_order_id = '';
     this.product_category_id = '';
     this.product_name = '';
-    this.price = 0;
     this.quantity = 0;
     this.subtotal = 0;
   }
