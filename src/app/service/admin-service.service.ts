@@ -68,17 +68,12 @@ export class AdminServiceService {
   updateProduct(product: Product): Observable<Product> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
     return this.httpClient.post<Product>(`${this.API_CONFIG.product.admin}/product_update`, product, { headers })
-    .pipe(
-      catchError((error:any) => this.handleError(error))
-    );
+   
   }
 
-  deleteProduct(id: string): Observable<void> {
+  deleteProduct(id: string | undefined): Observable<void> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
     return this.httpClient.delete<void>(`${this.API_CONFIG.product.admin}/delete/${id}`, { headers })
-    .pipe(
-      catchError(error => this.handleError(error))
-    );
   }
 
   createCategory(category: Category): Observable<Category> {
@@ -99,7 +94,6 @@ export class AdminServiceService {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
     return this.httpClient.delete(`${this.API_CONFIG.category.admin}/delete/${id}`, { headers })
       .pipe(
-        catchError((error:any) => this.handleError(error)),
         tap(() => this.notifyDataChanged())
       );
   }
@@ -128,9 +122,7 @@ export class AdminServiceService {
 
   deleteProductCategory(id: string): Observable<void> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
-    return this.httpClient.delete<void>(`${this.API_CONFIG.productCategory.admin}/delete/${id}`, { headers }).pipe(
-      catchError(error => this.handleError(error))
-    );;
+    return this.httpClient.delete<void>(`${this.API_CONFIG.productCategory.admin}/delete/${id}`, { headers })
   }
 
   getProductCategoryByCategoryId(categoryId: string): Observable<ProductCategory[]> {
@@ -159,16 +151,12 @@ export class AdminServiceService {
 
   updateOrder(order: any): Observable<any> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
-    return this.httpClient.post<any>(`${this.API_CONFIG.order.admin}/product_order_update`, order, { headers }).pipe(
-      catchError(error => this.handleError(error))
-    );;
+    return this.httpClient.post<any>(`${this.API_CONFIG.order.admin}/product_order_update`, order, { headers });
   }
 
   deleteOrder(product_order_id: string): Observable<any> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
-    return this.httpClient.delete<any>(`${this.API_CONFIG.order.admin}/delete/${product_order_id}`, { headers }).pipe(
-      catchError(error => this.handleError(error))
-    );;
+    return this.httpClient.delete<any>(`${this.API_CONFIG.order.admin}/delete/${product_order_id}`, { headers });
   }
 
   getTopSellingProducts(startDate: string, endDate: string): Observable<Blob> {
@@ -188,12 +176,12 @@ export class AdminServiceService {
     });
   }
 
-  private handleError(error: HttpErrorResponse) {
-    if (error.status === 403) {
-      console.log('Access Forbidden. Token might be expired or invalid.');
-      this.authService.logout();
-      this.router.navigate(['/login']);
-    }
-    return throwError(() => error);
-  }
+  // private handleError(error: HttpErrorResponse) {
+  //   if (error.status === 403) {
+  //     console.log('Access Forbidden. Token might be expired or invalid.');
+  //     this.authService.logout();
+  //     this.router.navigate(['/login']);
+  //   }
+  //   return throwError(() => error);
+  // }
 }

@@ -25,23 +25,23 @@
                     </div>
 
 
-                    <div class="flex">
-                        <div class="overflow-x-auto">
-                            <div class="inline-flex" style="min-width: max-content;">
-                                <div *ngFor="let column of productColumns" class="w-48">
-                                    <div *ngFor="let product of column" class="relative group">
-                                        <div class="cursor-pointer border p-1 hover:bg-gray-100 truncate"
-                                            [ngClass]="{'text-red-500 font-semibold': isMatchingSearch(product)}"
-                                            (click)="selectProductForUpdate(product)">
-                                            {{ product.product_name }}
-                                        </div>
-                                        <div
-                                            class="absolute z-10 left-0 mt-1 p-2 bg-white border rounded shadow-lg hidden group-hover:block min-w-[150px]">
-                                            <strong>Từ khóa:</strong>
-                                            <div *ngFor="let keyword of product.keywords">
-                                                {{ keyword }}
-                                            </div>
-                                        </div>
+                    <div class="w-full">
+                        <div
+                            class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 3xl:grid-cols-16">
+                            <div *ngFor="let product of products; trackBy: trackByProduct"
+                                class="p-2 border text-sm font-medium cursor-pointer text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out relative group"
+                                [ngClass]="{'text-red-500 font-semibold': isMatchingSearch(product)}"
+                                (click)="selectProductForUpdate(product)">
+                                <div class="truncate">{{ product?.product_name || '' }}</div>
+                                <div *ngIf="product"
+                                    class="absolute z-10 left-0 mt-1 p-2 bg-white border rounded shadow-lg hidden group-hover:block min-w-[150px] max-w-[200px]"
+                                    [ngClass]="{
+                                         'bottom-full mb-1': isBottomHalf(product),
+                                         'top-full mt-1': !isBottomHalf(product)
+                                     }">
+                                    <strong class="block mb-1">Từ khóa:</strong>
+                                    <div *ngFor="let keyword of product.keywords" class="truncate">
+                                        {{ keyword }}
                                     </div>
                                 </div>
                             </div>

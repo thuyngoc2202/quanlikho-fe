@@ -21,9 +21,12 @@
         <div *ngIf="productCart && productCart.length > 0" class="flex flex-col lg:flex-row lg:justify-between">
             <div class="flex-1">
                 <div *ngFor="let item of productCart" class="flex items-center border-b pb-4 mb-4">
-                    <div class="flex-1">
-                        <p>
+                    <div class="flex-1 flex flex-col">
+                        <p class="text-base font-medium">
                             {{ item.product_name }}
+                        </p>
+                        <p class="text-xs text-gray-500 mt-1">
+                            {{ item.category_name }}
                         </p>
                     </div>
                     <div class="text-black font-bold mr-4">

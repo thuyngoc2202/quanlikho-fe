@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Product } from 'src/app/model/product.model';
 import { AdminServiceService } from 'src/app/service/admin-service.service';
 import * as XLSX from 'xlsx';
 import { ToastrService } from 'ngx-toastr';
+
 
 @Component({
   selector: 'app-product',
@@ -13,7 +14,7 @@ import { ToastrService } from 'ngx-toastr';
 export class ProductComponent implements OnInit {
   // Properties
   products: Product[] = [];
-  filteredProducts: Product[] = [];
+  filteredProducts: any[] = [];
   formProduct!: FormGroup;
   idProduct: string = '';
   keywords: string[] = [];
@@ -32,18 +33,30 @@ export class ProductComponent implements OnInit {
   groupOrder: string[] = [];
   productColumns: Product[][] = [];
 
+
   constructor(
     private formBuilder: FormBuilder,
     private adminService: AdminServiceService,
     private toastr: ToastrService,
+    private cdr: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
     this.createForm();
     this.loadProducts();
-   
+
   }
 
+  isBottomHalf(product: Product): boolean {
+    const index = this.products.indexOf(product);
+    return index >= this.products.length / 2;
+  }
+
+  // Không cần setupBreakpointObserver() nữa, vì Tailwind sẽ xử lý responsive
+
+  trackByProduct(index: number, product: Product): string {
+    return product.product_id;
+  }
   // Form Management
   createForm() {
     this.formProduct = this.formBuilder.group({
@@ -63,7 +76,7 @@ export class ProductComponent implements OnInit {
     this.createForm();
   }
 
-  selectProductForUpdate(product: Product) {
+  selectProductForUpdate(product: any) {
     this.resetProductForm();
     this.isUpdatePopupOpen = true;
     this.formProduct.patchValue({
@@ -153,7 +166,8 @@ export class ProductComponent implements OnInit {
     this.adminService.getProduct().subscribe({
       next: (response: any) => {
         this.products = response.result_data;
-        this.organizeProductsIntoColumns();
+        this.filteredProducts = this.products;
+        // this.organizeProductsIntoColumns();
       },
       error: (error) => {
         console.error('Failed to load products', error);
@@ -161,42 +175,42 @@ export class ProductComponent implements OnInit {
     });
   }
 
-  organizeProductsIntoColumns() {
-    const groupedProducts: { [key: string]: Product[] } = {};
-    this.products.forEach(product => {
-      const prefix = product.product_name.split(' ')[0].toUpperCase();
-      if (!groupedProducts[prefix]) {
-        groupedProducts[prefix] = [];
-      }
-      groupedProducts[prefix].push(product);
-    });
-  
-    this.productColumns = [];
-    let currentColumn: Product[] = [];
-    let currentPrefix = '';
-  
-    Object.entries(groupedProducts).forEach(([prefix, group]) => {
-      if (currentPrefix !== prefix) {
-        if (currentColumn.length > 0) {
-          this.productColumns.push(currentColumn);
-          currentColumn = [];
-        }
-        currentPrefix = prefix;
-      }
-  
-      group.forEach(product => {
-        if (currentColumn.length >= 32 ) {
-          this.productColumns.push(currentColumn);
-          currentColumn = [];
-        }
-        currentColumn.push(product);
-      });
-    });
-  
-    if (currentColumn.length > 0) {
-      this.productColumns.push(currentColumn);
-    }
-  }
+  // organizeProductsIntoColumns() {
+  //   const groupedProducts: { [key: string]: Product[] } = {};
+  //   this.products.forEach(product => {
+  //     const prefix = product.product_name.split(' ')[0].toUpperCase();
+  //     if (!groupedProducts[prefix]) {
+  //       groupedProducts[prefix] = [];
+  //     }
+  //     groupedProducts[prefix].push(product);
+  //   });
+
+  //   this.productColumns = [];
+  //   let currentColumn: Product[] = [];
+  //   let currentPrefix = '';
+
+  //   Object.entries(groupedProducts).forEach(([prefix, group]) => {
+  //     if (currentPrefix !== prefix) {
+  //       if (currentColumn.length > 0) {
+  //         this.productColumns.push(currentColumn);
+  //         currentColumn = [];
+  //       }
+  //       currentPrefix = prefix;
+  //     }
+
+  //     group.forEach(product => {
+  //       if (currentColumn.length >= 32) {
+  //         this.productColumns.push(currentColumn);
+  //         currentColumn = [];
+  //       }
+  //       currentColumn.push(product);
+  //     });
+  //   });
+
+  //   if (currentColumn.length > 0) {
+  //     this.productColumns.push(currentColumn);
+  //   }
+  // }
   openDeleteProductPopup() {
     this.isConfirmDeletePopupOpen = true;
   }

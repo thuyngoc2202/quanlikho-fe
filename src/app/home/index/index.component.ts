@@ -10,6 +10,7 @@ import { OrderDetails } from 'src/app/model/cart-detail.model';
 import { Router } from '@angular/router';
 import { retry, Subscription } from 'rxjs';
 import { PriceDisplayPipe } from 'src/app/pipe/price-display-pipe.pipe';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-index',
@@ -32,13 +33,17 @@ export class IndexComponent implements OnInit, OnDestroy {
   showPopup: boolean = false;
   selectedProduct: any = {};
   private categorySubscription!: Subscription;
+  private breakpointSubscription!: Subscription;
+  productsPerRow: number = 8; // Default value
+  showPopupCart: boolean = false;
 
   constructor(
     private userService: UserServiceService,
     private activeMenuService: ActiveMenuService,
     private cartService: CartService,
     private router: Router,
-    private sltCategory: SelectedCategoryService
+    private sltCategory: SelectedCategoryService,
+    private breakpointObserver: BreakpointObserver
   ) { }
 
   ngOnInit(): void {
@@ -58,12 +63,35 @@ export class IndexComponent implements OnInit, OnDestroy {
         this.setActiveCategory(category);
       }
     });
+    this.breakpointSubscription = this.breakpointObserver
+      .observe([
+        Breakpoints.XSmall,
+        Breakpoints.Small,
+        Breakpoints.Medium,
+        Breakpoints.Large,
+        Breakpoints.XLarge
+      ])
+      .subscribe(result => {
+        if (result.breakpoints[Breakpoints.XSmall]) {
+          this.productsPerRow = 2;
+        } else if (result.breakpoints[Breakpoints.Small]) {
+          this.productsPerRow = 4;
+        } else if (result.breakpoints[Breakpoints.Medium]) {
+          this.productsPerRow = 6;
+        } else if (result.breakpoints[Breakpoints.Large]) {
+          this.productsPerRow = 8;
+        } else if (result.breakpoints[Breakpoints.XLarge]) {
+          this.productsPerRow = 10;
+        }
+      });
   }
-
 
   ngOnDestroy() {
     if (this.categorySubscription) {
       this.categorySubscription.unsubscribe();
+    }
+    if (this.breakpointSubscription) {
+      this.breakpointSubscription.unsubscribe();
     }
   }
 
@@ -108,7 +136,7 @@ export class IndexComponent implements OnInit, OnDestroy {
     }
 
     this.productQuantities[item.product_category_id] = newQuantity;
-    item.quantity = newQuantity;
+    // item.quantity = newQuantity;
 
     this.onQuantityChange(item);
   }
@@ -126,8 +154,18 @@ export class IndexComponent implements OnInit, OnDestroy {
     let orderCart = JSON.parse(localStorage.getItem('cart') || '[]');
     const quantity = this.productQuantities[product.product_category_id] || 1;
 
+    // Sử dụng inventory_quantity thay vì quantity
+    if (quantity > product.inventory_quantity) {
+      alert(`Số lượng yêu cầu (${quantity}) vượt quá số lượng tồn kho (${product.inventory_quantity}).`);
+      return;
+    }
     const orderProduct = orderCart.find((item: any) => item.product_category_id === product.product_category_id);
     if (orderProduct) {
+      // Kiểm tra tổng số lượng trong giỏ hàng và số lượng mới không vượt quá tồn kho
+      if (orderProduct.quantity + quantity > product.inventory_quantity) {
+        alert(`Tổng số lượng (${orderProduct.quantity + quantity}) vượt quá số lượng tồn kho (${product.inventory_quantity}).`);
+        return;
+      }
       orderProduct.quantity += quantity;
     } else {
       const orderDetail = new OrderDetails();
@@ -139,6 +177,7 @@ export class IndexComponent implements OnInit, OnDestroy {
       orderDetail.category_name = product.category_name;
       orderCart.push(orderDetail);
     }
+
     this.getTotalQuantity();
     localStorage.setItem('cart', JSON.stringify(orderCart));
     this.updateCartCount();
@@ -147,16 +186,15 @@ export class IndexComponent implements OnInit, OnDestroy {
     this.productQuantities[product.product_category_id] = 0;
 
     // Hiển thị popup
-    this.selectedProduct = product;
-    this.selectedProduct.quantity = quantity;
+    this.selectedProduct = { ...product }; // Tạo bản sao của sản phẩm
+    this.selectedProduct.quantity = quantity; // Số lượng đã thêm vào giỏ hàng
     this.showPopup = true;
+    this.showPopupCart = false;
     this.cartService.updateCart();
-    
-    // Ẩn popup sau 3 giây (tùy chọn)
   }
 
   getQuantity(product: any): number {
-    return this.productQuantities[product.product_category_id] || 1;
+    return 1;
   }
 
   getProductCategory() {
@@ -188,11 +226,14 @@ export class IndexComponent implements OnInit, OnDestroy {
   }
 
   loadProductCategoryByCategoryId(categoryId: string | null) {
-    if (categoryId) {
+      if (categoryId) {
 
       this.userService.getProductCategoryByCategoryId(categoryId).subscribe({
         next: (response: any) => {
-          this.productsCategories = response.result_data;
+          this.productsCategories = response.result_data.map((product: any) => ({
+            ...product,
+            inventory_quantity: product.quantity // Lưu số lượng tồn kho
+          }));
           this.filteredProductsCategories = this.productsCategories;
         },
         error: (error) => {
@@ -243,12 +284,27 @@ export class IndexComponent implements OnInit, OnDestroy {
     this.showPopup = false;
   }
 
+  closePopupCart(event: MouseEvent) {
+    // Đóng popup
+    this.showPopupCart = false;
+    this.selectedProduct = null;
+  }
+
   buyNow(product: any) {
     let orderCart = JSON.parse(localStorage.getItem('cart') || '[]');
     const quantity = this.productQuantities[product.product_category_id] || 1;
 
+    if (quantity > product.inventory_quantity) {
+      alert(`Số lượng yêu cầu (${quantity}) vượt quá số lượng tồn kho (${product.inventory_quantity}).`);
+      return;
+    }
+
     const orderProduct = orderCart.find((item: any) => item.product_category_id === product.product_category_id);
     if (orderProduct) {
+      if (orderProduct.quantity + quantity > product.inventory_quantity) {
+        alert(`Tổng số lượng (${orderProduct.quantity + quantity}) vượt quá số lượng tồn kho (${product.inventory_quantity}).`);
+        return;
+      }
       orderProduct.quantity += quantity;
     } else {
       const orderDetail = new OrderDetails();
@@ -263,5 +319,30 @@ export class IndexComponent implements OnInit, OnDestroy {
     localStorage.setItem('cart', JSON.stringify(orderCart));
     // Navigate to checkout
     this.router.navigate(['/checkout']);
+  }
+
+  openPopupCart(product: ProductCategory | null) {
+    this.showPopupCart = true;
+    if (product) {
+      this.selectedProduct = product;
+      this.getQuantity(product);
+      console.log('this.selectedProduct', this.selectedProduct);
+      
+    }
+  }
+
+  getProductRows(): (ProductCategory | null)[][] {
+    const rows: (ProductCategory | null)[][] = [];
+    
+    for (let i = 0; i < this.filteredProductsCategories.length; i += this.productsPerRow) {
+      const row = this.filteredProductsCategories.slice(i, i + this.productsPerRow);
+      // Pad the row with null values if it's not full
+      while (row.length < this.productsPerRow) {
+        row.push(null);
+      }
+      rows.push(row);
+    }
+    
+    return rows;
   }
 }

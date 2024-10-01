@@ -11,11 +11,12 @@ import { Router } from '@angular/router'; // Add this import
 })
 export class AuthService {
   private loggedIn = new BehaviorSubject<boolean>(this.hasToken());
+  public isLoggedIn$ = this.loggedIn.asObservable();
 
   constructor(
     private jwtHelper: JwtHelperService,
     private router: Router // Inject Router
-  ) { }
+  ) { } 
 
   private hasToken(): boolean {
     return !!localStorage.getItem('token');
@@ -30,13 +31,12 @@ export class AuthService {
     return localStorage.removeItem('role');
   }
   logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('encodedRole');
+    this.removeToken();
     this.loggedIn.next(false);
     this.router.navigate(['/login']);
   }
 
-  public getToken(): string | null {
+  public getToken(): string {
     const token = localStorage.getItem('token');
     const expiration = localStorage.getItem('tokenExpiration');
     
@@ -45,11 +45,11 @@ export class AuthService {
       if (new Date().getTime() > expirationTime) {
         this.removeToken();
         this.loggedIn.next(false);
-        return null;
+        return '';
       }
     }
     
-    return token || null;
+    return token || '';
   }
 
   public getRole() {

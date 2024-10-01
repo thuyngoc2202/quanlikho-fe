@@ -1,26 +1,9 @@
 <app-navigation></app-navigation>
-<div class="container mx-auto py-8 px-4 lg:px-0">
-    <div class="flex flex-col lg:flex-row gap-8">
-        <aside class="w-full lg:w-1/4 lg:pr-8 mb-8 lg:mb-0">
-
-            <h2 class="text-lg font-semibold mb-4">
-                DANH MỤC SẢN PHẨM
-            </h2>
-            <ul class="space-y-2">
-                <li *ngFor="let category of categories"
-                    class="flex justify-between items-center hover:bg-gray-300 p-2 rounded-lg cursor-pointer"
-                    [ngClass]="{'bg-gray-300': activeMenu === category.category_name}"
-                    (click)="selectCategory(category)">
-                    <span class="text-gray-600 hover:text-gray-800">
-                        {{ category.category_name }}
-                    </span>
-                </li>
-            </ul>
-
-        </aside>
+<div class="container mx-auto py-4 sm:py-8 px-4 lg:px-0">
+    <div class="flex justify-center">
         <!-- Product Grid -->
-        <div class="w-full lg:w-3/4 overflow-x-auto">
-            <div class="relative mt-4 mb-4">
+        <div class="w-full max-w-4xl">
+            <div class="relative mb-4">
                 <input type="text" placeholder="Tìm kiếm sản phẩm"
                     class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
                     [(ngModel)]="searchQuery" (input)="searchProductCategories()">
@@ -28,94 +11,32 @@
                     class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0z" />
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 014 12" />
                 </svg>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full bg-white border border-gray-200">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
-                            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên sản
-                                phẩm</th>
-                            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loại
-                                hàng</th>
-                            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giá
-                            </th>
-                            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số
-                                lượng</th>
-                            <th class="p-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Thao
-                                tác</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr *ngIf="filteredProductsCategories.length === 0">
-                            <td colspan="6" class="p-2 text-center text-gray-500">Không có dữ liệu</td>
-                        </tr>
-                        <tr *ngFor="let productsCategory of filteredProductsCategories; let i = index"
-                            class="hover:bg-gray-50 transition duration-300 ease-in-out">
-                            <td class="p-2 whitespace-nowrap">{{ i + 1 }}</td>
-                            <td class="p-2 whitespace-nowrap font-medium text-gray-900">{{ productsCategory.product_name
-                                }}</td>
-                            <td class="p-2 whitespace-nowrap text-gray-500">{{ productsCategory.category_name }}</td>
-                            <td class="p-2 whitespace-nowrap text-gray-500">{{ productsCategory.price | priceDisplay | customCurrency
-                                }}</td>
-                            <td class="p-2 whitespace-nowrap">
-                                <div class="flex items-center space-x-1">
-                                    <button (click)="decreaseQuantity(productsCategory)"
-                                        class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-2 rounded text-xs">
-                                        -
-                                    </button>
-                                    <input type="number" [ngModel]="getQuantity(productsCategory)"
-                            (ngModelChange)="handleQuantityChange(productsCategory, $event)"
-                            class="w-12 text-center border rounded py-1 px-1 text-sm" 
-                            min="1" 
-                            style="-moz-appearance: textfield; appearance: textfield;"
-                            (input)="handleInputChange($event, productsCategory)">
-                                    <button (click)="increaseQuantity(productsCategory)"
-                                        class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-2 rounded text-xs">
-                                        +
-                                    </button>
-                                </div>
-                            </td>
-                            <td class="p-2 whitespace-nowrap text-center">
-                                <div class="flex justify-center space-x-1">
-                                    <button
-                                        (click)="buyNow(productsCategory)"
-                                        class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded text-xs transition duration-300 ease-in-out">
-                                        Mua
-                                    </button>
-                                    <button
-                                        class="bg-sky-500 hover:bg-sky-700 text-white font-bold py-1 px-2 rounded text-xs transition duration-300 ease-in-out"
-                                        (click)="addToCart(productsCategory)">
-                                        Thêm vào giỏ hàng
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 3xl:grid-cols-16">
+                <div *ngFor="let product of productsCategories" 
+                     (click)="openPopupCart(product)"
+                     class="p-2 truncate border rounded text-sm font-medium cursor-pointer text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out">
+                    {{ product?.product_name || '' }}
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Success Popup -->
 <div *ngIf="showPopup" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" (click)="closePopup($event)">
-    <div class="bg-white rounded-lg shadow-lg w-96" (click)="$event.stopPropagation()">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-sm mx-4" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between p-4 border-b">
             <div class="flex items-center text-green-600">
-                <svg class="w-9 h-9 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-8 h-8 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="12" cy="12" r="11" fill="#4CAF50" />
                     <path d="M7 13l3 3 7-7" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <animate
-                        attributeName="stroke-dasharray"
-                        from="0 28 28"
-                        to="28 28 28"
-                        dur="0.5s"
-                        fill="freeze"
-                      />
+                      <animate attributeName="stroke-dasharray" from="0 28 28" to="28 28 28" dur="0.5s" fill="freeze" />
                     </path>
-                  </svg>
-                <span class="font-medium">Thêm vào giỏ hàng thành công</span>
+                </svg>
+                <span class="font-medium text-sm sm:text-base">Thêm vào giỏ hàng thành công</span>
             </div>
             <button (click)="showPopup = false" class="text-gray-500 hover:text-gray-700">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -124,31 +45,70 @@
             </button>
         </div>
         <div class="p-4">
-            <div class="flex items-center mb-4">
-                <div>
-                    <h3 class="font-medium text-sm">{{ selectedProduct.product_name }}</h3>
-                </div>
-            </div>
-            <div class="mt-4 flex justify-between items-center mt-1">
+            <h3 class="font-medium text-sm sm:text-base mb-2">{{ selectedProduct.product_name }}</h3>
+            <div class="flex justify-between items-center mb-4">
                 <p class="text-sm text-gray-600">Giỏ hàng hiện có:</p>
-                    <span class="text-gray-500 text-sm ">{{ getTotalQuantity() }} sản phẩm</span>
-
+                <span class="text-gray-500 text-sm">{{ getTotalQuantity() }} sản phẩm</span>
             </div>
-            <div class="mt-4 flex justify-between space-x-2">
-                <button (click)="continueShopping()" class="flex-1 px-4 py-2 bg-white text-blue-500 border border-blue-500 rounded hover:bg-blue-50 transition-colors duration-300">
+            <div class="flex flex-col sm:flex-row justify-between gap-2">
+                <button (click)="continueShopping()" class="w-full sm:w-auto px-4 py-2 bg-white text-blue-500 border border-blue-500 rounded hover:bg-blue-50 transition-colors duration-300">
                     Thanh toán
                 </button>
-                <button (click)="goToCart()" class="flex-1 px-4 py-2 bg-yellow-700 text-white rounded hover:bg-yellow-600 transition-colors duration-300">
+                <button (click)="goToCart()" class="w-full sm:w-auto px-4 py-2 bg-yellow-700 text-white rounded hover:bg-yellow-600 transition-colors duration-300">
                     Xem giỏ hàng
                 </button>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Cart Popup -->
+<div *ngIf="showPopupCart" 
+     class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50"
+     (click)="closePopupCart($event)">
+    <div class="bg-white p-5 rounded-lg shadow-xl max-w-md w-full mx-4" (click)="$event.stopPropagation()">
+        <h2 class="text-xl font-bold mb-4">{{ selectedProduct.product_name }}</h2>
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="quantity">
+                Số lượng:
+            </label>
+            <div class="flex items-center space-x-2">
+                <button (click)="decreaseQuantity(selectedProduct)"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded transition duration-300 ease-in-out">
+                    -
+                </button>
+                <input type="number" [ngModel]="getQuantity(selectedProduct)"
+                    (ngModelChange)="handleQuantityChange(selectedProduct, $event)"
+                    class="w-16 text-center border rounded py-1 px-2 text-sm" min="1"
+                    style="-moz-appearance: textfield; appearance: textfield;"
+                    (input)="handleInputChange($event, selectedProduct)">
+                <button (click)="increaseQuantity(selectedProduct)"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded transition duration-300 ease-in-out">
+                    +
+                </button>
+            </div>
+        </div>
+        <div class="flex flex-col sm:flex-row justify-between gap-2">
+            <button (click)="buyNow(selectedProduct)" class="w-full sm:w-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+                Mua ngay
+            </button>
+            <button (click)="addToCart(selectedProduct)" class="w-full sm:w-auto bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+                Thêm vào giỏ hàng
+            </button>
+        </div>
+        <button (click)="closePopupCart($event)" class="mt-4 w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+            Đóng
+        </button>
+    </div>
+</div>
+
 <style>
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button {
         -webkit-appearance: none;
         margin: 0;
+    }
+    input[type=number] {
+        -moz-appearance: textfield;
     }
 </style>

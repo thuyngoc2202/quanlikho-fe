@@ -7,6 +7,8 @@ import { Category } from 'src/app/model/category.model';
 import { ActiveMenuService } from 'src/app/util/active-menu-service';
 import { SelectedCategoryService } from 'src/app/util/categoryService';
 import { Subscription } from 'rxjs';
+import { AdminServiceService } from 'src/app/service/admin-service.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-navigation',
@@ -26,7 +28,21 @@ export class NavigationComponent implements OnInit {
   productQuantities: { [key: string]: number } = {};
   private cartSubscription!: Subscription;
 
-  constructor(private activeMenuService: ActiveMenuService, private router: Router, private cartService: CartService, private authService: AuthService, private userService: UserServiceService, private sltCategory: SelectedCategoryService) { }
+  showEditCategoryPopup = false;
+  isConfirmUpdatePopupOpen = false;
+  showAddCategoryPopup = false;
+  isAddCategoryConfirmPopupOpen = false;
+  editingCategory!: Category;
+  newCategory: Category = new Category();
+
+  constructor(private activeMenuService: ActiveMenuService,
+    private router: Router,
+    private cartService: CartService, private authService: AuthService,
+    private userService: UserServiceService,
+    private sltCategory: SelectedCategoryService,
+    private adminService: AdminServiceService,
+    private toastr: ToastrService,
+  ) { }
 
   ngOnInit(): void {
     this.gerRouter();
@@ -34,12 +50,18 @@ export class NavigationComponent implements OnInit {
       this.cartCount = count;
       this.updateAuthStatus();
     });
-    
+
     this.getCategory();
     this.loadCartFromLocalStorage();
     this.cartSubscription = this.cartService.cartUpdated.subscribe(() => {
       this.loadCartFromLocalStorage();
     });
+
+    this.authService.isLoggedIn$.subscribe(
+      (isLoggedIn: boolean) => {
+        this.isLoggedIn = isLoggedIn;
+      }
+    );
   }
 
   updateAuthStatus() {
@@ -125,5 +147,87 @@ export class NavigationComponent implements OnInit {
   selectCategory(category: any) {
     this.sltCategory.setSelectedCategory(category);
     this.router.navigate(['/home']);
+  }
+
+  closeConfirmPopup() {
+    this.isConfirmUpdatePopupOpen = false;
+    this.isAddCategoryConfirmPopupOpen = false;
+  }
+
+  openAddCategoryConfirmPopup() {
+    if (this.newCategory.category_name && this.newCategory.category_name.trim()) {
+      this.isAddCategoryConfirmPopupOpen = true;
+    } else {
+      this.toastr.error('Tên danh mục không được để trống', 'Lỗi');
+    }
+  }
+
+  openEditCategoryConfirmPopup() {
+    this.isConfirmUpdatePopupOpen = true;
+  }
+
+  openEditCategoryPopup(category: any) {
+    this.editingCategory = { ...category };
+    this.showEditCategoryPopup = true;
+  }
+
+  cancelEditCategory() {
+    this.showEditCategoryPopup = false;
+  }
+
+  saveEditCategory() {
+    // Implement the logic to save the edited category
+    console.log('Saving edited category:', this.editingCategory);
+
+    console.log(this.editingCategory);
+    this.adminService.updateCategory(this.editingCategory).subscribe({
+      next: (response) => {
+        this.getCategory();
+        this.showEditCategoryPopup = false;
+        this.isConfirmUpdatePopupOpen = false;
+        this.toastr.success('Sửa loại hàng thành công', 'Thành công');
+      },
+      error: (error) => {
+        console.error('Failed to update category', error);
+        this.isConfirmUpdatePopupOpen = false;
+        this.toastr.error(`${error.error.result_data.msg}`, 'Thất bại');
+      }
+    });
+  }
+
+  openAddCategoryPopup() {
+    this.showAddCategoryPopup = true;
+    this.newCategory = new Category();
+  }
+
+  cancelAddCategory() {
+    this.showAddCategoryPopup = false;
+    this.newCategory = new Category();
+  }
+
+  saveNewCategory() {
+    if (!this.newCategory.category_name || !this.newCategory.category_name.trim()) {
+      this.toastr.error('Tên danh mục không được để trống', 'Lỗi');
+      return;
+    }
+
+    this.adminService.createCategory(this.newCategory).subscribe({
+      next: (response) => {
+        this.getCategory();
+        this.showAddCategoryPopup = false;
+        this.isAddCategoryConfirmPopupOpen = false;
+        this.newCategory = new Category();
+        this.toastr.success('Thêm loại hàng thành công', 'Thành công');
+      },
+      error: (error) => {
+        console.error('Failed to create category', error);
+        this.isAddCategoryConfirmPopupOpen = false;
+        if (error.error && error.error.result_data && error.error.result_data.msg) {
+          this.toastr.error(error.error.result_data.msg, 'Thất bại');
+        } else {
+          this.toastr.error('Có lỗi xảy ra khi thêm danh mục', 'Thất bại');
+        }
+      }
+    });
   }
 }

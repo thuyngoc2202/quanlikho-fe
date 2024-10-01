@@ -16,7 +16,6 @@ import { ReportComponent } from './admin/report/report/report.component';
 const routes: Routes = [
   { path: '', component: IndexComponent },
   { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
   { path: 'home', component: IndexComponent },
   { path: 'admin', component: ProductComponent, canActivate: [AuthGuard] },
   { path: 'admin/products', component: ProductComponent, canActivate: [AuthGuard] },
