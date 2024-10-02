@@ -8,7 +8,7 @@ export class ProductCategory {
     max_limit: number;
     create_date: string;
     modify_date: string;
-    
+    keywords: string[];
     constructor(){
         this.product_category_id = '';
         this.product_id = '';
@@ -19,5 +19,6 @@ export class ProductCategory {
         this.max_limit = 0;
         this.create_date = '';
         this.modify_date = '';
+        this.keywords = [];
     }
 }

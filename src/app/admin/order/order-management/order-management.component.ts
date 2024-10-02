@@ -7,6 +7,8 @@ import { AdminServiceService } from 'src/app/service/admin-service.service';
 
 import { ToastrService } from 'ngx-toastr';
 import { HighlightPipe } from 'src/app/pipe/highlight.pipe';
+import { AuthService } from 'src/app/auth/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-order-management',
@@ -32,7 +34,8 @@ export class OrderManagementComponent implements OnInit {
   idOrder: string = '';
   isUpdating: boolean = false;
 
-  constructor(private adminService: AdminServiceService, private toastr: ToastrService) { }
+
+  constructor(private adminService: AdminServiceService, private toastr: ToastrService, private authService: AuthService , public router: Router) { }
 
   ngOnInit(): void {
     this.getAllOrder();
@@ -57,6 +60,7 @@ export class OrderManagementComponent implements OnInit {
     this.isDetailPopupOpen = true;
     this.adminService.getOrderDetail(product_order_id).subscribe((res) => {
       this.selectedOrder = res.result_data;
+      this.currentStatus = res.result_data.status; 
       console.log('réa', this.selectedOrder);
     });
   }

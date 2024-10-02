@@ -36,20 +36,25 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  public getToken(): string {
+  public getToken(): string | null {
     const token = localStorage.getItem('token');
     const expiration = localStorage.getItem('tokenExpiration');
     
-    if (token && expiration) {
+    if (!token) {
+      return null;
+    }
+
+    if (expiration) {
       const expirationTime = parseInt(expiration, 10);
       if (new Date().getTime() > expirationTime) {
-        this.removeToken();
-        this.loggedIn.next(false);
-        return '';
+        this.logout(); // Use logout instead of just removing the token
+        return null;
       }
+    } else {
+      console.warn('Token found but no expiration time set');
     }
     
-    return token || '';
+    return token;
   }
 
   public getRole() {

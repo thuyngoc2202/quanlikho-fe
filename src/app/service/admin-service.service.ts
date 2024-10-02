@@ -68,7 +68,7 @@ export class AdminServiceService {
   updateProduct(product: Product): Observable<Product> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
     return this.httpClient.post<Product>(`${this.API_CONFIG.product.admin}/product_update`, product, { headers })
-   
+
   }
 
   deleteProduct(id: string | undefined): Observable<void> {
@@ -85,9 +85,9 @@ export class AdminServiceService {
 
   updateCategory(category: Category): Observable<Category> {
     return this.httpClient.post<Category>(`${this.API_CONFIG.category.unAuth}/category_update`, category, { headers: this.headers })
-    .pipe(
-      tap(() => this.notifyDataChanged())
-    );
+      .pipe(
+        tap(() => this.notifyDataChanged())
+      );
   }
 
   deleteCategory(id: string): Observable<any> {

@@ -7,6 +7,8 @@ import { saveAs } from 'file-saver';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { MatCalendarCellCssClasses } from '@angular/material/datepicker';
 import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-report',
@@ -36,7 +38,8 @@ export class ReportComponent implements OnInit {
     private adminService: AdminServiceService,
     private toastr: ToastrService,
     private cdr: ChangeDetectorRef,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    public router: Router
   ) {
     this.dateClassFunc = this.updateDateClass();
   }

@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
 import { CartService } from 'src/app/util/Cart.service';
 import { AuthService } from 'src/app/auth/auth.service';
 import { UserServiceService } from 'src/app/service/user-service.service';
 import { Category } from 'src/app/model/category.model';
 import { ActiveMenuService } from 'src/app/util/active-menu-service';
 import { SelectedCategoryService } from 'src/app/util/categoryService';
-import { Subscription } from 'rxjs';
+import { filter, Subscription } from 'rxjs';
 import { AdminServiceService } from 'src/app/service/admin-service.service';
 import { ToastrService } from 'ngx-toastr';
 
@@ -15,7 +15,7 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './navigation.component.html',
   styleUrls: ['./navigation.component.css']
 })
-export class NavigationComponent implements OnInit {
+export class NavigationComponent implements OnInit, OnDestroy {
   currentRoute: string = '';
   getCurrentRoute: string = '';
   cartCount: number = 0;
@@ -34,18 +34,28 @@ export class NavigationComponent implements OnInit {
   isAddCategoryConfirmPopupOpen = false;
   editingCategory!: Category;
   newCategory: Category = new Category();
+  isConfirmDeletePopupOpen: boolean = false;
+  idCategory: string = '';
+  categoryName: string = '';
 
+  showOrderManagementPopup = false;
+  showReportPopup: boolean = false;
+  private subscriptions: Subscription[] = [];
+
+  private categorySubscription: Subscription | null = null;
+  
   constructor(private activeMenuService: ActiveMenuService,
-    private router: Router,
+    public router: Router,
     private cartService: CartService, private authService: AuthService,
     private userService: UserServiceService,
     private sltCategory: SelectedCategoryService,
     private adminService: AdminServiceService,
     private toastr: ToastrService,
+    private categoryService: SelectedCategoryService
   ) { }
 
   ngOnInit(): void {
-    this.gerRouter();
+    this.updateRouteInfo();
     this.cartService.cartCount$.subscribe(count => {
       this.cartCount = count;
       this.updateAuthStatus();
@@ -62,6 +72,64 @@ export class NavigationComponent implements OnInit {
         this.isLoggedIn = isLoggedIn;
       }
     );
+
+    this.subscriptions.push(
+      this.cartService.cartCount$.subscribe(count => {
+        this.cartCount = count;
+        this.updateAuthStatus();
+      }),
+
+      this.cartService.cartUpdated.subscribe(() => {
+        this.loadCartFromLocalStorage();
+      }),
+
+      this.authService.isLoggedIn$.subscribe(
+        (isLoggedIn: boolean) => {
+          this.isLoggedIn = isLoggedIn;
+        }
+      ),
+
+      this.categoryService.selectedCategory$.subscribe(category => {
+        this.categoryName = category ? category.category_name : null;
+      }),
+
+      this.router.events.pipe(
+        filter(event => event instanceof NavigationEnd)
+      ).subscribe(() => {
+        this.resetBreadcrumb();
+        this.updateRouteInfo();
+      })
+    );
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+  resetBreadcrumb() {
+    this.categoryName = '';
+  }
+
+  updateRouteInfo() {
+    const urlSegments = this.router.url.split('/').filter(segment => segment !== '');
+    console.log(urlSegments);
+    if (urlSegments.length > 0) {
+      switch (urlSegments[0]) {
+        case 'login':
+          this.currentRoute = 'ĐĂNG NHẬP';
+          break;
+        case 'cart':
+          this.currentRoute = 'GIỎ HÀNG';
+          break;
+        case 'home':
+        case '':
+          this.currentRoute = 'DANH MỤC SẢN PHẨM';
+          break;
+        default:
+          this.currentRoute = urlSegments[0].toUpperCase();
+      } 
+    } else {
+      this.currentRoute = 'TRANG CHỦ';
+    }
   }
 
   updateAuthStatus() {
@@ -133,6 +201,8 @@ export class NavigationComponent implements OnInit {
   }
 
   logout() {
+    this.updateAuthStatus();
+    this.categoryName = '';
     this.authService.logout();
     this.updateAuthStatus();
   }
@@ -144,6 +214,7 @@ export class NavigationComponent implements OnInit {
   }
 
   selectCategory(category: any) {
+    this.categoryName = category.category_name;
     this.sltCategory.setSelectedCategory(category);
     this.router.navigate(['/home']);
   }
@@ -151,6 +222,7 @@ export class NavigationComponent implements OnInit {
   closeConfirmPopup() {
     this.isConfirmUpdatePopupOpen = false;
     this.isAddCategoryConfirmPopupOpen = false;
+    this.isConfirmDeletePopupOpen = false;
   }
 
   openAddCategoryConfirmPopup() {
@@ -228,5 +300,41 @@ export class NavigationComponent implements OnInit {
         }
       }
     });
+  }
+
+  openDeleteCategoryPopup(categoryId: string){
+    this.isConfirmDeletePopupOpen = true;
+    this.idCategory = categoryId;
+  }
+
+  openDeleteConfirmCategoryPopup() {
+    this.adminService.deleteCategory(this.idCategory).subscribe({
+      next: (response) => {
+        this.getCategory();
+        this.toastr.success('Xoá danh mục hàng thành công', 'Thành công');
+        this.idCategory = '';
+        this.isConfirmDeletePopupOpen = false;
+      },
+      error: (error) => {
+        console.error('Failed to delete category', error);
+        this.toastr.error(`Xoá danh mục hàng thất bại`, 'Thất bại');
+      }
+    });
+  }
+
+  openOrderManagementPopup() {
+    this.showOrderManagementPopup = true;
+  }
+
+  closeOrderManagementPopup() {
+    this.showOrderManagementPopup = false;
+  }
+
+  openReportPopup() {
+    this.showReportPopup = true;
+  }
+
+  closeReportPopup() {
+    this.showReportPopup = false;
   }
 }

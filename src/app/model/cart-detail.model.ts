@@ -55,13 +55,16 @@ export class PlaceOrderDetail {
   product_name: string;
   quantity: number;
   subtotal: number;
-  
+  category_name: string;
+  stock: number;
   constructor() {
     this.product_order_id = '';
     this.product_category_id = '';
     this.product_name = '';
     this.quantity = 0;
     this.subtotal = 0;
+    this.category_name = '';
+    this.stock = 0;
   }
 }
 

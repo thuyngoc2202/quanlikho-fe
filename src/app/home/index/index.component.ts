@@ -8,7 +8,7 @@ import { CustomCurrencyPipe } from 'src/app/pipe/custom-currency.pipe';
 import { CartService } from 'src/app/util/Cart.service';
 import { OrderDetails } from 'src/app/model/cart-detail.model';
 import { Router } from '@angular/router';
-import { retry, Subscription } from 'rxjs';
+import { retry, Subscription, forkJoin } from 'rxjs';
 import { PriceDisplayPipe } from 'src/app/pipe/price-display-pipe.pipe';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { AuthService } from 'src/app/auth/auth.service';
@@ -55,6 +55,8 @@ export class IndexComponent implements OnInit, OnDestroy {
   editForm!: FormGroup;
   idProductCategory: string = '';
   isConfirmUpdatePopupOpen: boolean = false;
+  newKeywords: string[] = [];
+  formProduct!: FormGroup;
 
   constructor(
     private userService: UserServiceService,
@@ -94,6 +96,7 @@ export class IndexComponent implements OnInit, OnDestroy {
       }
     });
     this.validate();
+    this.validateProduct();
   }
 
 
@@ -111,6 +114,11 @@ export class IndexComponent implements OnInit, OnDestroy {
       quantity: ['', [Validators.required, Validators.min(0)]],
       min_limit: ['', [Validators.required, Validators.min(0)]],
       max_limit: ['', [Validators.required, Validators.min(0)]],
+    });
+  }
+  validateProduct() {
+    this.formProduct = this.fb.group({
+      product_name: ['', Validators.required],
     });
   }
 
@@ -401,6 +409,10 @@ export class IndexComponent implements OnInit, OnDestroy {
     this.resetProductForm();
     this.showEditPopup = true;
 
+    this.formProduct.patchValue({
+      product_name: productsCategory.product_name,
+    });
+    this.newKeywords = [...productsCategory.keywords];
 
     this.editForm.patchValue({
       quantity: productsCategory.quantity,
@@ -429,35 +441,47 @@ export class IndexComponent implements OnInit, OnDestroy {
     this.showEditPopup = false;
   }
   confirmUpdate() {
-    this.updateProductCategory();
+    this.isConfirmUpdatePopupOpen = true;
   }
 
   updateProductCategory() {
-    const productCategoryData = {
-      ...this.editForm.value,
-      product_id: this.idProduct,
-      category_id: this.idCategory,
-      product_category_id: this.idProductCategory,
-    }
+    if (this.editForm.valid && this.formProduct.valid) {
+      const productCategoryData = {
+        ...this.editForm.value,
+        product_id: this.idProduct,
+        category_id: this.idCategory,
+        product_category_id: this.idProductCategory,
+      };
 
+      const productData = {
+        ...this.formProduct.value,
+        keywords: this.newKeywords,
+        product_id: this.idProduct,
+      };
 
-    if (this.editForm.valid) {
-      this.adminService.updateProductCategory(productCategoryData).subscribe({
+      forkJoin({
+        productCategory: this.adminService.updateProductCategory(productCategoryData),
+        product: this.adminService.updateProduct(productData)
+      }).subscribe({
         next: (response) => {
           this.showEditPopup = false;
           this.isConfirmUpdatePopupOpen = false;
           this.loadProductCategoryByCategoryId(this.idCategory);
-          this.resetProductForm();
-          this.toastr.success('Sửa sản phẩm thành công', 'Thành công');
+          this.loadProduct();
+          this.toastr.success('Sửa sản phẩm và danh mục thành công', 'Thành công');
         },
         error: (error) => {
           this.isConfirmUpdatePopupOpen = false;
-          this.toastr.error(`${error.error.result_data.msg}`, 'Thất bại');
+          if (error.error && error.error.result_data && error.error.result_data.msg) {
+            this.toastr.error(`${error.error.result_data.msg}`, 'Thất bại');
+          } else {
+            this.toastr.error('Có lỗi xảy ra khi cập nhật', 'Thất bại');
+          }
         }
       });
     } else {
       this.isConfirmUpdatePopupOpen = false;
-      this.toastr.error(`Thiếu trường`, 'Thất bại');
+      this.toastr.error('Vui lòng điền đầy đủ thông tin', 'Thất bại');
     }
   }
   loadCategory() {
@@ -514,5 +538,55 @@ export class IndexComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     this.showEditPopup = false;
     this.editForm.reset();
+    this.formProduct.reset();
+    this.newKeywords = [];
+
   }
+  
+  isBottomHalf(productCategory: ProductCategory): boolean {
+    const index = this.productsCategories.indexOf(productCategory);
+    return index >= this.productsCategories.length / 2;
+  }
+
+  // Không cần setupBreakpointObserver() nữa, vì Tailwind sẽ xử lý responsive
+
+  trackByProduct(index: number, productCategory: ProductCategory): string {
+    return productCategory.product_category_id;
+  }
+
+  addKeyword(keyword: string) {
+    if (keyword && keyword.trim() !== '') {
+      this.newKeywords.push(keyword.trim());
+    }
+  }
+
+  removeKeyword(index: number) {
+    this.newKeywords.splice(index, 1);
+  }
+
+  closeConfirmPopup() {
+    this.isConfirmUpdatePopupOpen = false;
+  }
+
+  isMatchingSearch(product: any): boolean {
+    if (!this.searchQuery) return false; // Không highlight nếu không có từ khóa tìm kiếm
+
+    const searchLower = this.searchQuery.toLowerCase();
+    console.log(searchLower);
+
+    // Kiểm tra tên sản phẩm
+    if (product.product_name.toLowerCase().includes(searchLower)) {
+      return true;
+    }
+
+    // Kiểm tra từ khóa (nếu có)
+    if (product.keywords && Array.isArray(product.keywords)) {
+      return product.keywords.some((keyword: string) =>
+        keyword.toLowerCase().includes(searchLower)
+      );
+    }
+
+    return false;
+  }
+
 }
