@@ -36,7 +36,12 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  public getToken(): string | null {
+  public getToken(): string {
+    const token = localStorage.getItem('token');
+    return token || '';
+  }
+
+  public getToken1(): string | null {
     const token = localStorage.getItem('token');
     const expiration = localStorage.getItem('tokenExpiration');
     
@@ -81,7 +86,7 @@ export class AuthService {
 
   public isAuthenticated(): boolean {
     // get the token
-    const token = this.getToken();
+    const token = this.getToken1();
     // return a boolean reflecting
     // whether or not the token is expired
     return !this.jwtHelper.isTokenExpired(token);
