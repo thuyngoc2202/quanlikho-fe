@@ -13,7 +13,6 @@ export class PlaceOrderComponent implements OnInit {
   cartCount: number = 0;
   productCart: any[] = [];
   items: any;
-  totalPrice: number = 0;
   productQuantities: { [key: string]: number } = {};
   orderNotes: string = '';
 
@@ -46,7 +45,7 @@ export class PlaceOrderComponent implements OnInit {
       this.productQuantities[product.product_category_id] = 1;
     }
     if (this.productQuantities[product.product_category_id] > 1) {
-      this.productQuantities[product.product_category_id]--;
+      this.productQuantities[product.product_category_id] = this.productQuantities[product.product_category_id] - 50;
       this.updateLocalStorage();
       this.updateCartCount();
       this.getTotalQuantity();
@@ -55,10 +54,31 @@ export class PlaceOrderComponent implements OnInit {
 
   increaseQuantity(product: any) {
 
-    this.productQuantities[product.product_category_id]++;
+    if (!this.productQuantities[product.product_category_id]) {
+      this.productQuantities[product.product_category_id] = 0;
+    }
+  
+    const currentQuantity = this.productQuantities[product.product_category_id];
+    const stock = product.stock || 0;
+    const incrementAmount = 50;
+  
+    if (currentQuantity + incrementAmount <= stock) {
+
+      this.productQuantities[product.product_category_id] += incrementAmount;
+    } else if (currentQuantity < stock) {
+
+      this.productQuantities[product.product_category_id] = stock;
+      alert(`Chỉ có thể tăng đến ${stock} (số lượng tồn kho)`);
+    } else {
+
+      alert('Số lượng đã đạt mức tối đa trong kho');
+      return; 
+    }
+  
     this.updateLocalStorage();
     this.updateCartCount();
     this.getTotalQuantity();
+  
   }
 
   removeItem(item: any) {
@@ -127,16 +147,7 @@ export class PlaceOrderComponent implements OnInit {
     this.cartService.updateCartCount(this.cartCount);
   }
 
-  getTotal() {
-    var total = 0;
-    for (var i = 0; i < this.productCart.length; i++) {
-      var item = this.productCart[i];
 
-      total += item.price * item.quantity;
-    }
-    localStorage.setItem('total', total.toString());
-    return total;
-  }
   getTotalQuantity(): number {
     let totalQuantity = 0;
     for (let item of this.productCart) {

@@ -1,26 +1,13 @@
 <app-navigation></app-navigation>
-<div class="container mx-auto py-8 px-4 lg:px-0">
-    <div class="flex flex-col lg:flex-row gap-8">
-        <aside class="w-full lg:w-1/4 lg:pr-8 mb-8 lg:mb-0">
-
-            <h2 class="text-lg font-semibold mb-4">
-                DANH MỤC SẢN PHẨM
-            </h2>
-            <ul class="space-y-2">
-                <li *ngFor="let category of categories"
-                    class="flex justify-between items-center hover:bg-gray-300 p-2 rounded-lg cursor-pointer"
-                    [ngClass]="{'bg-gray-300': activeMenu === category.category_name}"
-                    (click)="selectCategory(category)">
-                    <span class="text-gray-600 hover:text-gray-800">
-                        {{ category.category_name }}
-                    </span>
-                </li>
-            </ul>
-
-        </aside>
+<div class="container mx-auto py-4 sm:py-8 px-4 lg:px-0">
+    <div>
+        <h2 class="text-2xl font-bold mb-4">{{categoryName}}</h2>
+    </div>
+    <div class="flex justify-center">
         <!-- Product Grid -->
-        <div class="w-full lg:w-3/4 overflow-x-auto">
-            <div class="relative mt-4 mb-4">
+
+        <div class="w-full max-w-8xl">
+            <div class="relative mb-4">
                 <input type="text" placeholder="Tìm kiếm sản phẩm"
                     class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
                     [(ngModel)]="searchQuery" (input)="searchProductCategories()">
@@ -28,127 +15,271 @@
                     class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0z" />
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full bg-white border border-gray-200">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
-                            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên sản
-                                phẩm</th>
-                            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loại
-                                hàng</th>
-                            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giá
-                            </th>
-                            <th class="p-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số
-                                lượng</th>
-                            <th class="p-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Thao
-                                tác</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr *ngIf="filteredProductsCategories.length === 0">
-                            <td colspan="6" class="p-2 text-center text-gray-500">Không có dữ liệu</td>
-                        </tr>
-                        <tr *ngFor="let productsCategory of filteredProductsCategories; let i = index"
-                            class="hover:bg-gray-50 transition duration-300 ease-in-out">
-                            <td class="p-2 whitespace-nowrap">{{ i + 1 }}</td>
-                            <td class="p-2 whitespace-nowrap font-medium text-gray-900">{{ productsCategory.product_name
-                                }}</td>
-                            <td class="p-2 whitespace-nowrap text-gray-500">{{ productsCategory.category_name }}</td>
-                            <td class="p-2 whitespace-nowrap text-gray-500">{{ productsCategory.price | priceDisplay | customCurrency
-                                }}</td>
-                            <td class="p-2 whitespace-nowrap">
-                                <div class="flex items-center space-x-1">
-                                    <button (click)="decreaseQuantity(productsCategory)"
-                                        class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-2 rounded text-xs">
-                                        -
-                                    </button>
-                                    <input type="number" [ngModel]="getQuantity(productsCategory)"
-                            (ngModelChange)="handleQuantityChange(productsCategory, $event)"
-                            class="w-12 text-center border rounded py-1 px-1 text-sm" 
-                            min="1" 
-                            style="-moz-appearance: textfield; appearance: textfield;"
-                            (input)="handleInputChange($event, productsCategory)">
-                                    <button (click)="increaseQuantity(productsCategory)"
-                                        class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-2 rounded text-xs">
-                                        +
-                                    </button>
-                                </div>
-                            </td>
-                            <td class="p-2 whitespace-nowrap text-center">
-                                <div class="flex justify-center space-x-1">
-                                    <button
-                                        (click)="buyNow(productsCategory)"
-                                        class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded text-xs transition duration-300 ease-in-out">
-                                        Mua
-                                    </button>
-                                    <button
-                                        class="bg-sky-500 hover:bg-sky-700 text-white font-bold py-1 px-2 rounded text-xs transition duration-300 ease-in-out"
-                                        (click)="addToCart(productsCategory)">
-                                        Thêm vào giỏ hàng
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="w-full">
+                <div
+                    class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 3xl:grid-cols-16">
+                    <div *ngFor="let product of productsCategories; trackBy: trackByProduct"
+                        class="p-2 border text-sm font-medium cursor-pointer text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out relative group"
+                        [ngClass]="{'text-red-500 font-semibold': isMatchingSearch(product)}"
+                        (click)="isLoggedIn ? openEditPopup(product) : openPopupCart(product)">
+                        <div class="relative w-full overflow-hidden group">
+                            <div class="truncate group-hover:truncate-none transition-all duration-300 ease-in-out">
+                                <span class="inline-block group-hover:animate-slide">
+                                    {{ product?.product_name || '' }}
+                                </span>
+                            </div>
+                        </div>
+                        <div *ngIf="product"
+                            class="absolute z-10 left-0 mt-1 p-2 bg-white border rounded shadow-lg hidden group-hover:block min-w-[150px] max-w-[200px]"
+                            [ngClass]="{
+                                         'bottom-full mb-1': isBottomHalf(product),
+                                         'top-full mt-1': !isBottomHalf(product)
+                                     }">
+                            <strong class="block mb-1">Tên dùng chung:</strong>
+                            <div *ngFor="let keyword of product.keywords" class="truncate">
+                                {{ keyword }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+
         </div>
     </div>
 </div>
-<div *ngIf="showPopup" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" (click)="closePopup($event)">
-    <div class="bg-white rounded-lg shadow-lg w-96" (click)="$event.stopPropagation()">
+
+<div *ngIf="showEditPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+    (click)="closePopupUpdate($event)">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-[800px]" (click)="$event.stopPropagation()">
+        <div>
+            <h2 class="text-lg font-bold mb-4">Sửa sản phẩm</h2>
+            <form [formGroup]="formProduct" class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block mb-1 text-gray-400">Tên sản phẩm</label>
+                    <input type="text" name="product_name" required class="border border-gray-300 p-2 w-full rounded"
+                        formControlName="product_name" />
+                </div>
+                <div>
+                    <label class="block mb-1 text-gray-400">Tên dùng chung</label>
+                    <div class="flex flex-col">
+                        <div class="flex mb-2">
+                            <input type="text" #newKeywordInput
+                                (keyup.enter)="addKeyword(newKeywordInput.value); newKeywordInput.value = ''"
+                                placeholder="Thêm tên dùng chung mới..."
+                                class="border border-gray-300 p-2 rounded-l flex-grow text-sm">
+                            <button (click)="addKeyword(newKeywordInput.value); newKeywordInput.value = ''"
+                                class="bg-blue-500 text-white px-3 py-2 rounded-r hover:bg-blue-600 focus:outline-none text-sm">
+                                Thêm
+                            </button>
+                        </div>
+                        <div class="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
+                            <span *ngFor="let keyword of newKeywords; let i = index"
+                                class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs flex items-center">
+                                {{ keyword }}
+                                <button (click)="removeKeyword(i)"
+                                    class="ml-1 text-blue-600 hover:text-blue-800 focus:outline-none">
+                                    &times;
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="mt-4 border-t">
+            <h2 class="text-lg font-bold mb-4">Sửa loại hàng</h2>
+            <form [formGroup]="editForm" class="grid grid-cols-3 gap-4">
+                <div class="relative">
+                    <label class="block mb-1 text-gray-400">Sản phẩm</label>
+                    <div class="relative">
+                        <input type="text" name="product_id"
+                            class="border bg-gray-200 border-gray-300 p-2 w-full rounded pr-8"
+                            (focus)="showProductDropdown = true" (input)="filterProducts($event)"
+                            [value]="selectedProductUpdate?.product_name || ''" [disabled]="!!selectedProductUpdate" />
+                        <button *ngIf="selectedProductUpdate && !selectedProductUpdate"
+                            (click)="clearProductSelection()"
+                            class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                            &#x2715;
+                        </button>
+                    </div>
+                    <div *ngIf="showProductDropdown"
+                        class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg">
+                        <ul class="max-h-60 overflow-auto">
+                            <li *ngFor="let product of filteredProducts" class="p-2 hover:bg-gray-100 cursor-pointer"
+                                (click)="selectProductUpdate(product)">
+                                {{ product.product_name }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="relative">
+                    <label class="block mb-1 text-gray-400">Danh mục hàng</label>
+                    <div class="relative">
+                        <input type="text" name="category_id"
+                            class="border bg-gray-200 border-gray-300 p-2 w-full rounded pr-8"
+                            (focus)="showCategoryDropdown = true" (input)="filterCategories($event)"
+                            [value]="selectedCategoryUpdate?.category_name || ''"
+                            [disabled]="!!selectedCategoryUpdate" />
+                        <button *ngIf="selectedCategoryUpdate && !selectedCategoryUpdate "
+                            (click)="clearCategorySelection()"
+                            class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                            &#x2715;
+                        </button>
+                    </div>
+                    <div *ngIf="showCategoryDropdown && !selectedCategoryUpdate"
+                        class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg">
+                        <ul class="max-h-60 overflow-auto">
+                            <li *ngFor="let category of filteredCategories" class="p-2 hover:bg-gray-100 cursor-pointer"
+                                (click)="selectCategoryUpdate(category)">
+                                {{ category.category_name }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div>
+                    <label class="block mb-1 text-gray-400">Số lượng</label>
+                    <input type="number" formControlName="quantity" class="border border-gray-300 p-2 w-full rounded" />
+                </div>
+                <div>
+                    <label class="block mb-1 text-gray-400">Ngưỡng thấp</label>
+                    <input type="number" formControlName="min_limit"
+                        class="border border-gray-300 p-2 w-full rounded" />
+                </div>
+                <div>
+                    <label class="block mb-1 text-gray-400">Ngưỡng cao</label>
+                    <input type="number" formControlName="max_limit"
+                        class="border border-gray-300 p-2 w-full rounded" />
+                </div>
+
+                <div class="col-span-3 flex justify-end mt-4">
+                    <button type="submit" (click)="confirmUpdate()"
+                        class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded">
+                        Cập nhật
+                    </button>
+                    <button type="button" (click)="closePopupUpdate($event)"
+                        class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Đóng</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="isConfirmUpdatePopupOpen"
+    class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+        <h2 class="text-lg font-bold mb-4">Xác nhận cập nhật</h2>
+        <p>Bạn có chắc chắn muốn cập nhật?</p>
+        <div class="flex justify-end mt-4">
+            <button (click)="updateProductCategory()"
+                class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded">Có</button>
+            <button (click)="closeConfirmPopup()"
+                class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Không</button>
+        </div>
+    </div>
+</div>
+
+<!-- Success Popup -->
+<div *ngIf="showPopup" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+    (click)="closePopup($event)">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-sm mx-4" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between p-4 border-b">
             <div class="flex items-center text-green-600">
-                <svg class="w-9 h-9 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-8 h-8 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="12" cy="12" r="11" fill="#4CAF50" />
-                    <path d="M7 13l3 3 7-7" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <animate
-                        attributeName="stroke-dasharray"
-                        from="0 28 28"
-                        to="28 28 28"
-                        dur="0.5s"
-                        fill="freeze"
-                      />
+                    <path d="M7 13l3 3 7-7" stroke="#ffffff" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <animate attributeName="stroke-dasharray" from="0 28 28" to="28 28 28" dur="0.5s"
+                            fill="freeze" />
                     </path>
-                  </svg>
-                <span class="font-medium">Thêm vào giỏ hàng thành công</span>
+                </svg>
+                <span class="font-medium text-sm sm:text-base">Thêm vào giỏ hàng thành công</span>
             </div>
             <button (click)="showPopup = false" class="text-gray-500 hover:text-gray-700">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
                 </svg>
             </button>
         </div>
         <div class="p-4">
-            <div class="flex items-center mb-4">
-                <div>
-                    <h3 class="font-medium text-sm">{{ selectedProduct.product_name }}</h3>
-                </div>
-            </div>
-            <div class="mt-4 flex justify-between items-center mt-1">
+            <h3 class="font-medium text-sm sm:text-base mb-2">{{ selectedProduct.product_name }}</h3>
+            <div class="flex justify-between items-center mb-4">
                 <p class="text-sm text-gray-600">Giỏ hàng hiện có:</p>
-                    <span class="text-gray-500 text-sm ">{{ getTotalQuantity() }} sản phẩm</span>
-
+                <span class="text-gray-500 text-sm">{{ getTotalQuantity() }} sản phẩm</span>
             </div>
-            <div class="mt-4 flex justify-between space-x-2">
-                <button (click)="continueShopping()" class="flex-1 px-4 py-2 bg-white text-blue-500 border border-blue-500 rounded hover:bg-blue-50 transition-colors duration-300">
+            <div class="flex flex-col sm:flex-row justify-between gap-2">
+                <button (click)="continueShopping()"
+                    class="w-full sm:w-1/2 px-4 py-1.5 bg-white text-blue-500 border border-blue-500 rounded hover:bg-blue-50 transition-colors duration-300">
                     Thanh toán
                 </button>
-                <button (click)="goToCart()" class="flex-1 px-4 py-2 bg-yellow-700 text-white rounded hover:bg-yellow-600 transition-colors duration-300">
+                <button (click)="goToCart()"
+                    class="w-full sm:w-1/2 px-4 py-1.5 bg-yellow-700 text-white rounded hover:bg-yellow-600 transition-colors duration-300">
                     Xem giỏ hàng
                 </button>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Cart Popup -->
+<div *ngIf="showPopupCart"
+    class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50"
+    (click)="closePopupCart($event)">
+    <div class="bg-white p-5 rounded-lg shadow-xl max-w-md w-full mx-4" (click)="$event.stopPropagation()">
+        <div class="flex justify-between items-center border-b">
+            <h2 class="text-xl font-bold mb-4">{{ selectedProduct.product_name }}</h2>
+            <p class="text-gray-500 text-sm">{{selectedProduct.category_name}}</p>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="quantity">
+                Số lượng 1:
+            </label>
+            <div class="flex items-center space-x-2">
+                <button (click)="decreaseQuantity(selectedProduct)"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded transition duration-300 ease-in-out">
+                    -
+                </button>
+                <input type="number" [ngModel]="getQuantity(selectedProduct)"
+                    (ngModelChange)="handleQuantityChange(selectedProduct, $event)"
+                    class="w-16 text-center border rounded py-1 px-2 text-sm" min="1"
+                    style="-moz-appearance: textfield; appearance: textfield;"
+                    (input)="handleInputChange($event, selectedProduct)">
+                <button (click)="increaseQuantity(selectedProduct)"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded transition duration-300 ease-in-out">
+                    +
+                </button>
+            </div>
+        </div>
+        <div class="flex flex-col sm:flex-row justify-between gap-2">
+            <button (click)="buyNow(selectedProduct)"
+                class="w-full sm:w-1/2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1.5 px-4 rounded transition duration-300 ease-in-out">
+                Mua ngay
+            </button>
+            <button (click)="addToCart(selectedProduct)"
+                class="w-full sm:w-1/2 bg-green-500 hover:bg-green-700 text-white font-bold py-1.5 px-4 rounded transition duration-300 ease-in-out">
+                Thêm vào giỏ hàng
+            </button>
+        </div>
+        <button (click)="closePopupCart($event)"
+            class="mt-4 w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+            Đóng
+        </button>
+    </div>
+</div>
+
 <style>
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button {
         -webkit-appearance: none;
         margin: 0;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield;
+        appearance: textfield;
     }
 </style>

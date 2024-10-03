@@ -1,5 +1,5 @@
 <div class="flex h-screen overflow-hidden">
-    <app-sidebar></app-sidebar>
+    <app-sidebar *ngIf="router.url === '/admin/order-management'"></app-sidebar>
     <div class="flex-1 flex flex-col overflow-hidden">
         <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
             <div class="container mx-auto px-6 py-8">
@@ -55,21 +55,16 @@
                                     </td>
                                     <td class="py-2 px-4 border-b">{{ item.order_date | date:'dd/MM/yyyy HH:mm' }}</td>
                                     <td class="py-2 px-4 border-b">
-                                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                                        <div class="flex space-x-2">
                                             <button
-                                                class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded w-full sm:w-auto"
-                                                (click)="openUpdatePopup(item)">
-                                                Sửa
-                                            </button>
-                                            <button
-                                                class="bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded w-full sm:w-auto"
-                                                (click)="openDeleteProductPopup(item.product_order_id)">
-                                                Xoá
-                                            </button>
-                                            <button
-                                                class="bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded w-full sm:w-auto"
+                                                class="bg-blue-500 hover:bg-blue-700 text-xs text-white px-2 py-1 rounded flex-grow sm:flex-grow-0 whitespace-nowrap"
                                                 (click)="openDetailOrder(item.product_order_id)">
                                                 Xem chi tiết
+                                            </button>
+                                            <button
+                                                class="bg-red-500 hover:bg-red-700 text-xs text-white px-2 py-1 rounded flex-grow sm:flex-grow-0"
+                                                (click)="openDeleteProductPopup(item.product_order_id)">
+                                                Xoá
                                             </button>
                                         </div>
                                     </td>
@@ -78,7 +73,7 @@
                         </table>
                     </div>
                     <!-- Popup Cập nhật -->
-                    <div *ngIf="isUpdatePopupOpen"
+                    <!-- <div *ngIf="isUpdatePopupOpen"
                         class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                         <div class="bg-white p-6 rounded-lg shadow-lg w-[800px]">
                             <h2 class="text-lg font-bold mb-4">Cập nhật đơn hàng</h2>
@@ -106,11 +101,10 @@
                                 <div>
                                     <label class="block mb-1 text-gray-400">Trạng thái đơn hàng</label>
                                     <select [(ngModel)]="selectedOrder.status" name="status" required
-                                            class="border border-gray-300 p-2 w-full rounded">
-                                        <option *ngFor="let statusInfo of getStatusAvailability(selectedOrder.status)"
-                                                [value]="statusInfo.status"
-                                                [disabled]="!statusInfo.available">
-                                            {{ statusInfo.status | statusOrder }}
+                                        class="border border-gray-300 p-2 w-full rounded">
+                                        <option *ngFor="let status of getAvailableStatuses()"
+                                            [value]="status">
+                                            {{ status | statusOrder }}
                                         </option>
                                     </select>
                                 </div>
@@ -132,90 +126,11 @@
                                 </div>
                             </form>
                         </div>
-                    </div>
+                    </div> -->
                     <!-- Popup Thêm -->
-                    <div *ngIf="isCreatePopupOpen"
-                        class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                        <div class="bg-white p-6 rounded-lg shadow-lg w-[800px]">
-                            <h2 class="text-lg font-bold mb-4">Thêm sản phẩm</h2>
-                            <form [formGroup]="formProduct" class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Tên sản phẩm</label>
-                                    <input type="text" name="product_name" required
-                                        class="border border-gray-300 p-2 w-full rounded"
-                                        formControlName="product_name" />
-                                </div>
-                                <div class="col-span-2">
-                                    <label class="block mb-1 text-gray-400">Từ khóa</label>
 
-                                    <div class="flex mb-2">
-                                        <input type="text" #newKeywordInput
-                                            (keyup.enter)="addKeyword(newKeywordInput.value); newKeywordInput.value = ''"
-                                            placeholder="Thêm từ khóa mới..."
-                                            class="border border-gray-300 p-2 rounded-l flex-grow">
-                                        <button (click)="addKeyword(newKeywordInput.value); newKeywordInput.value = ''"
-                                            class="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600 focus:outline-none">
-                                            Thêm
-                                        </button>
-                                    </div>
 
-                                    <div class="flex flex-wrap gap-2 ">
-                                        <span *ngFor="let keyword of newKeywords; let i = index"
-                                            class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center">
-                                            {{ keyword }}
-                                            <button (click)="removeKeyword(i)"
-                                                class="ml-1 text-blue-600 hover:text-blue-800 focus:outline-none">
-                                                &times;
-                                            </button>
-                                        </span>
-                                    </div>
-                                </div>
 
-                                <div class="col-span-3 flex justify-end mt-4">
-                                    <button type="submit"
-                                        class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded"
-                                        (click)="confirmCreate()">Thêm</button>
-                                    <button type="button" (click)="closePopup()"
-                                        class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Đóng</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <div *ngIf="showFileUploadPopup"
-                        class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                        <div class="bg-white p-6 rounded-lg shadow-lg w-[1000px]">
-                            <h2 class="text-lg font-bold mb-4">Nhập sản phẩm</h2>
-
-                            <div class="mb-4">
-                                <label for="file-upload" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Chọn file Excel (.xlsx) hoặc CSV:
-                                </label>
-                                <input type="file" id="file-upload" (change)="onFileSelected($event)"
-                                    accept=".xlsx,.csv" class="block w-full text-sm text-gray-500
-                                       file:mr-4 file:py-2 file:px-4
-                                       file:rounded-full file:border-0
-                                       file:text-sm file:font-semibold
-                                       file:bg-blue-50 file:text-blue-700
-                                       hover:file:bg-blue-100" />
-                            </div>
-
-                            <div *ngIf="selectedFile" class="mb-4 text-sm text-gray-600">
-                                Đã chọn file: {{ selectedFile.name }}
-                            </div>
-
-                            <div class="col-span-3 flex justify-end mt-4">
-                                <button type="button" (click)="uploadFile()" [disabled]="!selectedFile"
-                                    class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
-                                    Nhập
-                                </button>
-                                <button type="button" (click)="closePopup()"
-                                    class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">
-                                    Đóng
-                                </button>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Popup chi tiết đơn hàng -->
                     <div *ngIf="isDetailPopupOpen"
@@ -249,14 +164,13 @@
                                         selectedOrder.order_date | date:'dd/MM/yyyy HH:mm' }}</p>
                                 </div>
                                 <div>
-                                    <label class="block mb-1 text-gray-400">Tổng tiền</label>
-                                    <p class="border border-gray-300 p-2 w-full rounded bg-gray-100">{{
-                                        selectedOrder.total_amount | customCurrency }}</p>
-                                </div>
-                                <div>
                                     <label class="block mb-1 text-gray-400">Trạng thái đơn hàng</label>
-                                    <p class="border border-gray-300 p-2 w-full rounded bg-gray-100">{{
-                                        selectedOrder.status | statusOrder }}</p>
+                                    <select [(ngModel)]="selectedOrder.status" name="status" required
+                                        class="border border-gray-300 p-2 w-full rounded">
+                                        <option *ngFor="let status of getAvailableStatuses()" [value]="status">
+                                            {{ status | statusOrder }}
+                                        </option>
+                                    </select>
                                 </div>
 
                                 <div class="col-span-2">
@@ -275,28 +189,35 @@
                                         <thead>
                                             <tr class="bg-gray-100">
                                                 <th class="border border-gray-300 p-2">Tên sản phẩm</th>
+                                                <th class="border border-gray-300 p-2">Loại hàng</th>
                                                 <th class="border border-gray-300 p-2">Số lượng</th>
-                                                <th class="border border-gray-300 p-2">Đơn giá</th>
-                                                <th class="border border-gray-300 p-2">Thành tiền</th>
+                                                <th class="border border-gray-300 p-2">Số lượng tồn kho</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr *ngFor="let item of selectedOrder?.product_order_detail_list_responses">
+                                            <tr
+                                                *ngFor="let item of selectedOrder?.product_order_detail_list_responses; let i = index">
                                                 <td class="border border-gray-300 p-2">{{ item.product_name }}</td>
-                                                <td class="border border-gray-300 p-2 text-center">{{ item.quantity }}
+                                                <td class="border border-gray-300 p-2">{{ item.category_name }}</td>
+                                                <td class="border border-gray-300 p-2 text-center">
+                                                    <input type="number" 
+                                                           [value]="item.quantity"
+                                                           (input)="updateQuantity(i, $event)" 
+                                                           style="-moz-appearance: textfield; appearance: textfield;"
+                                                           class="w-20 text-center px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                                                           min="1">
                                                 </td>
-                                                <td class="border border-gray-300 p-2 text-right">{{ item.price |
-                                                    currency:'VND' }}</td>
-                                                <td class="border border-gray-300 p-2 text-right">{{ item.quantity *
-                                                    item.price | currency:'VND' }}</td>
+                                                <td class="border border-gray-300 p-2">{{ item.stock }}</td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                             <div class="flex justify-end mt-4">
+                                <button type="button" (click)="confirmUpdate()"
+                                    class="bg-blue-500 hover:bg-blue-700 text-white px-4 mr-2 py-2 rounded">Cập nhật</button>
                                 <button type="button" (click)="closePopup()"
-                                    class="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded">Đóng</button>
+                                    class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Đóng</button>
                             </div>
                         </div>
                     </div>
@@ -315,19 +236,7 @@
                             </div>
                         </div>
                     </div>
-                    <div *ngIf="isConfirmCreatePopupOpen"
-                        class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-                            <h2 class="text-lg font-bold mb-4">Xác nhận thêm đơn hàng</h2>
-                            <p>Bạn có chắc chắn muốn thêm đơn hàng này?</p>
-                            <div class="flex justify-end mt-4">
-                                <button (click)="addProduct()"
-                                    class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded">Có</button>
-                                <button (click)="closeConfirmPopup()"
-                                    class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Không</button>
-                            </div>
-                        </div>
-                    </div>
+
                     <div *ngIf="isConfirmDeletePopupOpen"
                         class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                         <div class="bg-white p-6 rounded-lg shadow-lg w-96">
@@ -346,3 +255,15 @@
         </main>
     </div>
 </div>
+<style>
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
+</style>

@@ -42,7 +42,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.checkScreenSize();
     this.loadCategory();
     this.activeMenu = this.activeCategoryService.getActiveMenu();
-    console.log(this.activeMenu);
     this.loadCategory();
     this.dataChangedSubscription = this.adminService.dataChanged$.subscribe(() => {
       this.loadCategory();
@@ -98,7 +97,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   logout() {
     this.authService.logout();
-    this.router.navigate(['/home']);
   }
 
   setActiveMenu(menuItem: string) {

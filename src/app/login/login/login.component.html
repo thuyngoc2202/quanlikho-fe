@@ -2,7 +2,6 @@
     <div class="container mx-auto mt-10">
         <div class="p-8 w-6/12 rounded-lgmax-w-md mx-auto">
             <h2 class="text-2xl font-bold text-center mb-4" >ĐĂNG NHẬP TÀI KHOẢN</h2>
-            <p class="text-center mb-6">Bạn chưa có tài khoản ? <a class="text-blue-500 hover:underline" routerLink="/register">Đăng ký tại đây</a></p>
             <form [formGroup]="form" (ngSubmit)="Login()">
                 <div class="mb-4">
                     <label class="block text-gray-700 font-medium mb-2" for="email">Email <span class="text-red-500">*</span></label>
@@ -11,9 +10,6 @@
                 <div class="mb-4">
                     <label class="block text-gray-700 font-medium mb-2" for="password">Mật khẩu <span class="text-red-500">*</span></label>
                     <input class="w-full px-3 py-2 border border-gray-300 rounded-md" formControlName="password" type="password" id="password" placeholder="Mật khẩu">
-                </div>
-                <div class="mb-6 text-left">
-                    <a href="#" class="text-blue-500 hover:underline">Quên mật khẩu? Nhấn vào đây</a>
                 </div>
                 <button class="w-full bg-red-600 text-white py-2 rounded-full hover:bg-red-700">ĐĂNG NHẬP</button>
             </form>

@@ -24,49 +24,28 @@
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full bg-white">
-                            <thead>
-                                <tr>
-                                    <th class="py-2 px-4 border-b text-left">ID</th>
-                                    <th class="py-2 px-4 border-b text-left">Tên sản phẩm</th>
-                                    <th class="py-2 px-4 border-b text-left">Keyword</th>
-                                    <th class="py-2 px-4 border-b text-left">Ngày cập nhật</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let product of products; let i = index" class="text-sm md:text-base"
-                                    [ngClass]="{'highlight': isMatchingSearch(product)}">
-                                    <td class="py-2 px-4 border-b">{{ i + 1 }}</td>
-                                    <td class="py-2 px-4 border-b ">
-                                        {{ product.product_name }}
-                                    </td>
-                                    <td class="py-2 px-4 border-b  product-keywords">
-                                        <select class="border border-gray-300 rounded px-2 py-1 w-full product-keywords"
-                                            [title]="product.keywords.join(', ')">
-                                            <option *ngFor="let keyword of product.keywords" [value]="keyword">
-                                                {{ keyword }}
-                                            </option>
-                                        </select>
-                                    </td>
-                                    <td class="py-2 px-4 border-b">{{ product.modify_date }}</td>
-                                    <td class="py-2 px-4 border-b">
-                                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                                            <button
-                                                class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded w-full sm:w-auto"
-                                                (click)="selectProductForUpdate(product)">
-                                                Sửa
-                                            </button>
-                                            <button
-                                                class="bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded w-full sm:w-auto"
-                                                (click)="openDeleteProductPopup(product.product_id)">
-                                                Xoá
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+
+                    <div class="w-full">
+                        <div
+                            class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 3xl:grid-cols-16">
+                            <div *ngFor="let product of products; trackBy: trackByProduct"
+                                class="p-2 border text-sm font-medium cursor-pointer text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out relative group"
+                                [ngClass]="{'text-red-500 font-semibold': isMatchingSearch(product)}"
+                                (click)="selectProductForUpdate(product)">
+                                <div class="truncate">{{ product?.product_name || '' }}</div>
+                                <div *ngIf="product"
+                                    class="absolute z-10 left-0 mt-1 p-2 bg-white border rounded shadow-lg hidden group-hover:block min-w-[150px] max-w-[200px]"
+                                    [ngClass]="{
+                                         'bottom-full mb-1': isBottomHalf(product),
+                                         'top-full mt-1': !isBottomHalf(product)
+                                     }">
+                                    <strong class="block mb-1">Tên dùng chung:</strong>
+                                    <div *ngFor="let keyword of product.keywords" class="truncate">
+                                        {{ keyword }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <!-- Popup Cập nhật -->
                     <div *ngIf="isUpdatePopupOpen"
@@ -81,12 +60,12 @@
                                         formControlName="product_name" />
                                 </div>
                                 <div class="col-span-2">
-                                    <label class="block mb-1 text-gray-400">Từ khóa</label>
+                                    <label class="block mb-1 text-gray-400">Tên dùng chung</label>
 
                                     <div class="flex mb-2">
                                         <input type="text" #newKeywordInput
                                             (keyup.enter)="addKeyword(newKeywordInput.value); newKeywordInput.value = ''"
-                                            placeholder="Thêm từ khóa mới..."
+                                            placeholder="Thêm tên dùng chung mới..."
                                             class="border border-gray-300 p-2 rounded-l flex-grow">
                                         <button (click)="addKeyword(newKeywordInput.value); newKeywordInput.value = ''"
                                             class="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600 focus:outline-none">
@@ -110,8 +89,11 @@
                                     <button type="submit"
                                         class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded"
                                         (click)="confirmUpdate()">Cập nhật</button>
+                                    <button type="button" (click)="openDeleteProductPopup()"
+                                        class="bg-purple-500 hover:bg-purple-700 text-white mr-4 px-4 py-2 rounded">Xoá</button>
                                     <button type="button" (click)="closePopup()"
                                         class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Đóng</button>
+
                                 </div>
                             </form>
                         </div>
@@ -129,12 +111,12 @@
                                         formControlName="product_name" />
                                 </div>
                                 <div class="col-span-2">
-                                    <label class="block mb-1 text-gray-400">Từ khóa</label>
+                                    <label class="block mb-1 text-gray-400">Tên dùng chung</label>
 
                                     <div class="flex mb-2">
                                         <input type="text" #newKeywordInput
                                             (keyup.enter)="addKeyword(newKeywordInput.value); newKeywordInput.value = ''"
-                                            placeholder="Thêm từ khóa mới..."
+                                            placeholder="Thêm tên dùng chung mới..."
                                             class="border border-gray-300 p-2 rounded-l flex-grow">
                                         <button (click)="addKeyword(newKeywordInput.value); newKeywordInput.value = ''"
                                             class="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600 focus:outline-none">

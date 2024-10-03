@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
@@ -10,5 +10,13 @@ export class CartService {
 
   updateCartCount(count: number) {
     this.cartCountSource.next(count);
+  }
+  
+  cartUpdated = new EventEmitter<void>();
+
+  constructor() {}
+
+  updateCart() {
+    this.cartUpdated.emit();
   }
 }

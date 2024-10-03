@@ -31,7 +31,6 @@
                                     <th class="py-1 px-4 border-b text-left w-16">ID</th>
                                     <th class="py-1 px-4 border-b text-left w-1/4">Tên loại hàng</th>
                                     <th class="py-1 px-4 border-b text-left w-24">Số lượng</th>
-                                    <th class="py-1 px-6 border-b text-left w-32">Giá</th>
                                     <th class="py-1 px-4 border-b text-left w-28">Ngưỡng thấp</th>
                                     <th class="py-1 px-4 border-b text-left w-28">Ngưỡng cao</th>
                                     <th class="py-1 px-4 border-b text-left w-52">Ngày cập nhật</th>
@@ -43,7 +42,6 @@
                                     <td class="py-1 px-4 border-b text-left w-16">{{ i + 1}}</td>
                                     <td class="py-1 px-4 border-b text-left w-1/4">{{ productsCategory.product_name }}</td>
                                     <td class="py-1 px-4 border-b text-left w-24">{{ productsCategory.quantity }}</td>
-                                    <td class="py-1 px-6 border-b text-left w-32">{{ productsCategory.price | customCurrency }}</td>
                                     <td class="py-1 px-4 border-b text-left w-28">{{ productsCategory.min_limit }}</td>
                                     <td class="py-1 px-4 border-b text-left w-28">{{ productsCategory.max_limit }}</td>
                                     <td class="py-1 px-4 border-b text-left w-52">{{ productsCategory.modify_date | date:'dd/MM/yyyy HH:mm' }}</td>
@@ -136,11 +134,7 @@
                                     <input type="number" name="max_limit" required
                                         class="border border-gray-300 p-2 w-full rounded" formControlName="max_limit" />
                                 </div>
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Giá</label>
-                                    <input type="number" name="price" required
-                                        class="border border-gray-300 p-2 w-full rounded" formControlName="price" />
-                                </div>
+
 
 
                                 <div class="col-span-3 flex justify-end mt-4">
@@ -221,11 +215,7 @@
                                     <input type="number" name="max_limit" required
                                         class="border border-gray-300 p-2 w-full rounded" formControlName="max_limit" />
                                 </div>
-                                <div>
-                                    <label class="block mb-1 text-gray-400">Giá</label>
-                                    <input type="number" name="price" required
-                                        class="border border-gray-300 p-2 w-full rounded" formControlName="price" />
-                                </div>
+
 
 
                                 <div class="col-span-3 flex justify-end mt-4">

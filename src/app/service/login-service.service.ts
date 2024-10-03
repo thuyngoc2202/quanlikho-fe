@@ -38,6 +38,7 @@ export class LoginServiceService {
             const encodedRole = this.authService.encodeRole(response.result_data.roleId);
             localStorage.setItem('encodedRole', encodedRole);
             localStorage.setItem('username', response.result_data.username);
+            this.authService.login(response.result_data.token);
           }
         })
       );
