@@ -192,7 +192,6 @@
                                                 <th class="border border-gray-300 p-2">Loại hàng</th>
                                                 <th class="border border-gray-300 p-2">Số lượng</th>
                                                 <th class="border border-gray-300 p-2">Số lượng tồn kho</th>
-                                                <th class="border border-gray-300 p-2">Thao tác</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -209,12 +208,6 @@
                                                            min="1">
                                                 </td>
                                                 <td class="border border-gray-300 p-2">{{ item.stock }}</td>
-                                                <td class="border border-gray-300 p-2 text-center">
-                                                    <button (click)="saveQuantity(i)"
-                                                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
-                                                        Cập nhật số lượng
-                                                    </button>
-                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>

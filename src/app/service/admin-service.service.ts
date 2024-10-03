@@ -38,6 +38,7 @@ export class AdminServiceService {
 
   constructor(private backend: HttpBackend, private authService: AuthService, private router: Router) {
     this.httpClient = new HttpClient(backend);
+    this.token = this.authService.getToken();
   }
 
   private headers = new HttpHeaders({

@@ -59,6 +59,8 @@ export class OrderManagementComponent implements OnInit {
   openDetailOrder(product_order_id: string) {
     this.isDetailPopupOpen = true;
     this.adminService.getOrderDetail(product_order_id).subscribe((res) => {
+      console.log('selectedOrder', res.result_data);
+      
       this.selectedOrder = res.result_data;
       this.currentStatus = res.result_data.status; 
       console.log('réa', this.selectedOrder);
@@ -89,8 +91,13 @@ export class OrderManagementComponent implements OnInit {
   }
 
   updateOrderStatus() {
+    const order = {
+      product_order_id: this.selectedOrder.product_order_id,
+      status: this.selectedOrder.status,
+      product_order_details : this.selectedOrder.product_order_detail_list_responses
+    }
 
-    this.adminService.updateOrder(this.selectedOrder).subscribe({
+    this.adminService.updateOrder(order).subscribe({
       next: (response: any) => {
         this.getAllOrder();
         this.closePopup();
