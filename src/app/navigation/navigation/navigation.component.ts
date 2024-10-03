@@ -111,7 +111,6 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   updateRouteInfo() {
     const urlSegments = this.router.url.split('/').filter(segment => segment !== '');
-    console.log(urlSegments);
     if (urlSegments.length > 0) {
       switch (urlSegments[0]) {
         case 'login':
@@ -248,9 +247,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   saveEditCategory() {
     // Implement the logic to save the edited category
-    console.log('Saving edited category:', this.editingCategory);
 
-    console.log(this.editingCategory);
     this.adminService.updateCategory(this.editingCategory).subscribe({
       next: (response) => {
         this.getCategory();

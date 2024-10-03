@@ -1,8 +1,8 @@
 <header class="bg-black text-white">
     <div class="container mx-auto px-4 py-2 flex flex-col sm:flex-row justify-between items-center">
         <div class="flex items-center space-x-4 mb-2 sm:mb-0">
-            <a class="text-sm hover:text-gray-300 transition duration-300" [routerLink]="['/admin']"
-                *ngIf="isAdmin">Quản Trị Viên</a>
+            <!-- <a class="text-sm hover:text-gray-300 transition duration-300" [routerLink]="['/admin']"
+                *ngIf="isAdmin">Quản Trị Viên</a> -->
         </div>
         <div class="flex items-center space-x-4">
             <div class="relative group p-2"> <!-- Thêm p-2 ở đây -->
@@ -44,7 +44,6 @@
 
 
                         <div class="px-4 py-3 bg-gray-50" *ngIf="cartItems.length > 0">
-
                             <button [routerLink]="['/cart']"
                                 class="w-full bg-yellow-500 text-gray-900 font-semibold rounded-md px-2 py-2 text-sm hover:bg-yellow-600 transition duration-300">
                                 Tiến hành thanh toán

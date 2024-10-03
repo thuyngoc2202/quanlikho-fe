@@ -95,7 +95,6 @@ export class AuthService {
   cachedRequests: Array<HttpRequest<any>> = [];
   public collectFailedRequest(request: HttpRequest<any>): void {
     this.cachedRequests.push(request);
-    console.log('Failed request:', request);
   }
   public retryFailedRequests(): void {
     // retry the requests. this method can
@@ -119,7 +118,6 @@ export class AuthService {
     setTimeout(() => {
       this.removeToken();
       this.loggedIn.next(false);
-      console.log('Token cleared after 10 seconds (test mode)');
       this.router.navigate(['/home']); 
     }, timeUntilExpiration);
   }

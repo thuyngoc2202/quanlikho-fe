@@ -286,7 +286,6 @@ export class ProductComponent implements OnInit {
     if (!this.searchTerm) return false; // Không highlight nếu không có từ khóa tìm kiếm
 
     const searchLower = this.searchTerm.toLowerCase();
-    console.log(searchLower);
 
     // Kiểm tra tên sản phẩm
     if (product.product_name.toLowerCase().includes(searchLower)) {

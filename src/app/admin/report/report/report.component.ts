@@ -59,7 +59,6 @@ export class ReportComponent implements OnInit {
 
   updateDateClass(): (date: Date) => MatCalendarCellCssClasses {
     return (date: Date): MatCalendarCellCssClasses => {
-      console.log('updateDateClass called', this.startDate, this.endDate);
       if (this.startDate && this.endDate) {
         if (date >= this.startDate && date <= this.endDate) {
           return 'selected-date-range mat-calendar-body-in-range';
@@ -112,7 +111,6 @@ export class ReportComponent implements OnInit {
 
   onEndDateSelected(event: Date | null) {
     this.endDate = event;
-    console.log('endDate', this.endDate);
 
     this.dateClassFunc = this.updateDateClass();
     this.updateCalendars();
@@ -129,7 +127,6 @@ export class ReportComponent implements OnInit {
   }
 
   applyDateRange() {
-    console.log('Date range:', this.startDate, this.endDate);
     this.showCalendar = false;
   }
 
@@ -137,8 +134,6 @@ export class ReportComponent implements OnInit {
     if (this.startDate && this.endDate) {
       const formattedStartDate = moment(this.startDate).format('YYYY-MM-DD');
       const formattedEndDate = moment(this.endDate).format('YYYY-MM-DD');
-      console.log(formattedStartDate);
-      console.log(formattedEndDate);
       this.adminService.getTopSellingProducts(formattedStartDate, formattedEndDate).subscribe({
         next: (response) => {
           if (response instanceof Blob) {
@@ -194,9 +189,6 @@ export class ReportComponent implements OnInit {
 
   exportBuReport() {
     // Implement the logic to export the "nhập bù" report
-    console.log('Exporting "nhập bù" report...');
-    console.log('Start date:', this.startDateBu);
-    console.log('End date:', this.endDateBu);
     this.adminService.getBuReport().subscribe({
       next: (response) => {
         if (response instanceof Blob) {

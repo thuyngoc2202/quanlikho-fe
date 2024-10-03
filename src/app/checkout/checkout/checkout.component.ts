@@ -105,7 +105,6 @@ export class CheckoutComponent implements OnInit {
           const orderDetailsRequest = {
             detail_requests: orderDetails
           };
-          console.log('orderDetailsRequest', orderDetailsRequest);
 
           
           this.userService.placeOrderDetail(orderDetailsRequest).subscribe({

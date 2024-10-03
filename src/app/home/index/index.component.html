@@ -1,7 +1,11 @@
 <app-navigation></app-navigation>
 <div class="container mx-auto py-4 sm:py-8 px-4 lg:px-0">
+    <div>
+        <h2 class="text-2xl font-bold mb-4">{{categoryName}}</h2>
+    </div>
     <div class="flex justify-center">
         <!-- Product Grid -->
+
         <div class="w-full max-w-8xl">
             <div class="relative mb-4">
                 <input type="text" placeholder="Tìm kiếm sản phẩm"
@@ -21,7 +25,7 @@
                         class="p-2 border text-sm font-medium cursor-pointer text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out relative group"
                         [ngClass]="{'text-red-500 font-semibold': isMatchingSearch(product)}"
                         (click)="isLoggedIn ? openEditPopup(product) : openPopupCart(product)">
-                        <div class="relative w-full overflow-hidden group" >
+                        <div class="relative w-full overflow-hidden group">
                             <div class="truncate group-hover:truncate-none transition-all duration-300 ease-in-out">
                                 <span class="inline-block group-hover:animate-slide">
                                     {{ product?.product_name || '' }}
@@ -232,7 +236,7 @@
         </div>
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="quantity">
-                Số lượng:
+                Số lượng 1:
             </label>
             <div class="flex items-center space-x-2">
                 <button (click)="decreaseQuantity(selectedProduct)"

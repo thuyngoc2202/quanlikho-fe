@@ -59,21 +59,17 @@ export class OrderManagementComponent implements OnInit {
   openDetailOrder(product_order_id: string) {
     this.isDetailPopupOpen = true;
     this.adminService.getOrderDetail(product_order_id).subscribe((res) => {
-      console.log('selectedOrder', res.result_data);
       
       this.selectedOrder = res.result_data;
       this.currentStatus = res.result_data.status; 
-      console.log('réa', this.selectedOrder);
     });
   }
 
   openUpdatePopup(order: any) {
-    console.log('order', order);
     this.isUpdatePopupOpen = true;
     this.adminService.getOrderStatus(order.product_order_id).subscribe((res) => {
       this.selectedOrder = res.result_data;
       this.currentStatus = res.result_data.status; 
-      console.log('Current status:', this.currentStatus);
     });
   }
 
@@ -174,7 +170,6 @@ export class OrderManagementComponent implements OnInit {
   updateQuantity(index: number, event: Event) {
     const newQuantity = (event.target as HTMLInputElement).value;
     this.selectedOrder.product_order_detail_list_responses[index].quantity = parseInt(newQuantity, 10);
-    console.log('newQuantity', this.selectedOrder.product_order_detail_list_responses[index]);
   }
 
   saveQuantity(index: number) {

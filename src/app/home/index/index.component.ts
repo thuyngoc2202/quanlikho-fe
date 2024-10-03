@@ -57,7 +57,7 @@ export class IndexComponent implements OnInit, OnDestroy {
   isConfirmUpdatePopupOpen: boolean = false;
   newKeywords: string[] = [];
   formProduct!: FormGroup;
-
+  categoryName: string = '';
   constructor(
     private userService: UserServiceService,
     private activeMenuService: ActiveMenuService,
@@ -92,6 +92,7 @@ export class IndexComponent implements OnInit, OnDestroy {
     );
     this.categorySubscription = this.sltCategory.selectedCategory$.subscribe(category => {
       if (category) {
+        this.categoryName = category.category_name;
         this.setActiveCategory(category);
       }
     });
@@ -130,18 +131,18 @@ export class IndexComponent implements OnInit, OnDestroy {
 
   decreaseQuantity(product: any) {
     if (!this.productQuantities[product.product_category_id]) {
-      this.productQuantities[product.product_category_id] = 1;
+      this.productQuantities[product.product_category_id] = 0;
     }
     if (this.productQuantities[product.product_category_id] > 1) {
-      this.productQuantities[product.product_category_id]--;
+      this.productQuantities[product.product_category_id] = this.productQuantities[product.product_category_id] - 50;
     }
   }
 
   increaseQuantity(product: any) {
     if (!this.productQuantities[product.product_category_id]) {
-      this.productQuantities[product.product_category_id] = 1;
+      this.productQuantities[product.product_category_id] = 0;
     }
-    this.productQuantities[product.product_category_id]++;
+    this.productQuantities[product.product_category_id] = this.productQuantities[product.product_category_id] + 50;
   }
 
   handleInputChange(event: Event, item: any): void {
@@ -201,6 +202,7 @@ export class IndexComponent implements OnInit, OnDestroy {
       orderDetail.quantity = quantity;
       orderDetail.category_id = product.category_id;
       orderDetail.category_name = product.category_name;
+      orderDetail.stock = product.inventory_quantity;
       orderCart.push(orderDetail);
     }
 
@@ -220,7 +222,7 @@ export class IndexComponent implements OnInit, OnDestroy {
   }
 
   getQuantity(product: any): number {
-    return 1;
+    return this.productQuantities[product.product_category_id] || 1;
   }
 
   getProductCategory() {
@@ -259,7 +261,9 @@ export class IndexComponent implements OnInit, OnDestroy {
           this.productsCategories = response.result_data.map((product: any) => ({
             ...product,
             inventory_quantity: product.quantity // Lưu số lượng tồn kho
+
           }));
+          
           this.filteredProductsCategories = this.productsCategories;
         },
         error: (error) => {
@@ -341,6 +345,7 @@ export class IndexComponent implements OnInit, OnDestroy {
       orderDetail.quantity = quantity;
       orderDetail.category_id = product.category_id;
       orderDetail.category_name = product.category_name;
+      orderDetail.stock = product.inventory_quantity;
       orderCart.push(orderDetail);
     }
     localStorage.setItem('cart', JSON.stringify(orderCart));
@@ -353,7 +358,6 @@ export class IndexComponent implements OnInit, OnDestroy {
     if (product) {
       this.selectedProduct = product;
       this.getQuantity(product);
-      console.log('this.selectedProduct', this.selectedProduct);
 
     }
   }
@@ -394,7 +398,6 @@ export class IndexComponent implements OnInit, OnDestroy {
     this.selectedProductUpdate = product;
     this.idProduct = product.product_id;
     this.showProductDropdown = false;
-    console.log('this.selectedProductUpdate', this.selectedProductUpdate);
 
   }
 
@@ -522,7 +525,6 @@ export class IndexComponent implements OnInit, OnDestroy {
     this.filteredCategories = this.categories.filter(category =>
       category.category_name.toLowerCase().includes(searchTerm)
     );
-    console.log('filterCategories', this.filteredCategories);
   }
   clearProductSelection() {
     this.selectedProductUpdate = '';
@@ -572,7 +574,6 @@ export class IndexComponent implements OnInit, OnDestroy {
     if (!this.searchQuery) return false; // Không highlight nếu không có từ khóa tìm kiếm
 
     const searchLower = this.searchQuery.toLowerCase();
-    console.log(searchLower);
 
     // Kiểm tra tên sản phẩm
     if (product.product_name.toLowerCase().includes(searchLower)) {
