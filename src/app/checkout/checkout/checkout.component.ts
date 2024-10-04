@@ -86,9 +86,8 @@ export class CheckoutComponent implements OnInit {
   placeOrder() {
     this.orderUser.totalAmount = this.total;
     this.orderUser.note = this.orderNotes;
-    this.orderUser.shipping_address = this.orderUser.shipping_address + ', Phường ' + this.selectedWard + ', Quận ' + this.selectedDistrict + ', ' + this.selectedCity;
+    this.orderUser.shipping_address = this.orderUser.shipping_address;
     this.orderUser.full_name = this.orderUser.full_name;
-    this.orderUser.email = this.orderUser.email;
     this.orderUser.phone_number = this.orderUser.phone_number;
 
     if (this.cartItems.length > 0) {

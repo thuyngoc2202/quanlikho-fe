@@ -59,22 +59,18 @@ export class AdminServiceService {
   }
 
   createProduct(product: Product): Observable<Product> {
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${this.token}`)
-      .set('Content-Type', 'application/json');
 
-    return this.httpClient.post<Product>(`${this.API_CONFIG.product.admin}/create`, product, { headers });
+
+    return this.httpClient.post<Product>(`${this.API_CONFIG.product.unAuth}/create`, product, { headers: this.headers });
   }
 
   updateProduct(product: Product): Observable<Product> {
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
-    return this.httpClient.post<Product>(`${this.API_CONFIG.product.admin}/product_update`, product, { headers })
+    return this.httpClient.post<Product>(`${this.API_CONFIG.product.unAuth}/product_update`, product, { headers: this.headers })
 
   }
 
   deleteProduct(id: string | undefined): Observable<void> {
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
-    return this.httpClient.delete<void>(`${this.API_CONFIG.product.admin}/delete/${id}`, { headers })
+    return this.httpClient.delete<void>(`${this.API_CONFIG.product.unAuth}/delete/${id}`, { headers: this.headers })
   }
 
   createCategory(category: Category): Observable<Category> {
@@ -92,8 +88,7 @@ export class AdminServiceService {
   }
 
   deleteCategory(id: string): Observable<any> {
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
-    return this.httpClient.delete(`${this.API_CONFIG.category.admin}/delete/${id}`, { headers })
+    return this.httpClient.delete(`${this.API_CONFIG.category.unAuth}/delete/${id}`, {  headers: this.headers })
       .pipe(
         tap(() => this.notifyDataChanged())
       );
@@ -123,7 +118,7 @@ export class AdminServiceService {
 
   deleteProductCategory(id: string): Observable<void> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
-    return this.httpClient.delete<void>(`${this.API_CONFIG.productCategory.admin}/delete/${id}`, { headers })
+    return this.httpClient.delete<void>(`${this.API_CONFIG.productCategory.unAuth}/delete/${id}`, {  headers: this.headers })
   }
 
   getProductCategoryByCategoryId(categoryId: string): Observable<ProductCategory[]> {
@@ -151,13 +146,15 @@ export class AdminServiceService {
   }
 
   updateOrder(order: any): Observable<any> {
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
-    return this.httpClient.post<any>(`${this.API_CONFIG.order.admin}/product_order_update`, order, { headers });
+    return this.httpClient.post<any>(`${this.API_CONFIG.order.unAuth}/product_order_update`, order, {  headers: this.headers });
   }
 
   deleteOrder(product_order_id: string): Observable<any> {
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
-    return this.httpClient.delete<any>(`${this.API_CONFIG.order.admin}/delete/${product_order_id}`, { headers });
+    return this.httpClient.delete<any>(`${this.API_CONFIG.order.unAuth}/delete/${product_order_id}`, { headers: this.headers });
+  }
+
+  startShipping(order: any): Observable<any> {
+    return this.httpClient.post<any>(`${this.API_CONFIG.order.unAuth}/start_shipping`, order, { headers: this.headers });
   }
 
   getTopSellingProducts(startDate: string, endDate: string): Observable<Blob> {
