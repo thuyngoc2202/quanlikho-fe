@@ -70,6 +70,8 @@ export class IndexComponent implements OnInit, OnDestroy {
   showFileUploadProductPopup: boolean = false;
   isCreateProductCategoryPopupOpen: boolean = false;
   isConfirmCreateProductCategoryPopupOpen: boolean = false;
+  sortedProducts: any[] = [];
+
   constructor(
     private userService: UserServiceService,
     private activeMenuService: ActiveMenuService,
@@ -110,9 +112,8 @@ export class IndexComponent implements OnInit, OnDestroy {
       }
     });
     this.validate();
-    this.validateProduct();
+    this.validateProduct();   
   }
-
 
   ngOnDestroy() {
     if (this.categorySubscription) {
@@ -154,13 +155,10 @@ export class IndexComponent implements OnInit, OnDestroy {
     if (!this.productQuantities[product.product_category_id]) {
       this.productQuantities[product.product_category_id] = 0;
     }
-    console.log('product', product);
-    console.log('this.productQuantities', this.productQuantities);
-  
     const currentQuantity = this.productQuantities[product.product_category_id];
     const stock = product.quantity || 0;
     const incrementAmount = 50;
-  
+
     if (currentQuantity + incrementAmount <= stock) {
 
       this.productQuantities[product.product_category_id] += incrementAmount;
@@ -169,9 +167,9 @@ export class IndexComponent implements OnInit, OnDestroy {
       this.productQuantities[product.product_category_id] = stock;
     } else {
 
-      return; 
+      return;
     }
-  
+
   }
 
   handleInputChange(event: Event, item: any): void {
@@ -290,8 +288,9 @@ export class IndexComponent implements OnInit, OnDestroy {
             inventory_quantity: product.quantity // Lưu số lượng tồn kho
 
           }));
-          
+
           this.filteredProductsCategories = this.productsCategories;
+          this.sortProducts(this.productsCategories);
         },
         error: (error) => {
           console.error('Failed to load products', error);
@@ -571,11 +570,8 @@ export class IndexComponent implements OnInit, OnDestroy {
     this.newKeywords = [];
 
   }
-  
-  isBottomHalf(productCategory: ProductCategory): boolean {
-    const index = this.productsCategories.indexOf(productCategory);
-    return index >= this.productsCategories.length / 2;
-  }
+
+
 
   // Không cần setupBreakpointObserver() nữa, vì Tailwind sẽ xử lý responsive
 
@@ -647,10 +643,10 @@ export class IndexComponent implements OnInit, OnDestroy {
           // Add success handling here (e.g., display a message, close popup)
           this.toastr.success('Nhập File thành công', 'Thành công');
           // Check if there are new products
-        if (response.result_data.import_fail && response.result_data.import_fail.length > 0) {
-          this.newProducts = response.result_data.import_fail;
-          this.showNewProductsPopup = true;
-        }
+          if (response.result_data.import_fail && response.result_data.import_fail.length > 0) {
+            this.newProducts = response.result_data.import_fail;
+            this.showNewProductsPopup = true;
+          }
         },
         error: (error) => {
           console.error('Error importing product', error);
@@ -693,7 +689,7 @@ export class IndexComponent implements OnInit, OnDestroy {
           this.isCreatePopupOpen = false;
           this.loadProduct();
           this.loadProductCategoryByCategoryId(this.idCategory);
-          this.formProduct.reset();       
+          this.formProduct.reset();
           this.toastr.success('Thêm sản phẩm thành công', 'Thành công');
         },
         error: (error) => {
@@ -797,6 +793,60 @@ export class IndexComponent implements OnInit, OnDestroy {
       this.isConfirmCreatePopupOpen = false;
       this.toastr.error(`Thiếu trường`, 'Thất bại');
     }
+  }
+
+ 
+  sortProducts(products: any[]) {
+    // Sắp xếp tất cả sản phẩm theo thứ tự alphabet
+    const sortedProducts = products.sort((a, b) => 
+      a.product_name.localeCompare(b.product_name)
+    );
+  
+    // Xác định số cột dựa trên kích thước màn hình
+    const columnCount = this.getColumnCount();
+  
+    // Tính số hàng cần thiết
+    const rowCount = Math.ceil(sortedProducts.length / columnCount);
+    
+  
+    // Tạo mảng 2 chiều để lưu trữ sản phẩm theo cột
+    const columns: any[][] = Array.from({ length: columnCount }, () => []);
+  
+    // Phân phối sản phẩm vào các cột
+    for (let i = 0; i < sortedProducts.length; i++) {
+      const columnIndex = Math.floor(i / rowCount);
+      columns[columnIndex].push(sortedProducts[i]);
+    }
+  
+    // Cập nhật sortedProducts
+    this.sortedProducts = columns;
+  }
+  
+  getColumnCount(): number {
+    const width = window.innerWidth;
+    if (width >= 1920) return 14; // 3xl
+    if (width >= 1536) return 12; // 2xl
+    if (width >= 1280) return 10; // xl
+    if (width >= 1024) return 8;  // lg
+    if (width >= 768) return 6;   // md
+    if (width >= 640) return 4;   // sm
+    return 2; // Default for xs
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    this.sortProducts(this.productsCategories);
+  }
+
+  isBottomHalf(product: any, columnIndex: number): boolean {
+    const column = this.sortedProducts[columnIndex];
+    const productIndex = column.indexOf(product);
+    return productIndex >= column.length / 2;
+  }
+
+
+  trackByColumn(index: number, column: any[]): number {
+    return index;
   }
 
 }

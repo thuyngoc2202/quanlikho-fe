@@ -38,28 +38,23 @@
             </div>
 
             <div class="w-full">
-                <div
-                    class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 3xl:grid-cols-16">
-                    <div *ngFor="let product of productsCategories; trackBy: trackByProduct"
-                        class="p-2 border text-sm font-medium cursor-pointer text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out relative group"
-                        [ngClass]="{'text-red-500 font-semibold': isMatchingSearch(product)}"
-                        (click)="isLoggedIn ? openEditPopup(product) : openPopupCart(product)">
-                        <div class="relative w-full overflow-hidden group">
-                            <div class="truncate group-hover:truncate-none transition-all duration-300 ease-in-out">
-                                <span class="inline-block group-hover:animate-slide">
-                                    {{ product?.product_name || '' }}
-                                </span>
-                            </div>
-                        </div>
-                        <div *ngIf="product"
-                            class="absolute z-10 left-0 mt-1 p-2 bg-white border rounded shadow-lg hidden group-hover:block min-w-[150px] max-w-[200px]"
-                            [ngClass]="{
-                                         'bottom-full mb-1': isBottomHalf(product),
-                                         'top-full mt-1': !isBottomHalf(product)
-                                     }">
-                            <strong class="block mb-1">Tên dùng chung:</strong>
-                            <div *ngFor="let keyword of product.keywords" class="truncate">
-                                {{ keyword }}
+                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 3xl:grid-cols-16">
+                    <div *ngFor="let column of sortedProducts; let columnIndex = index">
+                        <div *ngFor="let product of column; trackBy: trackByProduct"
+                            class="p-2 border text-sm font-medium cursor-pointer text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out relative group"
+                            [ngClass]="{'text-red-500 font-semibold': isMatchingSearch(product)}"
+                            (click)="isLoggedIn ? openEditPopup(product) : openPopupCart(product)">
+                            <div class="truncate">{{ product?.product_name || '' }}</div>
+                            <div *ngIf="product"
+                                class="absolute z-10 left-0 mt-1 p-2 bg-white border rounded shadow-lg hidden group-hover:block min-w-[150px] max-w-[200px]"
+                                [ngClass]="{
+                                     'bottom-full mb-1': isBottomHalf(product, columnIndex),
+                                     'top-full mt-1': !isBottomHalf(product, columnIndex)
+                                 }">
+                                <strong class="block mb-1">Tên dùng chung:</strong>
+                                <div *ngFor="let keyword of product.keywords" class="truncate">
+                                    {{ keyword }}
+                                </div>
                             </div>
                         </div>
                     </div>
