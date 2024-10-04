@@ -154,7 +154,24 @@ export class IndexComponent implements OnInit, OnDestroy {
     if (!this.productQuantities[product.product_category_id]) {
       this.productQuantities[product.product_category_id] = 0;
     }
-    this.productQuantities[product.product_category_id] = this.productQuantities[product.product_category_id] + 50;
+    console.log('product', product);
+    console.log('this.productQuantities', this.productQuantities);
+  
+    const currentQuantity = this.productQuantities[product.product_category_id];
+    const stock = product.quantity || 0;
+    const incrementAmount = 50;
+  
+    if (currentQuantity + incrementAmount <= stock) {
+
+      this.productQuantities[product.product_category_id] += incrementAmount;
+    } else if (currentQuantity < stock) {
+
+      this.productQuantities[product.product_category_id] = stock;
+    } else {
+
+      return; 
+    }
+  
   }
 
   handleInputChange(event: Event, item: any): void {
@@ -196,14 +213,12 @@ export class IndexComponent implements OnInit, OnDestroy {
 
     // Sử dụng inventory_quantity thay vì quantity
     if (quantity > product.inventory_quantity) {
-      alert(`Số lượng yêu cầu (${quantity}) vượt quá số lượng tồn kho (${product.inventory_quantity}).`);
       return;
     }
     const orderProduct = orderCart.find((item: any) => item.product_category_id === product.product_category_id);
     if (orderProduct) {
       // Kiểm tra tổng số lượng trong giỏ hàng và số lượng mới không vượt quá tồn kho
       if (orderProduct.quantity + quantity > product.inventory_quantity) {
-        alert(`Tổng số lượng (${orderProduct.quantity + quantity}) vượt quá số lượng tồn kho (${product.inventory_quantity}).`);
         return;
       }
       orderProduct.quantity += quantity;
@@ -339,14 +354,12 @@ export class IndexComponent implements OnInit, OnDestroy {
     const quantity = this.productQuantities[product.product_category_id] || 1;
 
     if (quantity > product.inventory_quantity) {
-      alert(`Số lượng yêu cầu (${quantity}) vượt quá số lượng tồn kho (${product.inventory_quantity}).`);
       return;
     }
 
     const orderProduct = orderCart.find((item: any) => item.product_category_id === product.product_category_id);
     if (orderProduct) {
       if (orderProduct.quantity + quantity > product.inventory_quantity) {
-        alert(`Tổng số lượng (${orderProduct.quantity + quantity}) vượt quá số lượng tồn kho (${product.inventory_quantity}).`);
         return;
       }
       orderProduct.quantity += quantity;
@@ -678,9 +691,9 @@ export class IndexComponent implements OnInit, OnDestroy {
         next: (response) => {
           this.isConfirmCreatePopupOpen = false;
           this.isCreatePopupOpen = false;
-          this.loadProductCategoryByCategoryId(this.idCategory);
-          this.editForm.reset();       
           this.loadProduct();
+          this.loadProductCategoryByCategoryId(this.idCategory);
+          this.formProduct.reset();       
           this.toastr.success('Thêm sản phẩm thành công', 'Thành công');
         },
         error: (error) => {
@@ -771,8 +784,8 @@ export class IndexComponent implements OnInit, OnDestroy {
           this.isCreateProductCategoryPopupOpen = false;
           this.isConfirmCreateProductCategoryPopupOpen = false;
           this.loadProductCategoryByCategoryId(this.selectedCategoryId);
-          this.resetProductForm();
-          this.toastr.success('Thêm sản phẩm thành công', 'Thành công');
+          this.editForm.reset();
+          this.toastr.success('Thêm danh mục thành công', 'Thành công');
         },
         error: (error) => {
           console.error('Failed to create category', error);

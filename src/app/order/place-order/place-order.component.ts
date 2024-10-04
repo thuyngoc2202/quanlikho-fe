@@ -68,10 +68,8 @@ export class PlaceOrderComponent implements OnInit {
     } else if (currentQuantity < stock) {
 
       this.productQuantities[product.product_category_id] = stock;
-      alert(`Chỉ có thể tăng đến ${stock} (số lượng tồn kho)`);
     } else {
 
-      alert('Số lượng đã đạt mức tối đa trong kho');
       return; 
     }
   

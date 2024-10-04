@@ -46,7 +46,7 @@
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
                                                   [ngClass]="{
                                                     'bg-orange-100 text-orange-800': item.status === 'PENDING',
-                                                    'bg-blue-100 text-blue-800': item.status === 'SHIPPING'
+                                                    'bg-green-100 text-green-800': item.status === 'SHIPPING'
                                                   }">
                                                 {{ item.status | statusOrder }}
                                             </span>
@@ -80,27 +80,27 @@
                                 <h2 class="text-lg sm:text-xl font-bold mb-2 sm:mb-4">Chi tiết đơn hàng</h2>
                                 <div class="flex-grow overflow-y-auto">
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-                                        <div>
-                                            <label class="block mb-1 text-gray-400 text-xs sm:text-sm">Tên khách hàng</label>
-                                            <p class="border border-gray-300 p-1 sm:p-2 w-full rounded bg-gray-100 text-xs sm:text-sm">{{ selectedOrder.full_name }}</p>
+                                        <div class="sm:col-span-1">
+                                            <div class="space-y-2">
+                                                <div>
+                                                    <label class="block mb-1 text-gray-400 text-xs sm:text-sm">Tên khách hàng</label>
+                                                    <p class="border border-gray-300 p-1 sm:p-2 w-full rounded bg-gray-100 text-xs sm:text-sm">{{ selectedOrder.full_name }}</p>
+                                                </div>
+                                                <div>
+                                                    <label class="block mb-1 text-gray-400 text-xs sm:text-sm">Số điện thoại</label>
+                                                    <p class="border border-gray-300 p-1 sm:p-2 w-full rounded bg-gray-100 text-xs sm:text-sm">{{ selectedOrder.phone_number }}</p>
+                                                </div>
+                                                <div>
+                                                    <label class="block mb-1 text-gray-400 text-xs sm:text-sm">Ngày đặt hàng</label>
+                                                    <p class="border border-gray-300 p-1 sm:p-2 w-full rounded bg-gray-100 text-xs sm:text-sm">{{ selectedOrder.order_date | date:'dd/MM/yyyy HH:mm' }}</p>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <label class="block mb-1 text-gray-400 text-xs sm:text-sm">Số điện thoại</label>
-                                            <p class="border border-gray-300 p-1 sm:p-2 w-full rounded bg-gray-100 text-xs sm:text-sm">{{ selectedOrder.phone_number }}</p>
-                                        </div>
-                                        <div>
-                                            <label class="block mb-1 text-gray-400 text-xs sm:text-sm">Ngày đặt hàng</label>
-                                            <p class="border border-gray-300 p-1 sm:p-2 w-full rounded bg-gray-100 text-xs sm:text-sm">{{ selectedOrder.order_date | date:'dd/MM/yyyy HH:mm' }}</p>
-                                        </div>
-                                        <div class="">
+                                        <div class="sm:col-span-1 flex flex-col">
                                             <label class="block mb-1 text-gray-400 text-xs sm:text-sm">Ghi chú</label>
-                                            <p class="border border-gray-300 p-1 sm:p-2 w-full rounded bg-gray-100 text-xs sm:text-sm h-10 flex items-center">
+                                            <p class="border border-gray-300 p-1 sm:p-2 w-full rounded bg-gray-100 text-xs sm:text-sm flex-grow flex items-start overflow-auto">
                                                 {{ selectedOrder.note || ' ' }}
                                             </p>
-                                        </div>
-                                        <div>
-                                            <label class="block mb-1 text-gray-400 text-xs sm:text-sm">Trạng thái</label>
-                                            <p class="border border-gray-300 p-1 sm:p-2 w-full rounded bg-gray-100 text-xs sm:text-sm">{{ selectedOrder.status | statusOrder }}</p>
                                         </div>
                                         <div class="col-span-1 sm:col-span-2">
                                             <label class="block mb-1 text-gray-400 text-xs sm:text-sm">Địa chỉ giao hàng</label>
