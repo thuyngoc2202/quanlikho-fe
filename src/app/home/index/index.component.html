@@ -3,19 +3,19 @@
     <div class="flex justify-between">
         <h2 class="text-2xl font-bold mb-4">{{categoryName}}</h2>
         <div class="flex justify-end mb-4">
-            <button (click)="openFileUploadProductPopup()"
+            <button *ngIf="isLoggedIn" (click)="openFileUploadProductPopup()"
                 class="mr-2 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded">
                 Nhập tên sản phẩm
             </button>
-            <button (click)="openAddProductPopup()"
+            <button *ngIf="isLoggedIn" (click)="openAddProductPopup()"
                 class="mr-2 bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded">
                 Thêm tên sản phẩm
             </button>
-            <button (click)="openFileUploadPopup()"
+            <button *ngIf="isLoggedIn" (click)="openFileUploadPopup()"
                 class="mr-2 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded">
                 Nhập hàng
             </button>
-            <button (click)="openAddProductCategoryPopup()"
+            <button *ngIf="isLoggedIn" (click)="openAddProductCategoryPopup()"
                 class="bg-green-500 hover:bg-green-700 text-white  py-2 px-4 rounded">
                 Thêm hàng
             </button>
@@ -38,19 +38,26 @@
             </div>
 
             <div class="w-full">
-                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 3xl:grid-cols-16">
+                <div
+                    class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 3xl:grid-cols-16">
                     <div *ngFor="let column of sortedProducts; let columnIndex = index">
                         <div *ngFor="let product of column; trackBy: trackByProduct"
                             class="p-2 border text-sm font-medium cursor-pointer text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out relative group"
                             [ngClass]="{'text-red-500 font-semibold': isMatchingSearch(product)}"
                             (click)="isLoggedIn ? openEditPopup(product) : openPopupCart(product)">
-                            <div class="truncate">{{ product?.product_name || '' }}</div>
+                            <div class="overflow-hidden">
+                                <div class="truncate group-hover:truncate-none transition-all duration-300 ease-in-out">
+                                    <span class="inline-block group-hover:animate-marquee">
+                                        {{ product?.product_name || '' }}
+                                    </span>
+                                </div>
+                            </div>
                             <div *ngIf="product"
-                                class="absolute z-10 left-0 mt-1 p-2 bg-white border rounded shadow-lg hidden group-hover:block min-w-[150px] max-w-[200px]"
+                                class="absolute z-10 left-0 mt-1 p-2 bg-white border rounded shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out min-w-[150px] max-w-[200px] max-h-[150px] overflow-y-auto"
                                 [ngClass]="{
-                                     'bottom-full mb-1': isBottomHalf(product, columnIndex),
-                                     'top-full mt-1': !isBottomHalf(product, columnIndex)
-                                 }">
+                                    'bottom-full mb-1': isBottomHalf(product, columnIndex),
+                                    'top-full mt-1': !isBottomHalf(product, columnIndex)
+                                }">
                                 <strong class="block mb-1">Tên dùng chung:</strong>
                                 <div *ngFor="let keyword of product.keywords" class="truncate">
                                     {{ keyword }}
@@ -285,7 +292,8 @@
     </div>
 </div>
 
-<div *ngIf="showFileUploadPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" (click)="closeFilePopup()">
+<div *ngIf="showFileUploadPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+    (click)="closeFilePopup()">
     <div class="bg-white p-6 rounded-lg shadow-lg w-[1000px]" (click)="$event.stopPropagation()">
         <h2 class="text-lg font-bold mb-4">Nhập loại hàng</h2>
 
@@ -317,7 +325,9 @@
         </div>
     </div>
 </div>
-<div *ngIf="showFileUploadProductPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" (click)="closeFileUploadProductPopup()">
+<div *ngIf="showFileUploadProductPopup"
+    class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+    (click)="closeFileUploadProductPopup()">
     <div class="bg-white p-6 rounded-lg shadow-lg w-[1000px]" (click)="$event.stopPropagation()">
         <h2 class="text-lg font-bold mb-4">Nhập sản phẩm</h2>
 
@@ -349,7 +359,8 @@
         </div>
     </div>
 </div>
-<div *ngIf="isCreatePopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" (click)="closeAddProductPopup()">
+<div *ngIf="isCreatePopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+    (click)="closeAddProductPopup()">
     <div class="bg-white p-6 rounded-lg shadow-lg w-[800px]" (click)="$event.stopPropagation()">
         <h2 class="text-lg font-bold mb-4">Thêm sản phẩm</h2>
         <form [formGroup]="formProduct" class="grid grid-cols-2 gap-4">
@@ -393,7 +404,9 @@
     </div>
 </div>
 
-<div *ngIf="isCreateProductCategoryPopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" (click)="closeCreateProductCategoryPopup()">
+<div *ngIf="isCreateProductCategoryPopupOpen"
+    class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+    (click)="closeCreateProductCategoryPopup()">
     <div class="bg-white p-6 rounded-lg shadow-lg w-[800px]" (click)="$event.stopPropagation()">
         <div class="mt-4 border-t">
             <h2 class="text-lg font-bold mb-4">Thêm loại hàng</h2>
@@ -466,7 +479,8 @@
         </div>
     </div>
 </div>
-<div *ngIf="showNewProductsPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" (click)="closeNewProductsPopup()">
+<div *ngIf="showNewProductsPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+    (click)="closeNewProductsPopup()">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl" (click)="$event.stopPropagation()">
         <h2 class="text-xl font-semibold mb-4">Sản phẩm mới chưa có trong danh sách sản phẩm</h2>
         <div class="max-h-96 overflow-y-auto">
@@ -495,7 +509,8 @@
         </div>
     </div>
 </div>
-<div *ngIf="isConfirmCreatePopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" (click)="closePopupCreate()">
+<div *ngIf="isConfirmCreatePopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+    (click)="closePopupCreate()">
     <div class="bg-white p-6 rounded-lg shadow-lg w-96" (click)="$event.stopPropagation()">
         <h2 class="text-lg font-bold mb-4">Xác nhận thêm sản phẩm</h2>
         <p>Bạn có chắc chắn muốn thêm sản phẩm này?</p>
@@ -507,7 +522,9 @@
         </div>
     </div>
 </div>
-<div *ngIf="isConfirmCreateProductCategoryPopupOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" (click)="closePopupCreateProductCategory()">
+<div *ngIf="isConfirmCreateProductCategoryPopupOpen"
+    class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+    (click)="closePopupCreateProductCategory()">
     <div class="bg-white p-6 rounded-lg shadow-lg w-96" (click)="$event.stopPropagation()">
         <h2 class="text-lg font-bold mb-4">Xác nhận thêm loại hàng</h2>
         <p>Bạn có chắc chắn muốn thêm loại hàng này?</p>
