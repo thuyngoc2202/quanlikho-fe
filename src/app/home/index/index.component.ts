@@ -58,6 +58,18 @@ export class IndexComponent implements OnInit, OnDestroy {
   newKeywords: string[] = [];
   formProduct!: FormGroup;
   categoryName: string = '';
+  showFileUploadPopup: boolean = false;
+  newProducts: any[] = [];
+  showNewProductsPopup = false;
+  selectedFile: File | null = null;
+  selectedCategoryId: string | null = null;
+  isCreatePopupOpen: boolean = false;
+  isConfirmCreatePopupOpen: boolean = false;
+  selectedCategoryCreate: any;
+  selectedProductCreate: any;
+  showFileUploadProductPopup: boolean = false;
+  isCreateProductCategoryPopupOpen: boolean = false;
+  isConfirmCreateProductCategoryPopupOpen: boolean = false;
   constructor(
     private userService: UserServiceService,
     private activeMenuService: ActiveMenuService,
@@ -93,6 +105,7 @@ export class IndexComponent implements OnInit, OnDestroy {
     this.categorySubscription = this.sltCategory.selectedCategory$.subscribe(category => {
       if (category) {
         this.categoryName = category.category_name;
+        this.selectedCategoryId = category.category_id;
         this.setActiveCategory(category);
       }
     });
@@ -110,11 +123,9 @@ export class IndexComponent implements OnInit, OnDestroy {
 
   validate() {
     this.editForm = this.fb.group({
-      product_name: ['', Validators.required],
-      category_name: ['', Validators.required],
-      quantity: ['', [Validators.required, Validators.min(0)]],
-      min_limit: ['', [Validators.required, Validators.min(0)]],
-      max_limit: ['', [Validators.required, Validators.min(0)]],
+      quantity: ['', [Validators.required]],
+      min_limit: ['', [Validators.required]],
+      max_limit: ['', [Validators.required]],
     });
   }
   validateProduct() {
@@ -122,6 +133,7 @@ export class IndexComponent implements OnInit, OnDestroy {
       product_name: ['', Validators.required],
     });
   }
+
 
   updateCartCount(): void {
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -528,11 +540,13 @@ export class IndexComponent implements OnInit, OnDestroy {
   }
   clearProductSelection() {
     this.selectedProductUpdate = '';
+    this.selectedProductCreate = '';
     this.idProduct = '';
   }
 
   clearCategorySelection() {
     this.selectedCategoryUpdate = null;
+    this.selectedCategoryCreate = null;
     this.idCategory = '';
   }
   closePopupUpdate(event: MouseEvent) {
@@ -588,6 +602,188 @@ export class IndexComponent implements OnInit, OnDestroy {
     }
 
     return false;
+  }
+
+  openFileUploadPopup() {
+    this.showFileUploadPopup = true;
+  }
+
+  closeFileUploadPopup() {
+    this.showFileUploadPopup = false;
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+    } else {
+      this.selectedFile = null;
+    }
+  }
+  uploadFile(): void {
+    if (!this.selectedFile) {
+      console.error('No file selected');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', this.selectedFile);
+    if (this.selectedCategoryId !== null) {
+      this.adminService.importProductCategory(this.selectedCategoryId, formData).subscribe({
+        next: (response) => {
+          // Add success handling here (e.g., display a message, close popup)
+          this.toastr.success('Nhập File thành công', 'Thành công');
+          // Check if there are new products
+        if (response.result_data.import_fail && response.result_data.import_fail.length > 0) {
+          this.newProducts = response.result_data.import_fail;
+          this.showNewProductsPopup = true;
+        }
+        },
+        error: (error) => {
+          console.error('Error importing product', error);
+          // Add error handling here
+          this.toastr.error('Nhập File thất bại', 'Thất bại');
+
+        }
+      });
+    } else {
+      this.toastr.error('Chọn danh mục trước khi nhập file', 'Thất bại');
+    }
+
+  }
+  closeFilePopup() {
+    this.showFileUploadPopup = false;
+    this.selectedFile = null;
+  }
+  closeNewProductsPopup() {
+    this.showNewProductsPopup = false;
+    this.newProducts = [];
+    this.showFileUploadPopup = false;
+    this.loadProductCategoryByCategoryId(this.selectedCategoryId);
+  }
+  openAddProductPopup() {
+    this.isCreatePopupOpen = true;
+  }
+  closeAddProductPopup() {
+    this.isCreatePopupOpen = false;
+    this.formProduct.reset();
+    this.newKeywords = [];
+  }
+  addProduct() {
+    const productData = this.formProduct.value;
+    productData.keywords = this.newKeywords;
+
+    if (this.formProduct.valid) {
+      this.adminService.createProduct(productData).subscribe({
+        next: (response) => {
+          this.isConfirmCreatePopupOpen = false;
+          this.isCreatePopupOpen = false;
+          this.loadProductCategoryByCategoryId(this.idCategory);
+          this.editForm.reset();       
+          this.loadProduct();
+          this.toastr.success('Thêm sản phẩm thành công', 'Thành công');
+        },
+        error: (error) => {
+          console.error('Failed to create product', error);
+          this.isConfirmCreatePopupOpen = false;
+          this.toastr.error(`${error.error.result_data.msg}`, 'Thất bại');
+        }
+      });
+    } else {
+      this.isConfirmCreatePopupOpen = false;
+      this.toastr.error(`Thiếu trường`, 'Thất bại');
+    }
+  }
+  uploadProductCategoryFile(): void {
+    if (!this.selectedFile) {
+      console.error('No file selected');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', this.selectedFile);
+
+    this.adminService.importProduct(formData).subscribe({
+      next: (response) => {
+        this.closeFileUploadProductPopup();
+        this.loadProductCategoryByCategoryId(this.idCategory);
+        this.toastr.success('Nhập sản phẩm thành công', 'Thành công');
+      },
+      error: (error) => {
+        console.error('Error importing product', error);
+        this.toastr.error('Nhập sản phẩm thất bại', 'Thất bại');
+      }
+    });
+  }
+  openAddProductCategoryPopup() {
+    this.isCreateProductCategoryPopupOpen = true;
+  }
+  closeAddProductCategoryPopup() {
+    this.isCreateProductCategoryPopupOpen = false;
+  }
+  openFileUploadProductPopup() {
+    this.showFileUploadProductPopup = true;
+  }
+  closeFileUploadProductPopup() {
+    this.showFileUploadProductPopup = false;
+    this.selectedFile = null;
+  }
+  confirmCreate() {
+    this.isConfirmCreatePopupOpen = true;
+  }
+  closePopupCreate() {
+    this.isConfirmCreatePopupOpen = false;
+  }
+
+  confirmCreateProductCategory() {
+    this.isConfirmCreateProductCategoryPopupOpen = true;
+  }
+  closePopupCreateProductCategory() {
+    this.isConfirmCreateProductCategoryPopupOpen = false;
+  }
+  selectProductCreate(product: any) {
+    this.selectedProductCreate = product;
+    this.idProduct = product.product_id;
+    this.showProductDropdown = false;
+
+  }
+
+  selectCategoryCreate(category: any) {
+    this.selectedCategoryCreate = category;
+    this.idCategory = category.category_id;
+    this.showCategoryDropdown = false;
+  }
+  openCreateProductCategoryPopup() {
+    this.isCreateProductCategoryPopupOpen = true;
+  }
+  closeCreateProductCategoryPopup() {
+    this.isCreateProductCategoryPopupOpen = false;
+  }
+
+  addProductCategory() {
+    const productCategorytData = this.editForm.value;
+    productCategorytData.product_id = this.idProduct;
+    productCategorytData.category_id = this.idCategory;
+
+    if (this.editForm.valid) {
+      this.adminService.createProductCategory(productCategorytData).subscribe({
+        next: (response) => {
+          this.isCreateProductCategoryPopupOpen = false;
+          this.isConfirmCreateProductCategoryPopupOpen = false;
+          this.loadProductCategoryByCategoryId(this.selectedCategoryId);
+          this.resetProductForm();
+          this.toastr.success('Thêm sản phẩm thành công', 'Thành công');
+        },
+        error: (error) => {
+          console.error('Failed to create category', error);
+          this.isConfirmCreatePopupOpen = false;
+          this.toastr.error(`${error.error.result_data.msg}`, 'Thất bại');
+        }
+      });
+    } else {
+      this.isConfirmCreatePopupOpen = false;
+      this.toastr.error(`Thiếu trường`, 'Thất bại');
+    }
   }
 
 }

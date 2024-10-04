@@ -35,12 +35,21 @@ export class OrderManagementComponent implements OnInit {
   isUpdating: boolean = false;
 
 
-  constructor(private adminService: AdminServiceService, private toastr: ToastrService, private authService: AuthService , public router: Router) { }
+  constructor(private adminService: AdminServiceService, private toastr: ToastrService, private authService: AuthService, public router: Router) { }
 
   ngOnInit(): void {
     this.getAllOrder();
   }
+  isStatusDropdownOpen = false;
+  
+  toggleStatusDropdown() {
+    this.isStatusDropdownOpen = !this.isStatusDropdownOpen;
+  }
 
+  selectStatus(status: string) {
+    this.selectedOrder.status = status;
+    this.isStatusDropdownOpen = false;
+  }
   getAllOrder() {
     this.adminService.getAllOrder().subscribe((res) => {
       this.orders = res.result_data.productOrderListResponse;
@@ -59,9 +68,9 @@ export class OrderManagementComponent implements OnInit {
   openDetailOrder(product_order_id: string) {
     this.isDetailPopupOpen = true;
     this.adminService.getOrderDetail(product_order_id).subscribe((res) => {
-      
+
       this.selectedOrder = res.result_data;
-      this.currentStatus = res.result_data.status; 
+      this.currentStatus = res.result_data.status;
     });
   }
 
@@ -69,7 +78,7 @@ export class OrderManagementComponent implements OnInit {
     this.isUpdatePopupOpen = true;
     this.adminService.getOrderStatus(order.product_order_id).subscribe((res) => {
       this.selectedOrder = res.result_data;
-      this.currentStatus = res.result_data.status; 
+      this.currentStatus = res.result_data.status;
     });
   }
 
@@ -90,7 +99,7 @@ export class OrderManagementComponent implements OnInit {
     const order = {
       product_order_id: this.selectedOrder.product_order_id,
       status: this.selectedOrder.status,
-      product_order_details : this.selectedOrder.product_order_detail_list_responses
+      product_order_details: this.selectedOrder.product_order_detail_list_responses
     }
 
     this.adminService.updateOrder(order).subscribe({
@@ -130,17 +139,30 @@ export class OrderManagementComponent implements OnInit {
     });
   }
 
+  startShipping() {
+  
+    const detail_requests = {
+      detail_requests: this.selectedOrder.product_order_detail_list_responses
+    }
+
+    this.adminService.startShipping(detail_requests).subscribe({
+      next: (response: any) => {
+        this.getAllOrder();
+        this.closePopup();
+        this.toastr.success('Xuất đơn thành công');
+      },
+      error: (error) => {
+        this.toastr.error('Xuất đơn thất bại');
+      }
+    });
+  }
+
   readonly orderStatuses = [
     'PENDING',
-    'CONFIRMED',
     'SHIPPING',
-    'DELIVERED',
-    'CANCELLED',
-    'RETURNED',
-    'COMPLETED'
   ];
 
-  currentStatus: string = ''; 
+  currentStatus: string = '';
 
   getAvailableStatuses(): string[] {
     return this.getAllowedStatuses(this.currentStatus);
@@ -149,19 +171,9 @@ export class OrderManagementComponent implements OnInit {
   private getAllowedStatuses(currentStatus: string): string[] {
     switch (currentStatus) {
       case 'PENDING':
-        return this.orderStatuses; 
-      case 'CONFIRMED':
-        return ['CONFIRMED', 'SHIPPING', 'DELIVERED', 'CANCELLED', 'RETURNED', 'COMPLETED'];
+        return this.orderStatuses;
       case 'SHIPPING':
-        return ['SHIPPING', 'DELIVERED', 'CANCELLED', 'RETURNED', 'COMPLETED'];
-      case 'DELIVERED':
-        return ['DELIVERED', 'CANCELLED', 'RETURNED', 'COMPLETED'];
-      case 'CANCELLED':
-        return ['CANCELLED', 'RETURNED', 'COMPLETED'];
-      case 'RETURNED':
-        return ['RETURNED', 'COMPLETED'];
-      case 'COMPLETED':
-        return ['COMPLETED'];
+        return ['SHIPPING'];
       default:
         return this.orderStatuses;
     }
