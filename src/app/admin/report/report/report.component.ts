@@ -17,9 +17,12 @@ import { Router } from '@angular/router';
   providers: [DatePipe]
 })
 export class ReportComponent implements OnInit {
+
   @ViewChild('picker') picker!: MatDateRangePicker<Date>;
   @ViewChild('startCalendar') startCalendar!: MatCalendar<Date>;
   @ViewChild('endCalendar') endCalendar!: MatCalendar<Date>;
+  @ViewChild('startCalendarBu') startCalendarBu!: MatCalendar<Date>;
+  @ViewChild('endCalendarBu') endCalendarBu!: MatCalendar<Date>;
 
   isExportPopupOpen: boolean = false;
   startDate: Date | null = null;
@@ -29,11 +32,14 @@ export class ReportComponent implements OnInit {
   tempStartDate: Date | null = null;
   tempEndDate: Date | null = null;
   private dateClassFunc: (date: Date) => MatCalendarCellCssClasses;
-  
-  isExportBuPopupOpen = false;
-  startDateBu!: Date;
-  endDateBu!: Date;
+  private dateClassFuncBu: (date: Date) => MatCalendarCellCssClasses;
+  private dateClassFuncEndBu: (date: Date) => MatCalendarCellCssClasses;
 
+  isExportBuPopupOpen = false;
+  startDateBu: Date | null = null;
+  endDateBu: Date | null = null;
+  showCalendarBu = false;
+  today: Date = new Date();
   constructor(
     private adminService: AdminServiceService,
     private toastr: ToastrService,
@@ -42,6 +48,8 @@ export class ReportComponent implements OnInit {
     public router: Router
   ) {
     this.dateClassFunc = this.updateDateClass();
+    this.dateClassFuncBu = this.updateDateClassBu();
+    this.dateClassFuncEndBu = this.updateDateClassEndCalendarBu();
   }
 
   ngOnInit() {
@@ -70,6 +78,12 @@ export class ReportComponent implements OnInit {
 
   get dateClass(): (date: Date) => MatCalendarCellCssClasses {
     return this.dateClassFunc;
+  }
+  get dateClassBu(): (date: Date) => MatCalendarCellCssClasses {
+    return this.dateClassFuncBu;
+  }
+  get dateClassEndCalendarBu(): (date: Date) => MatCalendarCellCssClasses {
+    return this.dateClassFuncEndBu;
   }
 
   openExportPopup() {
@@ -179,25 +193,42 @@ export class ReportComponent implements OnInit {
 
   closeExportBuPopup() {
     this.isExportBuPopupOpen = false;
+    this.clearDateRangeBu();
+  }
+
+  clearDateRangeBu() {
+    this.startDateBu = null;
   }
 
   getDateRangeStringBu(): string {
-    const start = this.datePipe.transform(this.startDateBu, 'dd/MM/yyyy');
-    const end = this.datePipe.transform(this.endDateBu, 'dd/MM/yyyy');
-    return `${start} - ${end}`;
+    if (this.startDateBu && this.endDateBu) {
+      const start = moment(this.startDateBu).format('DD/MM/YYYY');
+      const end = moment(this.endDateBu).format('DD/MM/YYYY');
+      return `${start} - ${end}`;
+    }
+    return '';
   }
 
   exportBuReport() {
     // Implement the logic to export the "nhập bù" report
+    const formattedEndDate = moment(this.endDateBu).format('YYYY-MM-DD');
     this.adminService.getBuReport().subscribe({
       next: (response) => {
         if (response instanceof Blob) {
           const contentDisposition = response.type;
-          let fileName = 'Nhập bù Hàng.csv';
+          let fileName = 'Nhập bù hàng ' + formattedEndDate + '.csv';
+          console.log(fileName);
+
           if (contentDisposition) {
-            const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/i);
-            if (fileNameMatch && fileNameMatch.length === 2)
-              fileName = fileNameMatch[1];
+            const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+            const matches = filenameRegex.exec(contentDisposition);
+            if (matches != null && matches[1]) {
+              fileName = matches[1].replace(/['"]/g, '');
+              // Decode the filename
+              fileName = decodeURIComponent(fileName);
+              // Replace any remaining problematic characters
+              fileName = fileName.replace(/[/\\?%*:|"<>]/g, '-');
+            }
           }
           const blob = new Blob([response], { type: 'text/csv' });
           saveAs(blob, fileName);
@@ -212,8 +243,78 @@ export class ReportComponent implements OnInit {
   }
 
   initializeBuDates() {
-    this.endDateBu = new Date(); // Today
-    this.startDateBu = new Date(this.endDateBu);
-    this.startDateBu.setMonth(this.startDateBu.getMonth() - 1); // 1 month ago
+    this.endDateBu = new Date();
+    this.today = new Date();
+  }
+
+  toggleCalendarBu() {
+    this.showCalendarBu = !this.showCalendarBu;
+  }
+
+  updateDateClassBu(): (date: Date) => MatCalendarCellCssClasses {
+    return (date: Date): MatCalendarCellCssClasses => {
+      console.log(date, this.startDateBu, this.endDateBu);
+
+      if (this.startDateBu && this.endDateBu) {
+        if (date >= this.startDateBu && date <= this.endDateBu) {
+          return 'selected-date-range mat-calendar-body-in-range';
+        }
+      }
+      return '';
+    };
+  }
+
+  updateDateClassEndCalendarBu(): (date: Date) => MatCalendarCellCssClasses {
+    return (date: Date): MatCalendarCellCssClasses => {
+      
+      let classes: string[] = [];
+  
+      // Luôn thêm 'disabled-date' cho tất cả các ngày trừ ngày hiện tại
+      if (date.getTime() !== this.today.getTime()) {
+        classes.push('disabled-date');
+      }
+  
+      // Kiểm tra và thêm class cho phạm vi ngày được chọn
+      if (this.startDateBu && date >= this.startDateBu && date <= this.today) {
+        classes.push('selected-date-range', 'mat-calendar-body-in-range');
+      }
+  
+      return classes.join(' ');
+    };
+  }
+
+  onStartDateBuSelected($event: Date | null) {
+    if ($event) {
+      this.startDateBu = $event;
+
+  
+      // Đảm bảo ngày kết thúc luôn là ngày hiện tại
+      this.endDateBu = new Date();
+  
+      // Nếu ngày bắt đầu sau ngày hiện tại, đặt nó là ngày hiện tại
+      if (this.startDateBu > this.today) {
+        this.startDateBu = new Date(this.today);
+      }
+    } else {
+      this.startDateBu = null;
+      this.endDateBu = new Date(); // Đặt lại ngày kết thúc là ngày hiện tại
+    }
+  
+    // Cập nhật các hàm dateClass
+    this.dateClassFuncBu = this.updateDateClassBu();
+    this.dateClassFuncEndBu = this.updateDateClassEndCalendarBu();
+  
+    // Cập nhật calendars
+    this.updateCalendarsBu();
+  }
+
+  private updateCalendarsBu() {
+    if (this.startCalendarBu) {
+      this.startCalendarBu.updateTodaysDate();
+    }
+    if (this.endCalendarBu) {
+      this.endCalendarBu.updateTodaysDate();
+    }
+    this.cdr.detectChanges();
   }
 }

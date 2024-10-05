@@ -70,7 +70,7 @@ export class IndexComponent implements OnInit, OnDestroy {
   showFileUploadProductPopup: boolean = false;
   isCreateProductCategoryPopupOpen: boolean = false;
   isConfirmCreateProductCategoryPopupOpen: boolean = false;
-  sortedProducts: any[] = [];
+  sortedProducts: any[][] = [];
 
   constructor(
     private userService: UserServiceService,
@@ -796,32 +796,6 @@ export class IndexComponent implements OnInit, OnDestroy {
   }
 
  
-  sortProducts(products: any[]) {
-    // Sắp xếp tất cả sản phẩm theo thứ tự alphabet
-    const sortedProducts = products.sort((a, b) => 
-      a.product_name.localeCompare(b.product_name)
-    );
-  
-    // Xác định số cột dựa trên kích thước màn hình
-    const columnCount = this.getColumnCount();
-  
-    // Tính số hàng cần thiết
-    const rowCount = Math.ceil(sortedProducts.length / columnCount);
-    
-  
-    // Tạo mảng 2 chiều để lưu trữ sản phẩm theo cột
-    const columns: any[][] = Array.from({ length: columnCount }, () => []);
-  
-    // Phân phối sản phẩm vào các cột
-    for (let i = 0; i < sortedProducts.length; i++) {
-      const columnIndex = Math.floor(i / rowCount);
-      columns[columnIndex].push(sortedProducts[i]);
-    }
-  
-    // Cập nhật sortedProducts
-    this.sortedProducts = columns;
-  }
-  
   getColumnCount(): number {
     const width = window.innerWidth;
     if (width >= 1920) return 14; // 3xl
@@ -831,6 +805,23 @@ export class IndexComponent implements OnInit, OnDestroy {
     if (width >= 768) return 6;   // md
     if (width >= 640) return 4;   // sm
     return 2; // Default for xs
+  }
+
+  sortProducts(products: any[]) {
+    const sortedList = products.sort((a, b) => 
+      a.product_name.localeCompare(b.product_name)
+    );
+
+    const columnCount = this.getColumnCount();
+    const columns: any[][] = Array.from({ length: columnCount }, () => []);
+
+    for (let i = 0; i < sortedList.length; i++) {
+      const columnIndex = Math.floor(i / Math.ceil(sortedList.length / columnCount));
+      console.log(columnIndex);
+      columns[columnIndex].push(sortedList[i]);
+    }
+
+    this.sortedProducts = columns;
   }
 
   @HostListener('window:resize', ['$event'])

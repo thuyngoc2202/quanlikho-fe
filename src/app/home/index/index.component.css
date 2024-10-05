@@ -1,7 +1,25 @@
 .highlight {
-    background-color: rgb(199, 45, 45);
+    background-color: red;
     color: white;
+    font-weight: bold;
 }
 
+.product-grid {
+    display: grid;
+}
 
+.product-column {
+    display: flex;
+    flex-direction: column;
+}
 
+.product-card {
+    border: 1px solid #ddd;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.product-card h3 {
+    margin-top: 0;
+    font-size: 1rem;
+}

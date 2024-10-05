@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Order, OrderManagement } from 'src/app/model/cart-detail.model';
 import { CustomCurrencyPipe } from 'src/app/pipe/custom-currency.pipe';
@@ -14,7 +14,9 @@ import { Router } from '@angular/router';
   selector: 'app-order-management',
   templateUrl: './order-management.component.html',
   styleUrls: ['./order-management.component.css'],
-  providers: [CustomCurrencyPipe, StatusOrderPipe, HighlightPipe]
+  providers: [CustomCurrencyPipe, StatusOrderPipe, HighlightPipe],
+  encapsulation: ViewEncapsulation.None
+
 })
 export class OrderManagementComponent implements OnInit {
   searchTerm: string = '';
@@ -34,8 +36,17 @@ export class OrderManagementComponent implements OnInit {
   idOrder: string = '';
   isUpdating: boolean = false;
 
+  paginatedProducts: any[] = [];
+  currentPage: number = 1;
+  pageSize: number = 5; // Số lượng sản phẩm trên mỗi trang
+  totalPages: number = 1;
 
-  constructor(private adminService: AdminServiceService, private toastr: ToastrService, private authService: AuthService, public router: Router) { }
+  constructor(private adminService: AdminServiceService, 
+    private toastr: ToastrService,
+    private authService: AuthService, 
+    public router: Router,
+    private changeDetectorRef: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     this.getAllOrder();
@@ -53,6 +64,7 @@ export class OrderManagementComponent implements OnInit {
   getAllOrder() {
     this.adminService.getAllOrder().subscribe((res) => {
       this.orders = res.result_data.productOrderListResponse;
+      this.filteredOrders = this.orders;
     });
   }
 
@@ -60,6 +72,24 @@ export class OrderManagementComponent implements OnInit {
     return this.searchTerm ? fullName.toLowerCase().includes(this.searchTerm.toLowerCase()) : false;
   }
 
+  private removeAccents(str: string): string {
+    return str.normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '')
+              .replace(/đ/g, 'd').replace(/Đ/g, 'D');
+  }
+  
+  onSearchChange() {
+    if (!this.searchTerm.trim()) {
+      this.filteredOrders = [...this.orders]; // Hiển thị tất cả đơn hàng nếu ô tìm kiếm trống
+    } else {
+      const searchTermLower = this.removeAccents(this.searchTerm.toLowerCase().trim());
+      this.filteredOrders = this.orders.filter(order => 
+        this.removeAccents(order.full_name.toLowerCase()).includes(searchTermLower) || 
+        order.phone_number.includes(searchTermLower)
+      );
+    }
+  }
+  
 
   openDetailPopup(order: any) {
     this.isDetailPopupOpen = true;
@@ -70,6 +100,9 @@ export class OrderManagementComponent implements OnInit {
     this.adminService.getOrderDetail(product_order_id).subscribe((res) => {
 
       this.selectedOrder = res.result_data;
+      console.log(this.selectedOrder);
+      this.updatePaginatedProducts();
+
       this.currentStatus = res.result_data.status;
     });
   }
@@ -87,6 +120,7 @@ export class OrderManagementComponent implements OnInit {
       this.isUpdatePopupOpen = false;
       this.isDetailPopupOpen = false;
     }
+    this.currentPage = 1
   }
   closeConfirmPopup() {
     if (this.isConfirmUpdatePopupOpen || this.isConfirmDeletePopupOpen) {
@@ -96,12 +130,24 @@ export class OrderManagementComponent implements OnInit {
   }
 
   updateOrderStatus() {
+    // Kiểm tra số lượng trước khi cập nhật
+    const invalidItems = this.selectedOrder.product_order_detail_list_responses.filter(
+      item => item.quantity > 0 && item.stock === 0
+    );
+  
+    if (invalidItems.length > 0) {
+      // Có ít nhất một sản phẩm có số lượng > 0 nhưng stock = 0
+      const itemNames = invalidItems.map(item => item.product_name).join(', ');
+      this.toastr.error(`Không thể cập nhật. Sản phẩm đã hết hàng: ${itemNames}`);
+      return;
+    }
+  
     const order = {
       product_order_id: this.selectedOrder.product_order_id,
       status: this.selectedOrder.status,
       product_order_details: this.selectedOrder.product_order_detail_list_responses
     }
-
+  
     this.adminService.updateOrder(order).subscribe({
       next: (response: any) => {
         this.getAllOrder();
@@ -110,7 +156,7 @@ export class OrderManagementComponent implements OnInit {
         this.toastr.success('Cập nhật đơn hàng thành công');
       },
       error: (error) => {
-
+        console.error('Error updating order:', error);
         this.toastr.error('Cập nhật đơn hàng thất bại');
       }
     });
@@ -180,18 +226,51 @@ export class OrderManagementComponent implements OnInit {
   }
 
   updateQuantity(index: number, event: Event) {
-    const newQuantity = (event.target as HTMLInputElement).value;
-    this.selectedOrder.product_order_detail_list_responses[index].quantity = parseInt(newQuantity, 10);
+    const input = event.target as HTMLInputElement;
+    const newQuantity = parseInt(input.value, 10);
+    
+    if (isNaN(newQuantity) || newQuantity < 1) {
+      console.error('Invalid quantity input');
+      return;
+    }
+  
+    // Update the quantity in the paginatedProducts array
+    if (this.paginatedProducts[index]) {
+      this.paginatedProducts[index].quantity = newQuantity;
+    } else {
+    }
+    
+    // Also update the quantity in the original array
+    const originalIndex = (this.currentPage - 1) * this.pageSize + index;
+    if (this.selectedOrder.product_order_detail_list_responses[originalIndex]) {
+      this.selectedOrder.product_order_detail_list_responses[originalIndex].quantity = newQuantity;
+    } 
+  
+    // Force change detection
+    this.changeDetectorRef.detectChanges();
   }
 
-  saveQuantity(index: number) {
-    // const item = this.selectedOrder.product_order_detail_list_responses[index];
-    // if (item.newQuantity !== undefined && item.newQuantity !== item.quantity) {
-    //   // Gọi API để cập nhật số lượng
-    //   // Ví dụ: this.orderService.updateQuantity(item.id, item.newQuantity).subscribe(...)
-    //   console.log(`Cập nhật số lượng cho sản phẩm ${item.product_name}: ${item.newQuantity}`);
-    //   item.quantity = item.newQuantity;
-    //   delete item.newQuantity;
-    // }
+ 
+
+  updatePaginatedProducts() {
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.paginatedProducts = this.selectedOrder.product_order_detail_list_responses.slice(start, end);
+    this.totalPages = Math.ceil(this.selectedOrder.product_order_detail_list_responses.length / this.pageSize);
+    console.log(this.paginatedProducts);
+  }
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePaginatedProducts();
+    }
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePaginatedProducts();
+    }
   }
 }
