@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ChangeDetectorRef } from '@angular/core';
 import { SelectedCategoryService } from 'src/app/util/categoryService';
 import { Category } from 'src/app/model/category.model';
 import { ProductCategory } from 'src/app/model/product-category.model';
@@ -70,7 +70,14 @@ export class IndexComponent implements OnInit, OnDestroy {
   showFileUploadProductPopup: boolean = false;
   isCreateProductCategoryPopupOpen: boolean = false;
   isConfirmCreateProductCategoryPopupOpen: boolean = false;
-  sortedProducts: any[][] = [];
+  
+  selectedProductImport: any;
+  paginatedProducts: any[] = []; // Danh sách sản phẩm đã phân trang
+  currentPage: number = 1;
+  itemsPerPage: number = 10;
+  totalPages: number = 1;
+  categoryNameImport: string = '';
+  typeLogin: string = '';
 
   constructor(
     private userService: UserServiceService,
@@ -82,7 +89,7 @@ export class IndexComponent implements OnInit, OnDestroy {
     private adminService: AdminServiceService,
     private fb: FormBuilder,
     private toastr: ToastrService,
-
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -112,7 +119,10 @@ export class IndexComponent implements OnInit, OnDestroy {
       }
     });
     this.validate();
-    this.validateProduct();   
+    this.validateProduct();
+    this.initializeProducts();
+    this.updatePagination();
+
   }
 
   ngOnDestroy() {
@@ -145,31 +155,43 @@ export class IndexComponent implements OnInit, OnDestroy {
   decreaseQuantity(product: any) {
     if (!this.productQuantities[product.product_category_id]) {
       this.productQuantities[product.product_category_id] = 0;
+      return; 
     }
-    if (this.productQuantities[product.product_category_id] > 1) {
-      this.productQuantities[product.product_category_id] = this.productQuantities[product.product_category_id] - 50;
-    }
+    
+  
+    let currentQuantity = Number(this.productQuantities[product.product_category_id]);
+    const minQuantity = Number(product.min_quantity) || 1;
+    
+ 
+    let newQuantity = currentQuantity - minQuantity;
+    
+ 
+    newQuantity = Math.max(0, Math.floor(newQuantity / minQuantity) * minQuantity);
+    
+ 
+    this.productQuantities[product.product_category_id] = newQuantity;
+  
   }
 
   increaseQuantity(product: any) {
     if (!this.productQuantities[product.product_category_id]) {
       this.productQuantities[product.product_category_id] = 0;
     }
-    const currentQuantity = this.productQuantities[product.product_category_id];
-    const stock = product.quantity || 0;
-    const incrementAmount = 50;
-
-    if (currentQuantity + incrementAmount <= stock) {
-
-      this.productQuantities[product.product_category_id] += incrementAmount;
-    } else if (currentQuantity < stock) {
-
-      this.productQuantities[product.product_category_id] = stock;
+    
+    const currentQuantity = Number(this.productQuantities[product.product_category_id]);
+    const stock = Number(product.quantity) || 0;
+    const minQuantity = Number(product.min_quantity) || 1;
+    
+    let newQuantity = currentQuantity + minQuantity;
+    
+    newQuantity = Math.floor(newQuantity / minQuantity) * minQuantity;
+    
+    if (newQuantity <= stock) {
+      this.productQuantities[product.product_category_id] = newQuantity;
     } else {
-
-      return;
+      this.productQuantities[product.product_category_id] = Math.floor(stock / minQuantity) * minQuantity;
     }
-
+  
   }
 
   handleInputChange(event: Event, item: any): void {
@@ -209,13 +231,11 @@ export class IndexComponent implements OnInit, OnDestroy {
     let orderCart = JSON.parse(localStorage.getItem('cart') || '[]');
     const quantity = this.productQuantities[product.product_category_id] || 1;
 
-    // Sử dụng inventory_quantity thay vì quantity
     if (quantity > product.inventory_quantity) {
       return;
     }
     const orderProduct = orderCart.find((item: any) => item.product_category_id === product.product_category_id);
     if (orderProduct) {
-      // Kiểm tra tổng số lượng trong giỏ hàng và số lượng mới không vượt quá tồn kho
       if (orderProduct.quantity + quantity > product.inventory_quantity) {
         return;
       }
@@ -228,6 +248,7 @@ export class IndexComponent implements OnInit, OnDestroy {
       orderDetail.category_id = product.category_id;
       orderDetail.category_name = product.category_name;
       orderDetail.stock = product.inventory_quantity;
+      orderDetail.min_quantity = product.min_quantity;
       orderCart.push(orderDetail);
     }
 
@@ -280,8 +301,12 @@ export class IndexComponent implements OnInit, OnDestroy {
 
   loadProductCategoryByCategoryId(categoryId: string | null) {
     if (categoryId) {
-
-      this.userService.getProductCategoryByCategoryId(categoryId).subscribe({
+      if (this.isLoggedIn) {
+        this.typeLogin = 'admin';
+      } else {
+        this.typeLogin = 'user';
+      }
+      this.userService.getProductCategoryByCategoryId(categoryId, this.typeLogin).subscribe({
         next: (response: any) => {
           this.productsCategories = response.result_data.map((product: any) => ({
             ...product,
@@ -290,7 +315,6 @@ export class IndexComponent implements OnInit, OnDestroy {
           }));
 
           this.filteredProductsCategories = this.productsCategories;
-          this.sortProducts(this.productsCategories);
         },
         error: (error) => {
           console.error('Failed to load products', error);
@@ -370,6 +394,7 @@ export class IndexComponent implements OnInit, OnDestroy {
       orderDetail.category_id = product.category_id;
       orderDetail.category_name = product.category_name;
       orderDetail.stock = product.inventory_quantity;
+      orderDetail.min_quantity = product.min_quantity;
       orderCart.push(orderDetail);
     }
     localStorage.setItem('cart', JSON.stringify(orderCart));
@@ -575,10 +600,6 @@ export class IndexComponent implements OnInit, OnDestroy {
 
   // Không cần setupBreakpointObserver() nữa, vì Tailwind sẽ xử lý responsive
 
-  trackByProduct(index: number, productCategory: ProductCategory): string {
-    return productCategory.product_category_id;
-  }
-
   addKeyword(keyword: string) {
     if (keyword && keyword.trim() !== '') {
       this.newKeywords.push(keyword.trim());
@@ -638,14 +659,16 @@ export class IndexComponent implements OnInit, OnDestroy {
     const formData = new FormData();
     formData.append('file', this.selectedFile);
     if (this.selectedCategoryId !== null) {
-      this.adminService.importProductCategory(this.selectedCategoryId, formData).subscribe({
+      this.adminService.importVerifyProductCategory(this.selectedCategoryId, formData).subscribe({
         next: (response) => {
           // Add success handling here (e.g., display a message, close popup)
           this.toastr.success('Nhập File thành công', 'Thành công');
           // Check if there are new products
-          if (response.result_data.import_fail && response.result_data.import_fail.length > 0) {
-            this.newProducts = response.result_data.import_fail;
+          if (response.result_data.import_data && response.result_data.import_data.length > 0) {
+            this.newProducts = response.result_data.import_data;
+            this.categoryNameImport = response.result_data.category_name;
             this.showNewProductsPopup = true;
+            this.updatePagination();
           }
         },
         error: (error) => {
@@ -660,6 +683,118 @@ export class IndexComponent implements OnInit, OnDestroy {
     }
 
   }
+
+  updatePagination() {
+    this.totalPages = Math.ceil(this.newProducts.length / this.itemsPerPage);
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    this.paginatedProducts = this.newProducts.slice(startIndex, startIndex + this.itemsPerPage);
+
+  }
+
+  prevPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePagination();
+    }
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePagination();
+    }
+  }
+
+  isNewProduct(product: Product): boolean {
+    return !product.system_name;
+  }
+
+  getProductDisplayValue(product: any): string {
+    return product.system_name || '';
+  }
+
+  updateInputValue(product: any, value: string): void {
+    product.system_name = value;
+    this.filterProductsImport(product);
+  }
+
+  updateProductValue(product: any, event: any): void {
+    product.system_name = event.target.value;
+    this.filterProductsImport(product);
+  }
+
+  showProductImportDropdown(index: number): void {
+    const product = this.paginatedProducts[index];
+    product.showDropdown = true;
+    this.showAllProducts(product);
+  }
+
+  showAllProducts(product: any): void {
+    product.filteredProducts = [...this.products]; // Show all products
+  }
+
+  filterProductsImport(product: any): void {
+    const searchTerm = product.system_name.toLowerCase();
+    product.filteredProducts = this.products.filter(p => 
+      p.product_name.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  selectProductImport(existingProduct: any, product: any) {
+    product.system_name = existingProduct.product_name;
+    product.showDropdown = false;
+  }
+
+  clearProductSelectionImport(product: any): void {
+    product.system_name = '';
+  }
+  onBlur(product: any): void {
+    setTimeout(() => {
+      product.showDropdown = false;
+    }, 200);
+  }
+
+  importNewProducts() {
+    const importNewProducts= this.newProducts.map(({ filteredProducts, showDropdown, ...rest }) => ({
+      ...rest,
+      system_name: rest.system_name,
+      import_name: rest.import_name,
+      quantity: rest.quantity,
+    }));
+    const importData = {
+      import_data: importNewProducts,
+      category_id: this.selectedCategoryId,
+      category_name: this.categoryName,
+    }
+    this.adminService.importProductCategory(importData).subscribe({
+      next: (response) => {
+        this.toastr.success('Nhập sản phẩm thành công', 'Thành công');
+        this.closeNewProductsPopup();
+        this.loadProductCategoryByCategoryId(this.selectedCategoryId);
+        this.newProducts = [];
+        this.initializeProducts();
+        this.showFileUploadPopup = false;
+        this.selectedFile = null;
+      },
+      error: (error) => {
+        this.toastr.error('Nhập sản phẩm thất bại', 'Thất bại');
+      }
+    });
+  }
+
+  
+  initializeProducts() {
+    this.newProducts = this.newProducts.map(product => ({
+      ...product,
+      system_name: product.system_name || product.import_name || '',
+      filteredProducts: [],
+      showDropdown: false
+    }));
+    this.updatePagination();
+  }
+
+
+
   closeFilePopup() {
     this.showFileUploadPopup = false;
     this.selectedFile = null;
@@ -795,7 +930,7 @@ export class IndexComponent implements OnInit, OnDestroy {
     }
   }
 
- 
+
   getColumnCount(): number {
     const width = window.innerWidth;
     if (width >= 1920) return 14; // 3xl
@@ -807,37 +942,21 @@ export class IndexComponent implements OnInit, OnDestroy {
     return 2; // Default for xs
   }
 
-  sortProducts(products: any[]) {
-    const sortedList = products.sort((a, b) => 
-      a.product_name.localeCompare(b.product_name)
-    );
 
-    const columnCount = this.getColumnCount();
-    const columns: any[][] = Array.from({ length: columnCount }, () => []);
-
-    for (let i = 0; i < sortedList.length; i++) {
-      const columnIndex = Math.floor(i / Math.ceil(sortedList.length / columnCount));
-      console.log(columnIndex);
-      columns[columnIndex].push(sortedList[i]);
+  trackByProduct(index: number, product: any): any {
+    return product.id; // hoặc bất kỳ thuộc tính duy nhất nào của sản phẩm
+  }
+  
+  isBottomHalf(product: any): boolean {
+    // Implement logic to determine if the product is in the bottom half of the screen
+    // This might involve getting the element's position relative to the viewport
+    const element = document.getElementById(product.id); // Assume each product has a unique id
+    if (element) {
+      const rect = element.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      return rect.top > windowHeight / 2;
     }
-
-    this.sortedProducts = columns;
-  }
-
-  @HostListener('window:resize', ['$event'])
-  onResize(event: Event) {
-    this.sortProducts(this.productsCategories);
-  }
-
-  isBottomHalf(product: any, columnIndex: number): boolean {
-    const column = this.sortedProducts[columnIndex];
-    const productIndex = column.indexOf(product);
-    return productIndex >= column.length / 2;
-  }
-
-
-  trackByColumn(index: number, column: any[]): number {
-    return index;
+    return false;
   }
 
 }

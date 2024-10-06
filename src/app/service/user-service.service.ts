@@ -43,8 +43,8 @@ export class UserServiceService {
     return this.httpClient.get<Category[]>(`${this.API_CONFIG.category.unAuth}/all`, { headers: this.headers });
   }
 
-  getProductCategoryByCategoryId(categoryId: string): Observable<ProductCategory[]> {
-    return this.httpClient.get<ProductCategory[]>(`${this.API_CONFIG.productCategory.unAuth}/${categoryId}`);
+  getProductCategoryByCategoryId(categoryId: string, typeLogin: string): Observable<ProductCategory[]> {
+    return this.httpClient.get<ProductCategory[]>(`${this.API_CONFIG.productCategory.unAuth}/${categoryId}/${typeLogin}`);
   }
 
   placeOrder(order: any): Observable<Order> {

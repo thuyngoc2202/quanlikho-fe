@@ -23,6 +23,7 @@ export class OrderDetails {
   category_id: string;
   category_name: string;
   stock: number;
+  min_quantity: number;
 
   constructor() {
     this.product_name = '';
@@ -31,6 +32,7 @@ export class OrderDetails {
     this.category_id = '';
     this.category_name = '';
     this.stock = 0;
+    this.min_quantity = 0;
   }
 }
 export class OrderUser {

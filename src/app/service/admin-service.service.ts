@@ -128,9 +128,13 @@ export class AdminServiceService {
   importProduct(formData: FormData): Observable<any> {
     return this.httpClient.post(`${this.API_CONFIG.product.unAuth}/import`, formData);
   }
+  
+  importVerifyProductCategory(categoryId: string | null, formData: FormData): Observable<any> {
+    return this.httpClient.post(`${this.API_CONFIG.productCategory.unAuth}/import/verify/${categoryId}`, formData);
+  }
 
-  importProductCategory(categoryId: string | null, formData: FormData): Observable<any> {
-    return this.httpClient.post(`${this.API_CONFIG.productCategory.unAuth}/import/${categoryId}`, formData);
+  importProductCategory(importData: any): Observable<any> {
+    return this.httpClient.post(`${this.API_CONFIG.productCategory.unAuth}/import`, importData);
   }
 
   getAllOrder(): Observable<any> {
@@ -168,8 +172,11 @@ export class AdminServiceService {
     });
   }
 
-  getBuReport(): Observable<Blob> {
+  getBuReport(startDate: string): Observable<Blob> {
+    let params = new HttpParams()
+      .set('startDate', startDate);
     return this.httpClient.get<Blob>(`${this.API_CONFIG.report}/restock-product-category`, {
+      params: params,
       responseType: 'blob' as 'json'
     });
   }

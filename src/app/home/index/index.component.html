@@ -30,29 +30,28 @@
             </svg>
         </div>
 
-        <div class="product-grid w-full overflow-hidden" [style.grid-template-columns]="'repeat(' + getColumnCount() + ', minmax(0, 1fr))'">
-            <div *ngFor="let column of sortedProducts; trackBy: trackByColumn; let columnIndex = index" class="product-column w-full">
-                <div *ngFor="let product of column; trackBy: trackByProduct"
-                    class="p-1 sm:p-2 border text-xs sm:text-sm font-medium cursor-pointer text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out relative group"
-                    [ngClass]="{'highlight': isMatchingSearch(product)}"
-                    (click)="isLoggedIn ? openEditPopup(product) : openPopupCart(product)">
-                    <div class="overflow-hidden">
-                        <div class="truncate group-hover:truncate-none transition-all duration-300 ease-in-out">
-                            <span class="inline-block group-hover:animate-marquee">
-                                {{ product?.product_name || '' }}
-                            </span>
-                        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 3xl:grid-cols-16">
+            <div *ngFor="let product of productsCategories; trackBy: trackByProduct"
+                class="p-2 border text-sm font-medium cursor-pointer text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out relative group"
+                [ngClass]="{'highlight': isMatchingSearch(product)}"
+                (click)="isLoggedIn ? openEditPopup(product) : openPopupCart(product)">
+                <div class="overflow-hidden">
+                    <div class="truncate group-hover:truncate-none transition-all duration-300 ease-in-out">
+                        <span class="inline-block group-hover:animate-marquee">
+                            {{ product?.product_name || '' }}
+                        </span>
                     </div>
-                    <div *ngIf="product"
-                        class="absolute z-10 left-0 mt-1 p-2 bg-white border rounded shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out min-w-[150px] max-w-[200px] max-h-[235px] overflow-y-auto"
-                        [ngClass]="{
-                            'bottom-full mb-1': isBottomHalf(product, columnIndex),
-                            'top-full mt-1': !isBottomHalf(product, columnIndex)
-                        }">
-                        <strong class="block mb-1">Tên dùng chung:</strong>
-                        <div *ngFor="let keyword of product.keywords" class="truncate">
-                            {{ keyword }}
-                        </div>
+                </div>
+                <div *ngIf="product"
+                    class="absolute z-50 left-0 p-2 bg-white border rounded shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out min-w-[150px] max-w-[200px] max-h-[235px] overflow-y-auto"
+                    [ngClass]="{
+                        'bottom-full mb-1': isBottomHalf(product),
+                        'top-full mt-1': !isBottomHalf(product)
+                    }"
+                    [style.transform]="'translateY(' + (isBottomHalf(product) ? '-1%' : '0') + ')'">
+                    <strong class="block mb-1">Tên dùng chung:</strong>
+                    <div *ngFor="let keyword of product.keywords" class="truncate">
+                        {{ keyword }}
                     </div>
                 </div>
             </div>
@@ -470,28 +469,75 @@
 <div *ngIf="showNewProductsPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
     (click)="closeNewProductsPopup()">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl" (click)="$event.stopPropagation()">
-        <h2 class="text-xl font-semibold mb-4">Sản phẩm mới chưa có trong danh sách sản phẩm</h2>
-        <div class="max-h-96 overflow-y-auto">
+        <h2 class="text-xl font-semibold mb-4">Nhập hàng cho {{categoryNameImport}}</h2>
+        <div class="max-h-[700px]">
             <table class="w-full">
                 <thead>
                     <tr>
                         <th class="px-4 py-2 text-left">#</th>
-                        <th class="px-4 py-2 text-left">Tên sản phẩm</th>
+                        <th class="px-4 py-2 text-left">Tên trong kho</th>
+                        <th class="px-4 py-2 text-left">Tên trong file</th>
+                        <th class="px-4 py-2 text-left">Số lượng</th>
                         <!-- Add more headers as needed -->
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let product of newProducts; let i = index">
-                        <td class="px-4 py-2">{{ i + 1 }}</td>
-                        <td class="px-4 py-2">{{ product }}</td>
-                        <!-- Add more cells as needed -->
+                    <tr *ngFor="let product of paginatedProducts; let i = index">
+                        <td class="px-4 py-1">{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+                        <td class="px-4 py-1 relative">
+                            <div class="relative">
+                                <input type="text" name="product_id"
+                                    class="border border-gray-300 p-2 w-full rounded-md pr-8 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ease-in-out"
+                                    (focus)="showProductImportDropdown(i)" (click)="showProductImportDropdown(i)"
+                                    (blur)="onBlur(product)" (input)="updateProductValue(product, $event)"
+                                    [ngModel]="getProductDisplayValue(product)"
+                                    (ngModelChange)="updateInputValue(product, $event)" />
+                                <button (click)="clearProductSelectionImport(product)"
+                                    class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div *ngIf="product.showDropdown"
+                                class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                <ul class="py-1">
+                                    <li *ngFor="let existingProduct of product.filteredProducts"
+                                        class="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors duration-150 ease-in-out"
+                                        (click)="selectProductImport(existingProduct, product)">
+                                        {{ existingProduct.product_name }}
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                        <td class="px-4 py-1">{{ product.import_name }}</td>
+                        <td class="px-4 py-1">{{ product.quantity }}</td>
                     </tr>
                 </tbody>
             </table>
+            <div class="flex justify-center items-center space-x-2 mt-4 pb-4">
+                <button (click)="prevPage()" [disabled]="currentPage === 1"
+                    class="px-3 py-1 rounded-md text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 ease-in-out">
+                    &larr; Trước
+                </button>
+                <span class="text-sm text-gray-700">
+                    Trang {{ currentPage }} / {{ totalPages }}
+                </span>
+                <button (click)="nextPage()" [disabled]="currentPage === totalPages"
+                    class="px-3 py-1 rounded-md text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 ease-in-out">
+                    Sau &rarr;
+                </button>
+            </div>
         </div>
         <div class="mt-4 flex justify-end">
+            <button (click)="importNewProducts()"
+                class="bg-blue-500 hover:bg-blue-600 mr-2 text-white font-medium px-4 py-2 rounded-md transition duration-300 ease-in-out">
+                Nhập
+            </button>
             <button (click)="closeNewProductsPopup()"
-                class="bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-md transition duration-300 ease-in-out">
+                class="bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-md transition duration-300 ease-in-out">
                 Đóng
             </button>
         </div>

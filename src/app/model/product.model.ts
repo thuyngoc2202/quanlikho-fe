@@ -1,5 +1,6 @@
 export class Product {
   product_id: string;
+  system_name: string;
   create_date: string;
   modify_date: string;
   keywords: [];
@@ -8,6 +9,7 @@ export class Product {
 
   constructor() {
     this.product_id = "";
+    this.system_name = "";
     this.create_date = "";
     this.modify_date = "";
     this.keywords = [];

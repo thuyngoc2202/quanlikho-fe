@@ -284,7 +284,7 @@ export class ProductCategoryComponent implements OnInit, OnDestroy {
     const formData = new FormData();
     formData.append('file', this.selectedFile);
     if (this.selectedCategoryId !== null) {
-      this.adminService.importProductCategory(this.selectedCategoryId, formData).subscribe({
+      this.adminService.importVerifyProductCategory(this.selectedCategoryId, formData).subscribe({
         next: (response) => {
           // Add success handling here (e.g., display a message, close popup)
           this.toastr.success('Nhập File thành công', 'Thành công');

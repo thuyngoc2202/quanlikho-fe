@@ -42,35 +42,50 @@ export class PlaceOrderComponent implements OnInit {
 
   decreaseQuantity(product: any) {
     if (!this.productQuantities[product.product_category_id]) {
-      this.productQuantities[product.product_category_id] = 1;
+      this.productQuantities[product.product_category_id] = 0;
+      return; // Không thể giảm nếu số lượng đã là 0
     }
-    if (this.productQuantities[product.product_category_id] > 1) {
-      this.productQuantities[product.product_category_id] = this.productQuantities[product.product_category_id] - 50;
-      this.updateLocalStorage();
-      this.updateCartCount();
-      this.getTotalQuantity();
-    } 
+    
+    // Chuyển đổi tất cả các giá trị sang số
+    let currentQuantity = Number(this.productQuantities[product.product_category_id]);
+    const minQuantity = Number(product.min_quantity) || 1;
+    
+    // Tính toán số lượng mới
+    let newQuantity = currentQuantity - minQuantity;
+    
+    // Đảm bảo số lượng mới là bội số của min_quantity và không âm
+    newQuantity = Math.max(0, Math.floor(newQuantity / minQuantity) * minQuantity);
+    
+    // Cập nhật số lượng mới
+    this.productQuantities[product.product_category_id] = newQuantity;
+  
+    this.updateLocalStorage();
+    this.updateCartCount();
+    this.getTotalQuantity();
+  
   }
-
+  
   increaseQuantity(product: any) {
-
     if (!this.productQuantities[product.product_category_id]) {
       this.productQuantities[product.product_category_id] = 0;
     }
-  
-    const currentQuantity = this.productQuantities[product.product_category_id];
-    const stock = product.stock || 0;
-    const incrementAmount = 50;
-  
-    if (currentQuantity + incrementAmount <= stock) {
+    
 
-      this.productQuantities[product.product_category_id] += incrementAmount;
-    } else if (currentQuantity < stock) {
+    const currentQuantity = Number(this.productQuantities[product.product_category_id]);
+    const stock = Number(product.stock) || 0;
+    const minQuantity = Number(product.min_quantity) || 1;
+    
 
-      this.productQuantities[product.product_category_id] = stock;
+    let newQuantity = currentQuantity + minQuantity;
+ 
+    newQuantity = Math.floor(newQuantity / minQuantity) * minQuantity;
+    
+
+    if (newQuantity <= stock) {
+      this.productQuantities[product.product_category_id] = newQuantity;
     } else {
-
-      return; 
+     
+      this.productQuantities[product.product_category_id] = Math.floor(stock / minQuantity) * minQuantity;
     }
   
     this.updateLocalStorage();

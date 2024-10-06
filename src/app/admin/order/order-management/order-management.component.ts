@@ -40,6 +40,7 @@ export class OrderManagementComponent implements OnInit {
   currentPage: number = 1;
   pageSize: number = 5; // Số lượng sản phẩm trên mỗi trang
   totalPages: number = 1;
+  originalQuantities: { [key: string]: number } = {};
 
   constructor(private adminService: AdminServiceService, 
     private toastr: ToastrService,
@@ -100,7 +101,9 @@ export class OrderManagementComponent implements OnInit {
     this.adminService.getOrderDetail(product_order_id).subscribe((res) => {
 
       this.selectedOrder = res.result_data;
-      console.log(this.selectedOrder);
+      this.selectedOrder.product_order_detail_list_responses.forEach(item => {
+        this.originalQuantities[item.product_name] = item.quantity;
+      });
       this.updatePaginatedProducts();
 
       this.currentStatus = res.result_data.status;
@@ -129,39 +132,55 @@ export class OrderManagementComponent implements OnInit {
     }
   }
 
-  updateOrderStatus() {
-    // Kiểm tra số lượng trước khi cập nhật
-    const invalidItems = this.selectedOrder.product_order_detail_list_responses.filter(
-      item => item.quantity > 0 && item.stock === 0
+ updateOrderStatus() {
+  let invalidItems: any[] = [];
+  console.log('selectedOrder', this.selectedOrder);
+  console.log('originalQuantities', this.originalQuantities);
+  this.selectedOrder.product_order_detail_list_responses.forEach(item => {
+    this.originalQuantities[item.product_order_id] = item.quantity;
+    console.log('originalQuantities', this.originalQuantities);
+  });
+  if (this.selectedOrder.status === 'PENDING') {
+    invalidItems = this.selectedOrder.product_order_detail_list_responses.filter(
+      item => item.quantity > item.stock
     );
-  
-    if (invalidItems.length > 0) {
-      // Có ít nhất một sản phẩm có số lượng > 0 nhưng stock = 0
-      const itemNames = invalidItems.map(item => item.product_name).join(', ');
-      this.toastr.error(`Không thể cập nhật. Sản phẩm đã hết hàng: ${itemNames}`);
-      return;
-    }
-  
-    const order = {
-      product_order_id: this.selectedOrder.product_order_id,
-      status: this.selectedOrder.status,
-      product_order_details: this.selectedOrder.product_order_detail_list_responses
-    }
-  
-    this.adminService.updateOrder(order).subscribe({
-      next: (response: any) => {
-        this.getAllOrder();
-        this.closePopup();
-        this.isConfirmUpdatePopupOpen = false;
-        this.toastr.success('Cập nhật đơn hàng thành công');
-      },
-      error: (error) => {
-        console.error('Error updating order:', error);
-        this.toastr.error('Cập nhật đơn hàng thất bại');
-      }
-    });
+  } else if (this.selectedOrder.status === 'SHIPPING') {
+    invalidItems = this.selectedOrder.product_order_detail_list_responses.filter(
+      item => item.quantity > (item.stock + this.originalQuantities[item.product_name])
+    
+    );
   }
 
+  if (invalidItems.length > 0) {
+    const itemNames = invalidItems.map(item => item.product_name).join(', ');
+    let errorMessage = 'Không thể cập nhật. ';
+    if (this.selectedOrder.status === 'PENDING') {
+      errorMessage += `Số lượng vượt quá tồn kho cho sản phẩm: ${itemNames}`;
+    } else if (this.selectedOrder.status === 'SHIPPING') {
+      errorMessage += `Số lượng vượt quá tổng của tồn kho và số lượng ban đầu cho sản phẩm: ${itemNames}`;
+    }
+    this.toastr.error(errorMessage);
+    return;
+  }
+  const order = {
+    product_order_id: this.selectedOrder.product_order_id,
+    status: this.selectedOrder.status,
+    product_order_details: this.selectedOrder.product_order_detail_list_responses
+  }
+
+  this.adminService.updateOrder(order).subscribe({
+    next: (response: any) => {
+      this.getAllOrder();
+      this.closePopup();
+      this.isConfirmUpdatePopupOpen = false;
+      this.toastr.success('Cập nhật đơn hàng thành công');
+    },
+    error: (error) => {
+      console.error('Error updating order:', error);
+      this.toastr.error('Cập nhật đơn hàng thất bại');
+    }
+  });
+}
   confirmUpdate() {
     this.isConfirmUpdatePopupOpen = true;
   }
@@ -257,7 +276,6 @@ export class OrderManagementComponent implements OnInit {
     const end = start + this.pageSize;
     this.paginatedProducts = this.selectedOrder.product_order_detail_list_responses.slice(start, end);
     this.totalPages = Math.ceil(this.selectedOrder.product_order_detail_list_responses.length / this.pageSize);
-    console.log(this.paginatedProducts);
   }
 
   previousPage() {

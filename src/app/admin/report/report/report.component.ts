@@ -8,6 +8,8 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { MatCalendarCellCssClasses } from '@angular/material/datepicker';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
+import * as XLSX from 'xlsx';
+
 
 
 @Component({
@@ -28,6 +30,8 @@ export class ReportComponent implements OnInit {
   startDate: Date | null = null;
   endDate: Date | null = null;
   endDateCalendarStart: Date | null = null;
+  startDateCalendarStart: Date | null = null;
+
   showCalendar = false;
   tempStartDate: Date | null = null;
   tempEndDate: Date | null = null;
@@ -151,17 +155,28 @@ export class ReportComponent implements OnInit {
       this.adminService.getTopSellingProducts(formattedStartDate, formattedEndDate).subscribe({
         next: (response) => {
           if (response instanceof Blob) {
-            const contentDisposition = response.type;
             let fileName = `Báo cáo bán hàng ${formattedStartDate} ${formattedEndDate}.csv`;
-            if (contentDisposition) {
-              const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/i);
-              if (fileNameMatch && fileNameMatch.length === 2)
-                fileName = fileNameMatch[1];
-            }
-            const blob = new Blob([response], { type: 'text/csv' });
-            saveAs(blob, fileName);
-            this.toastr.success('Xuất báo cáo thành công', 'Thành công');
-            this.closeExportPopup();
+            
+            const reader = new FileReader();
+            reader.onload = () => {
+              let csvContent = reader.result as string;
+              
+              // Thêm BOM (Byte Order Mark) để Windows nhận diện là UTF-8
+              const BOM = '\uFEFF';
+              csvContent = BOM + csvContent;
+              
+              // Đảm bảo rằng các giá trị được phân cách bằng dấu phẩy
+              csvContent = csvContent.replace(/;/g, ',');
+              
+              // Tạo Blob mới với nội dung đã được xử lý
+              const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+              
+              // Lưu file
+              saveAs(blob, fileName);
+              this.toastr.success('Xuất báo cáo thành công', 'Thành công');
+              this.closeExportPopup();
+            };
+            reader.readAsText(response);
           }
         },
         error: (err) => {
@@ -179,11 +194,13 @@ export class ReportComponent implements OnInit {
       this.tempStartDate = this.startDate;
       this.tempEndDate = this.endDate;
     }
+    this.startDateCalendarStart = new Date(this.today.getFullYear(), this.today.getMonth() - 1, 1);
+    
   }
 
   cancelDateSelection() {
-    this.tempStartDate = this.startDate;
-    this.tempEndDate = this.endDate;
+    this.startDate = null;
+    this.endDate = null;
     this.showCalendar = false;
   }
   openExportBuPopup() {
@@ -210,30 +227,33 @@ export class ReportComponent implements OnInit {
   }
 
   exportBuReport() {
-    // Implement the logic to export the "nhập bù" report
     const formattedEndDate = moment(this.endDateBu).format('YYYY-MM-DD');
-    this.adminService.getBuReport().subscribe({
-      next: (response) => {
+    const formattedStartDate = moment(this.startDateBu).format('YYYY-MM-DD');
+    this.adminService.getBuReport(formattedStartDate).subscribe({
+      next: (response: Blob) => {
         if (response instanceof Blob) {
-          const contentDisposition = response.type;
-          let fileName = 'Nhập bù hàng ' + formattedEndDate + '.csv';
-          console.log(fileName);
-
-          if (contentDisposition) {
-            const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-            const matches = filenameRegex.exec(contentDisposition);
-            if (matches != null && matches[1]) {
-              fileName = matches[1].replace(/['"]/g, '');
-              // Decode the filename
-              fileName = decodeURIComponent(fileName);
-              // Replace any remaining problematic characters
-              fileName = fileName.replace(/[/\\?%*:|"<>]/g, '-');
-            }
-          }
-          const blob = new Blob([response], { type: 'text/csv' });
-          saveAs(blob, fileName);
-          this.toastr.success('Xuất báo cáo nhập bù thành công', 'Thành công');
-          this.closeExportBuPopup();
+          let fileName = `Nhập bù hàng ${formattedEndDate}.csv`;
+          
+          const reader = new FileReader();
+          reader.onload = () => {
+            let csvContent = reader.result as string;
+            
+            // Thêm BOM (Byte Order Mark) để Windows nhận diện là UTF-8
+            const BOM = '\uFEFF';
+            csvContent = BOM + csvContent;
+            
+            // Đảm bảo rằng các giá trị được phân cách bằng dấu phẩy
+            csvContent = csvContent.replace(/;/g, ',');
+            
+            // Tạo Blob mới với nội dung đã được xử lý
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            
+            // Lưu file
+            saveAs(blob, fileName);
+            this.toastr.success('Xuất báo cáo thành công', 'Thành công');
+            this.closeExportBuPopup();
+          };
+          reader.readAsText(response);
         }
       },
       error: (err) => {
@@ -241,6 +261,7 @@ export class ReportComponent implements OnInit {
       }
     });
   }
+
 
   initializeBuDates() {
     this.endDateBu = new Date();
@@ -253,7 +274,6 @@ export class ReportComponent implements OnInit {
 
   updateDateClassBu(): (date: Date) => MatCalendarCellCssClasses {
     return (date: Date): MatCalendarCellCssClasses => {
-      console.log(date, this.startDateBu, this.endDateBu);
 
       if (this.startDateBu && this.endDateBu) {
         if (date >= this.startDateBu && date <= this.endDateBu) {
