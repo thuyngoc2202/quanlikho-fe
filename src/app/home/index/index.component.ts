@@ -637,9 +637,9 @@ export class IndexComponent implements OnInit, OnDestroy {
     }
 
     // Kiểm tra từ khóa (nếu có)
-    if (product.keywords && Array.isArray(product.keywords)) {
-      return product.keywords.some((keyword: string) =>
-        keyword.toLowerCase().includes(searchLower)
+    if (product.generic_name && Array.isArray(product.generic_name)) {
+      return product.generic_name.some((generic_name: string) =>
+        generic_name.toLowerCase().includes(searchLower)
       );
     }
 
@@ -824,6 +824,7 @@ export class IndexComponent implements OnInit, OnDestroy {
     this.isCreatePopupOpen = false;
     this.formProduct.reset();
     this.newKeywords = [];
+    this.newGenericNames = [];
   }
   addProduct() {
     const productData = this.formProduct.value;
@@ -838,6 +839,8 @@ export class IndexComponent implements OnInit, OnDestroy {
           this.loadProduct();
           this.loadProductCategoryByCategoryId(this.idCategory);
           this.formProduct.reset();
+          this.newKeywords = [];
+          this.newGenericNames = [];
           this.toastr.success('Thêm sản phẩm thành công', 'Thành công');
         },
         error: (error) => {
