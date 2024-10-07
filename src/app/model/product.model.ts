@@ -5,7 +5,9 @@ export class Product {
   modify_date: string;
   keywords: [];
   product_name: string;
-  newKeyword:[];
+  newKeyword: [];
+  generic_names: [];
+  newGenericName: [];
 
   constructor() {
     this.product_id = "";
@@ -14,7 +16,8 @@ export class Product {
     this.modify_date = "";
     this.keywords = [];
     this.newKeyword = [];
-
+    this.generic_names = [];
+    this.newGenericName = [];
     this.product_name = "";
   }
 

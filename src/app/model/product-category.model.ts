@@ -9,6 +9,7 @@ export class ProductCategory {
     create_date: string;
     modify_date: string;
     keywords: string[];
+    generic_name: string[];
     constructor(){
         this.product_category_id = '';
         this.product_id = '';
@@ -20,5 +21,6 @@ export class ProductCategory {
         this.create_date = '';
         this.modify_date = '';
         this.keywords = [];
+        this.generic_name = [];
     }
 }

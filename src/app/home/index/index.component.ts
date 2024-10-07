@@ -56,6 +56,7 @@ export class IndexComponent implements OnInit, OnDestroy {
   idProductCategory: string = '';
   isConfirmUpdatePopupOpen: boolean = false;
   newKeywords: string[] = [];
+  newGenericNames: string[] = [];
   formProduct!: FormGroup;
   categoryName: string = '';
   showFileUploadPopup: boolean = false;
@@ -460,11 +461,13 @@ export class IndexComponent implements OnInit, OnDestroy {
   openEditPopup(productsCategory: ProductCategory) {
     this.resetProductForm();
     this.showEditPopup = true;
-
+    console.log('productsCategory', productsCategory);
+    
     this.formProduct.patchValue({
       product_name: productsCategory.product_name,
     });
     this.newKeywords = [...productsCategory.keywords];
+    this.newGenericNames = [...productsCategory.generic_name];
 
     this.editForm.patchValue({
       quantity: productsCategory.quantity,
@@ -508,6 +511,7 @@ export class IndexComponent implements OnInit, OnDestroy {
       const productData = {
         ...this.formProduct.value,
         keywords: this.newKeywords,
+        generic_name: this.newGenericNames,
         product_id: this.idProduct,
       };
 
@@ -597,7 +601,15 @@ export class IndexComponent implements OnInit, OnDestroy {
   }
 
 
+  addGenericName(genericName: string) {
+    if (genericName && genericName.trim() !== '') {
+      this.newGenericNames.push(genericName.trim());
+    }
+  }
 
+  removeGenericName(index: number) {
+    this.newGenericNames.splice(index, 1);
+  }
   // Không cần setupBreakpointObserver() nữa, vì Tailwind sẽ xử lý responsive
 
   addKeyword(keyword: string) {
@@ -816,6 +828,7 @@ export class IndexComponent implements OnInit, OnDestroy {
   addProduct() {
     const productData = this.formProduct.value;
     productData.keywords = this.newKeywords;
+    productData.generic_name = this.newGenericNames;
 
     if (this.formProduct.valid) {
       this.adminService.createProduct(productData).subscribe({
