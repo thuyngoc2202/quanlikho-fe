@@ -246,30 +246,33 @@ export class OrderManagementComponent implements OnInit {
 
   updateQuantity(index: number, event: Event) {
     const input = event.target as HTMLInputElement;
-    const newQuantity = parseInt(input.value, 10);
+    let newQuantity = parseInt(input.value, 10);
     
     if (isNaN(newQuantity) || newQuantity < 1) {
-      console.error('Invalid quantity input');
-      return;
+      newQuantity = 1;
+      input.value = '1';
     }
-  
+
     // Update the quantity in the paginatedProducts array
     if (this.paginatedProducts[index]) {
       this.paginatedProducts[index].quantity = newQuantity;
-    } else {
     }
     
     // Also update the quantity in the original array
     const originalIndex = (this.currentPage - 1) * this.pageSize + index;
     if (this.selectedOrder.product_order_detail_list_responses[originalIndex]) {
       this.selectedOrder.product_order_detail_list_responses[originalIndex].quantity = newQuantity;
-    } 
-  
+    }
+    
     // Force change detection
     this.changeDetectorRef.detectChanges();
   }
 
- 
+  preventNegativeInput(event: KeyboardEvent) {
+    if (event.key === '-' || event.key === 'e') {
+      event.preventDefault();
+    }
+  }
 
   updatePaginatedProducts() {
     const start = (this.currentPage - 1) * this.pageSize;
@@ -290,5 +293,17 @@ export class OrderManagementComponent implements OnInit {
       this.currentPage++;
       this.updatePaginatedProducts();
     }
+  }
+
+  isOrderEditable(): boolean {
+    if (!this.selectedOrder || !this.selectedOrder.order_date) {
+      return false;
+    }
+
+    const orderDate = new Date(this.selectedOrder.order_date);
+    const currentDate = new Date();
+    const diffInHours = (currentDate.getTime() - orderDate.getTime()) / (1000 * 60 * 60);
+
+    return diffInHours <= 48;
   }
 }

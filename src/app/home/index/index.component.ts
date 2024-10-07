@@ -79,6 +79,7 @@ export class IndexComponent implements OnInit, OnDestroy {
   totalPages: number = 1;
   categoryNameImport: string = '';
   typeLogin: string = '';
+  private dataChangedSubscription!: Subscription;
 
   constructor(
     private userService: UserServiceService,
@@ -121,9 +122,9 @@ export class IndexComponent implements OnInit, OnDestroy {
     });
     this.validate();
     this.validateProduct();
-    this.initializeProducts();
-    this.updatePagination();
-
+    this.dataChangedSubscription = this.adminService.dataChanged$.subscribe(() => {
+      this.loadProductCategoryByCategoryId(this.selectedCategoryId);
+    });
   }
 
   ngOnDestroy() {
@@ -643,6 +644,12 @@ export class IndexComponent implements OnInit, OnDestroy {
       );
     }
 
+    if (product.keywords && Array.isArray(product.keywords)) {
+      return product.keywords.some((keyword: string) =>
+        keyword.toLowerCase().includes(searchLower)
+      );
+    }
+
     return false;
   }
 
@@ -662,149 +669,12 @@ export class IndexComponent implements OnInit, OnDestroy {
       this.selectedFile = null;
     }
   }
-  uploadFile(): void {
-    if (!this.selectedFile) {
-      console.error('No file selected');
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', this.selectedFile);
-    if (this.selectedCategoryId !== null) {
-      this.adminService.importVerifyProductCategory(this.selectedCategoryId, formData).subscribe({
-        next: (response) => {
-          // Add success handling here (e.g., display a message, close popup)
-          this.toastr.success('Nhập File thành công', 'Thành công');
-          // Check if there are new products
-          if (response.result_data.import_data && response.result_data.import_data.length > 0) {
-            this.newProducts = response.result_data.import_data;
-            this.categoryNameImport = response.result_data.category_name;
-            this.showNewProductsPopup = true;
-            this.updatePagination();
-          }
-        },
-        error: (error) => {
-          console.error('Error importing product', error);
-          // Add error handling here
-          this.toastr.error('Nhập File thất bại', 'Thất bại');
-
-        }
-      });
-    } else {
-      this.toastr.error('Chọn danh mục trước khi nhập file', 'Thất bại');
-    }
-
-  }
-
-  updatePagination() {
-    this.totalPages = Math.ceil(this.newProducts.length / this.itemsPerPage);
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    this.paginatedProducts = this.newProducts.slice(startIndex, startIndex + this.itemsPerPage);
-
-  }
-
-  prevPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updatePagination();
-    }
-  }
-
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.updatePagination();
-    }
-  }
-
-  isNewProduct(product: Product): boolean {
-    return !product.system_name;
-  }
-
-  getProductDisplayValue(product: any): string {
-    return product.system_name || '';
-  }
-
-  updateInputValue(product: any, value: string): void {
-    product.system_name = value;
-    this.filterProductsImport(product);
-  }
-
-  updateProductValue(product: any, event: any): void {
-    product.system_name = event.target.value;
-    this.filterProductsImport(product);
-  }
-
-  showProductImportDropdown(index: number): void {
-    const product = this.paginatedProducts[index];
-    product.showDropdown = true;
-    this.showAllProducts(product);
-  }
-
-  showAllProducts(product: any): void {
-    product.filteredProducts = [...this.products]; // Show all products
-  }
-
-  filterProductsImport(product: any): void {
-    const searchTerm = product.system_name.toLowerCase();
-    product.filteredProducts = this.products.filter(p => 
-      p.product_name.toLowerCase().includes(searchTerm)
-    );
-  }
-
-  selectProductImport(existingProduct: any, product: any) {
-    product.system_name = existingProduct.product_name;
-    product.showDropdown = false;
-  }
-
-  clearProductSelectionImport(product: any): void {
-    product.system_name = '';
-  }
-  onBlur(product: any): void {
-    setTimeout(() => {
-      product.showDropdown = false;
-    }, 200);
-  }
-
-  importNewProducts() {
-    const importNewProducts= this.newProducts.map(({ filteredProducts, showDropdown, ...rest }) => ({
-      ...rest,
-      system_name: rest.system_name,
-      import_name: rest.import_name,
-      quantity: rest.quantity,
-    }));
-    const importData = {
-      import_data: importNewProducts,
-      category_id: this.selectedCategoryId,
-      category_name: this.categoryName,
-    }
-    this.adminService.importProductCategory(importData).subscribe({
-      next: (response) => {
-        this.toastr.success('Nhập sản phẩm thành công', 'Thành công');
-        this.closeNewProductsPopup();
-        this.loadProductCategoryByCategoryId(this.selectedCategoryId);
-        this.newProducts = [];
-        this.initializeProducts();
-        this.showFileUploadPopup = false;
-        this.selectedFile = null;
-      },
-      error: (error) => {
-        this.toastr.error('Nhập sản phẩm thất bại', 'Thất bại');
-      }
-    });
-  }
+ 
+  
 
   
-  initializeProducts() {
-    this.newProducts = this.newProducts.map(product => ({
-      ...product,
-      system_name: product.system_name || product.import_name || '',
-      filteredProducts: [],
-      showDropdown: false
-    }));
-    this.updatePagination();
-  }
 
+  
 
 
   closeFilePopup() {
@@ -826,55 +696,8 @@ export class IndexComponent implements OnInit, OnDestroy {
     this.newKeywords = [];
     this.newGenericNames = [];
   }
-  addProduct() {
-    const productData = this.formProduct.value;
-    productData.keywords = this.newKeywords;
-    productData.generic_name = this.newGenericNames;
-
-    if (this.formProduct.valid) {
-      this.adminService.createProduct(productData).subscribe({
-        next: (response) => {
-          this.isConfirmCreatePopupOpen = false;
-          this.isCreatePopupOpen = false;
-          this.loadProduct();
-          this.loadProductCategoryByCategoryId(this.idCategory);
-          this.formProduct.reset();
-          this.newKeywords = [];
-          this.newGenericNames = [];
-          this.toastr.success('Thêm sản phẩm thành công', 'Thành công');
-        },
-        error: (error) => {
-          console.error('Failed to create product', error);
-          this.isConfirmCreatePopupOpen = false;
-          this.toastr.error(`${error.error.result_data.msg}`, 'Thất bại');
-        }
-      });
-    } else {
-      this.isConfirmCreatePopupOpen = false;
-      this.toastr.error(`Thiếu trường`, 'Thất bại');
-    }
-  }
-  uploadProductCategoryFile(): void {
-    if (!this.selectedFile) {
-      console.error('No file selected');
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', this.selectedFile);
-
-    this.adminService.importProduct(formData).subscribe({
-      next: (response) => {
-        this.closeFileUploadProductPopup();
-        this.loadProductCategoryByCategoryId(this.idCategory);
-        this.toastr.success('Nhập sản phẩm thành công', 'Thành công');
-      },
-      error: (error) => {
-        console.error('Error importing product', error);
-        this.toastr.error('Nhập sản phẩm thất bại', 'Thất bại');
-      }
-    });
-  }
+  
+  
   openAddProductCategoryPopup() {
     this.isCreateProductCategoryPopupOpen = true;
   }

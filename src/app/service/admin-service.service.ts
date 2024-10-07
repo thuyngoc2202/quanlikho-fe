@@ -130,11 +130,16 @@ export class AdminServiceService {
   }
   
   importVerifyProductCategory(categoryId: string | null, formData: FormData): Observable<any> {
-    return this.httpClient.post(`${this.API_CONFIG.productCategory.unAuth}/import/verify/${categoryId}`, formData);
+    return this.httpClient.post(`${this.API_CONFIG.productCategory.unAuth}/import/verify/${categoryId}`, formData)
+    .pipe(
+      tap(() => this.notifyDataChanged())
+    );;
   }
 
   importProductCategory(importData: any): Observable<any> {
-    return this.httpClient.post(`${this.API_CONFIG.productCategory.unAuth}/import`, importData);
+    return this.httpClient.post(`${this.API_CONFIG.productCategory.unAuth}/import`, importData).pipe(
+      tap(() => this.notifyDataChanged())
+    );;
   }
 
   getAllOrder(): Observable<any> {

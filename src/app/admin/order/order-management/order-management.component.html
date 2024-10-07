@@ -121,9 +121,12 @@
                                                             <td class="border border-gray-300 p-1 text-center" style="width: 15%;">
                                                                 <input type="number" 
                                                                        [(ngModel)]="item.quantity"
-                                                                       (input)="updateQuantity(i, $event)" 
+                                                                       (change)="updateQuantity(i, $event)" 
+                                                                       (keydown)="preventNegativeInput($event)"
                                                                        class="w-full text-center px-1 py-0.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-xs"
-                                                                       min="1">
+                                                                       min="1"
+                                                                       step="1"
+                                                                       onkeypress="return event.charCode >= 48 && event.charCode <= 57">
                                                             </td>
                                                             <td class="border border-gray-300 p-1 text-xs" style="width: 20%;">{{ item.stock }}</td>
                                                         </tr>
@@ -145,7 +148,14 @@
                                     <button type="button" [disabled]="selectedOrder.status === 'SHIPPING'" (click)="startShipping()"
                                     class="bg-purple-500 hover:bg-purple-700 text-white px-3 sm:px-4 py-1 sm:py-2 rounded text-xs sm:text-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">Xuất kho</button>
                                     <button type="button" (click)="confirmUpdate()"
-                                        class="bg-blue-500 hover:bg-blue-700 text-white px-3 sm:px-4 py-1 sm:py-2 rounded text-xs sm:text-sm transition-colors duration-200">Cập nhật</button>
+                                        [disabled]="!isOrderEditable()"
+                                        [ngClass]="{
+                                          'bg-blue-500 hover:bg-blue-700': isOrderEditable(),
+                                          'bg-gray-400 cursor-not-allowed': !isOrderEditable()
+                                        }"
+                                        class="text-white px-3 sm:px-4 py-1 sm:py-2 rounded text-xs sm:text-sm transition-colors duration-200">
+                                        Cập nhật
+                                    </button>
                                     <button type="button" (click)="closePopup()"
                                         class="bg-red-500 hover:bg-red-700 text-white px-3 sm:px-4 py-1 sm:py-2 rounded text-xs sm:text-sm transition-colors duration-200">Đóng</button>
                                 </div>
