@@ -50,8 +50,8 @@
                     }"
                     [style.transform]="'translateY(' + (isBottomHalf(product) ? '-1%' : '0') + ')'">
                     <strong class="block mb-1">Tên dùng chung:</strong>
-                    <div *ngFor="let keyword of product.keywords" class="truncate">
-                        {{ keyword }}
+                    <div *ngFor="let generic_name of product.generic_name" class="truncate">
+                        {{ generic_name }}
                     </div>
                 </div>
             </div>
