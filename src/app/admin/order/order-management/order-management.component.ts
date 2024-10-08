@@ -38,7 +38,7 @@ export class OrderManagementComponent implements OnInit {
 
   paginatedProducts: any[] = [];
   currentPage: number = 1;
-  pageSize: number = 10; // Số lượng sản phẩm trên mỗi trang
+  pageSize: number = 13; // Số lượng sản phẩm trên mỗi trang
   totalPages: number = 1;
   originalQuantities: { [key: string]: number } = {};
 
