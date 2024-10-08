@@ -38,9 +38,14 @@ export class OrderManagementComponent implements OnInit {
 
   paginatedProducts: any[] = [];
   currentPage: number = 1;
-  pageSize: number = 5; // Số lượng sản phẩm trên mỗi trang
+  pageSize: number = 10; // Số lượng sản phẩm trên mỗi trang
   totalPages: number = 1;
   originalQuantities: { [key: string]: number } = {};
+
+  isCustomerInfoPopupOpen: boolean = false;
+  isProductListPopupOpen: boolean = false;
+  totalProducts: number = 0;
+
 
   constructor(private adminService: AdminServiceService, 
     private toastr: ToastrService,
@@ -97,7 +102,6 @@ export class OrderManagementComponent implements OnInit {
   }
 
   openDetailOrder(product_order_id: string) {
-    this.isDetailPopupOpen = true;
     this.adminService.getOrderDetail(product_order_id).subscribe((res) => {
 
       this.selectedOrder = res.result_data;
@@ -105,7 +109,7 @@ export class OrderManagementComponent implements OnInit {
         this.originalQuantities[item.product_name] = item.quantity;
       });
       this.updatePaginatedProducts();
-
+      this.totalProducts = Number(this.selectedOrder.product_order_detail_list_responses[0]?.subtotal) || 0;
       this.currentStatus = res.result_data.status;
     });
   }
@@ -305,5 +309,23 @@ export class OrderManagementComponent implements OnInit {
     const diffInHours = (currentDate.getTime() - orderDate.getTime()) / (1000 * 60 * 60);
 
     return diffInHours <= 48;
+  }
+
+  openCustomerInfoPopup(order_id: string) {
+    this.isCustomerInfoPopupOpen = true;
+    this.openDetailOrder(order_id);
+  }
+
+  closeCustomerInfoPopup() {
+    this.isCustomerInfoPopupOpen = false;
+  }
+
+  openProductListPopup(order_id: string) {
+    this.isProductListPopupOpen = true;
+    this.openDetailOrder(order_id);
+  }
+
+  closeProductListPopup() {
+    this.isProductListPopupOpen = false;
   }
 }

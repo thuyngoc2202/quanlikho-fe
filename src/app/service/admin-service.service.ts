@@ -166,10 +166,11 @@ export class AdminServiceService {
     return this.httpClient.post<any>(`${this.API_CONFIG.order.unAuth}/start_shipping`, order, { headers: this.headers });
   }
 
-  getTopSellingProducts(startDate: string, endDate: string): Observable<Blob> {
+  getTopSellingProducts(startDate: string, endDate: string,categoryId: string): Observable<Blob> {
     let params = new HttpParams()
       .set('startDate', startDate)
-      .set('endDate', endDate);
+      .set('endDate', endDate)
+      .set('categoryId', categoryId);
 
     return this.httpClient.get<Blob>(`${this.API_CONFIG.report}/top-selling-products`, {
       params: params,

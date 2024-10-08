@@ -9,6 +9,8 @@ import { MatCalendarCellCssClasses } from '@angular/material/datepicker';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import * as XLSX from 'xlsx';
+import { Category } from 'src/app/model/category.model';
+import { UserServiceService } from 'src/app/service/user-service.service';
 
 
 
@@ -44,12 +46,18 @@ export class ReportComponent implements OnInit {
   endDateBu: Date | null = null;
   showCalendarBu = false;
   today: Date = new Date();
+
+  categories: Category[] = [];
+  selectedCategory: string = '';
+
+ 
   constructor(
     private adminService: AdminServiceService,
     private toastr: ToastrService,
     private cdr: ChangeDetectorRef,
     private datePipe: DatePipe,
-    public router: Router
+    public router: Router,
+    private userService: UserServiceService
   ) {
     this.dateClassFunc = this.updateDateClass();
     this.dateClassFuncBu = this.updateDateClassBu();
@@ -58,7 +66,17 @@ export class ReportComponent implements OnInit {
 
   ngOnInit() {
     // Không cần gọi updateDateClass() ở đây nữa
+    this.getCategory();
   }
+
+  getCategory() {
+    this.userService.getCategory().subscribe((data: any) => {
+      this.categories = data.result_data;
+
+      
+    });
+  }
+
 
   getDateRangeString(): string {
     if (this.startDate && this.endDate) {
@@ -152,7 +170,7 @@ export class ReportComponent implements OnInit {
     if (this.startDate && this.endDate) {
       const formattedStartDate = moment(this.startDate).format('YYYY-MM-DD');
       const formattedEndDate = moment(this.endDate).format('YYYY-MM-DD');
-      this.adminService.getTopSellingProducts(formattedStartDate, formattedEndDate).subscribe({
+      this.adminService.getTopSellingProducts(formattedStartDate, formattedEndDate,this.selectedCategory).subscribe({
         next: (response) => {
           if (response instanceof Blob) {
             let fileName = `Báo cáo bán hàng ${formattedStartDate} ${formattedEndDate}.csv`;

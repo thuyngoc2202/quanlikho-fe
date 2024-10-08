@@ -1,5 +1,5 @@
 <app-navigation></app-navigation>
-<div class="container-fluid flex flex-col h-[calc(100vh-60px)]">
+<div class="container-fluid flex flex-col px-2 h-[calc(100vh-60px)] mt-3">
     <!-- Điều chỉnh 60px theo chiều cao thực tế của navigation -->
     <div class="w-full mb-4">
         <div class="relative">
@@ -15,9 +15,9 @@
         </div>
     </div>
 
-    <div class="product-grid flex-grow overflow-hidden">
+    <div class="product-grid flex-grow px-2">
         <div *ngFor="let product of productsCategories; trackBy: trackByProduct"
-            class="product-item text-xs font-medium cursor-pointer text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out relative group"
+            class="product-item  font-medium cursor-pointer text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out relative group"
             [ngClass]="{'highlight': isMatchingSearch(product)}"
             (click)="isLoggedIn ? openEditPopup(product) : openPopupCart(product)">
             <div
@@ -29,9 +29,9 @@
             <div *ngIf="product && !isMatchingSearch(product)"
                 class="popup absolute z-50 left-0 p-2 bg-white border rounded shadow-lg min-w-[150px] max-w-[200px] max-h-[235px] overflow-y-auto"
                 [ngClass]="{
-                                                 'bottom-full mb-1': isBottomHalf(product),
-                                      'top-full mt-1': !isBottomHalf(product)
-                            }" [style.transform]="'translateY(' + (isBottomHalf(product) ? '-1%' : '0') + ')'">
+                    'bottom-full mb-1': isBottomHalf(product),
+                    'top-full mt-1': !isBottomHalf(product)
+                }" [style.transform]="'translateY(' + (isBottomHalf(product) ? '-1%' : '0') + ')'">
                 <strong class="block mb-1">Tên dùng chung:</strong>
                 <div *ngFor="let generic_name of product.generic_name" class="truncate">
                     {{ generic_name }}

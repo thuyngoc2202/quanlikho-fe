@@ -57,6 +57,15 @@
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                 placeholder="Chọn khoảng thời gian">
         </div>
+        <div class="mb-4">
+            <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Chọn danh mục:</label>
+            <select id="category" [(ngModel)]="selectedCategory" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                <option value="">Tất cả</option>
+                <option *ngFor="let category of categories" [value]="category.category_id">
+                    {{ category.category_name }}
+                </option>
+            </select>
+        </div>
         <div *ngIf="showCalendar" class="flex space-x-4 mb-4">
             <mat-calendar #startCalendar class="custom-calendar" [(selected)]="startDate"
                 (selectedChange)="onStartDateSelected($event)" [dateClass]="dateClass"
