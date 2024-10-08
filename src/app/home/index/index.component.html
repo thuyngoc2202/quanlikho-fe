@@ -1,7 +1,8 @@
 <app-navigation></app-navigation>
-<div class="container-fluid">
-    <div class="w-full">
-        <div class="relative mb-4">
+<div class="container-fluid flex flex-col h-[calc(100vh-60px)]">
+    <!-- Điều chỉnh 60px theo chiều cao thực tế của navigation -->
+    <div class="w-full mb-4">
+        <div class="relative">
             <input type="text" placeholder="Tìm kiếm sản phẩm"
                 class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
                 [(ngModel)]="searchQuery" (input)="searchProductCategories()">
@@ -12,30 +13,28 @@
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
         </div>
+    </div>
 
-        <div
-            class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 3xl:grid-cols-16">
-            <div *ngFor="let product of productsCategories; trackBy: trackByProduct"
-                class="p-2 border text-sm font-medium cursor-pointer text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out relative group"
-                [ngClass]="{'highlight': isMatchingSearch(product)}"
-                (click)="isLoggedIn ? openEditPopup(product) : openPopupCart(product)">
-                <div class="overflow-hidden">
-                    <div class="truncate group-hover:truncate-none transition-all duration-300 ease-in-out">
-                        <span class="inline-block group-hover:animate-marquee">
-                            {{ product?.product_name || '' }}
-                        </span>
-                    </div>
-                </div>
-                <div *ngIf="product && !isMatchingSearch(product)"
-                    class="absolute z-50 left-0 p-2 bg-white border rounded shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out min-w-[150px] max-w-[200px] max-h-[235px] overflow-y-auto"
-                    [ngClass]="{
-                        'bottom-full mb-1': isBottomHalf(product),
-                        'top-full mt-1': !isBottomHalf(product)
-                    }" [style.transform]="'translateY(' + (isBottomHalf(product) ? '-1%' : '0') + ')'">
-                    <strong class="block mb-1">Tên dùng chung:</strong>
-                    <div *ngFor="let generic_name of product.generic_name" class="truncate">
-                        {{ generic_name }}
-                    </div>
+    <div class="product-grid flex-grow overflow-hidden">
+        <div *ngFor="let product of productsCategories; trackBy: trackByProduct"
+            class="product-item text-xs font-medium cursor-pointer text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out relative group"
+            [ngClass]="{'highlight': isMatchingSearch(product)}"
+            (click)="isLoggedIn ? openEditPopup(product) : openPopupCart(product)">
+            <div
+                class="truncate group-hover:truncate-none transition-all duration-300 ease-in-out h-full flex items-center">
+                <span class="inline-block group-hover:animate-marquee text-left pl-[2px]">
+                    {{ product?.product_name || '' }}
+                </span>
+            </div>
+            <div *ngIf="product && !isMatchingSearch(product)"
+                class="popup absolute z-50 left-0 p-2 bg-white border rounded shadow-lg min-w-[150px] max-w-[200px] max-h-[235px] overflow-y-auto"
+                [ngClass]="{
+                                                 'bottom-full mb-1': isBottomHalf(product),
+                                      'top-full mt-1': !isBottomHalf(product)
+                            }" [style.transform]="'translateY(' + (isBottomHalf(product) ? '-1%' : '0') + ')'">
+                <strong class="block mb-1">Tên dùng chung:</strong>
+                <div *ngFor="let generic_name of product.generic_name" class="truncate">
+                    {{ generic_name }}
                 </div>
             </div>
         </div>
@@ -305,16 +304,3 @@
         </div>
     </div>
 </div>
-
-<style>
-    input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-
-    input[type=number] {
-        -moz-appearance: textfield;
-        appearance: textfield;
-    }
-</style>

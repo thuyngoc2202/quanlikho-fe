@@ -783,13 +783,11 @@ export class IndexComponent implements OnInit, OnDestroy {
 
 
   trackByProduct(index: number, product: any): any {
-    return product.id; // hoặc bất kỳ thuộc tính duy nhất nào của sản phẩm
+    return product.product_category_id; // hoặc bất kỳ thuộc tính duy nhất nào của sản phẩm
   }
   
   isBottomHalf(product: any): boolean {
-    // Implement logic to determine if the product is in the bottom half of the screen
-    // This might involve getting the element's position relative to the viewport
-    const element = document.getElementById(product.id); // Assume each product has a unique id
+    const element = document.getElementById(product.id); // Đảm bảo mỗi sản phẩm có một id duy nhất
     if (element) {
       const rect = element.getBoundingClientRect();
       const windowHeight = window.innerHeight;

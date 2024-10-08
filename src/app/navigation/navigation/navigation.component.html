@@ -2,7 +2,8 @@
     <div class="container-fluid px-2 sm:px-4 py-2">
         <div class="flex flex-col sm:flex-row justify-between items-center">
             <!-- Navigation Links -->
-            <nav class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto order-2 sm:order-1">
+            <nav
+                class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto order-2 sm:order-1">
                 <a [routerLink]="['/home']" class="text-sm text-gray-300 hover:text-white transition duration-300">
                     TRANG CHỦ
                 </a>
@@ -96,7 +97,8 @@
                     <div
                         class="absolute right-0 mt-2 w-96 bg-white rounded-md shadow-lg overflow-hidden z-20 hidden group-hover:block">
                         <div class="py-2">
-                            <div class="px-4 py-2 text-lg text-black font-semibold border-b border-gray-200">Giỏ hàng</div>
+                            <div class="px-4 py-2 text-lg text-black font-semibold border-b border-gray-200">Giỏ hàng
+                            </div>
 
                             <!-- Kiểm tra nếu giỏ hàng trống -->
                             <ng-container *ngIf="cartItems.length === 0; else cartItemsList">
@@ -109,17 +111,20 @@
                             <ng-template #cartItemsList>
                                 <div class="max-h-60 overflow-y-auto">
                                     <div *ngFor="let item of cartItems"
-                                        class="px-4 py-2 flex items-start border-b border-gray-200">
-                                        <div class="flex-grow">
-                                            <p class="text-sm font-medium text-gray-900 mb-1">{{ item.product_name }}</p>
-                                            <div class="flex justify-between items-center">
-                                                <p class="text-xs text-gray-500">{{ item.quantity }} x</p>
-                                            </div>
+                                         class="px-3 py-1 flex items-center justify-between border-b border-gray-200">
+                                        <div class="flex items-center flex-grow">
+                                            <span class="text-sm font-medium text-gray-900 mr-4 truncate max-w-[150px]">{{ item.product_name }}</span>
+                                            <span class="text-xs text-gray-500 whitespace-nowrap"> x {{ item.quantity }} </span>
                                         </div>
-                                        <button class="text-gray-400 hover:text-gray-600 ml-2" (click)="removeItem(item)">
+                                        <button class="text-gray-400 hover:text-gray-600 ml-2 flex-shrink-0"
+                                                (click)="removeItem(item)">
                                             <i class="fas fa-times"></i>
                                         </button>
                                     </div>
+                                </div>
+                                <div class="flex items-center justify-between px-3 py-2 border-t border-gray-200 bg-gray-50">
+                                    <span class="text-sm font-medium text-gray-900">Tổng số lượng sản phẩm:</span>
+                                    <span class="text-sm font-bold text-gray-700">{{ cartCount }}</span>
                                 </div>
                             </ng-template>
 
@@ -152,10 +157,12 @@
                         <div
                             class="absolute right-0 mt-1 w-48 bg-white rounded-md shadow-lg py-1 z-10 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-300">
                             <div class="pt-2">
-                                <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" (click)="logout()">Đăng
+                                <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    (click)="logout()">Đăng
                                     xuất</a>
-                                <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" (click)="openChangePasswordPopup()">Đổi mật khẩu Admin</a>
-                                <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" >Thêm tài khoản</a>
+                                <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    (click)="openChangePasswordPopup()">Đổi mật khẩu Admin</a>
+                                <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Thêm tài khoản</a>
                             </div>
                         </div>
                     </div>
@@ -510,4 +517,4 @@
                 class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Không</button>
         </div>
     </div>
-</div> 
+</div>
