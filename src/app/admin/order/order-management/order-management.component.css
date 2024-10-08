@@ -78,6 +78,7 @@ th.sticky::after {
 }
 .popup-container h2 {
     font-size: 1rem;
+    margin-bottom: 8px;
 }
 .popup-container p, .popup-container th, .popup-container td, .popup-container input, .popup-container button {
     font-size: 0.75rem;
@@ -101,7 +102,7 @@ th.sticky::after {
         font-size: 1.125rem;
     }
     .popup-container p, .popup-container th, .popup-container td, .popup-container input, .popup-container button {
-        font-size: 0.8125rem;
+        font-size: 0.65rem;
     }
     .popup-container .p-2 {
         padding: 0.375rem;
@@ -113,33 +114,30 @@ th.sticky::after {
         padding: 0.75rem;
     }
     .popup-container th, .popup-container td {
-        padding: 0.18rem;
+        padding: 0.22rem;
     }
 }
 
 /* Styles cho màn hình từ 1920px trở lên */
 @media (min-width: 1920px) {
-    .popup-container {
-        width: 32rem;
-        height: 45rem;
-    }
+
     .popup-container h2 {
-        font-size: 1.5rem;
+        font-size: 1.75rem;
     }
     .popup-container p, .popup-container th, .popup-container td, .popup-container input, .popup-container button {
-        font-size: 1rem;
+        font-size: 0.75rem;
     }
     .popup-container .p-2 {
-        padding: 0.75rem;
+        padding: 0.875rem;
     }
     .popup-container .p-3 {
-        padding: 1rem;
+        padding: 1.125rem;
     }
     .popup-container .p-4 {
-        padding: 1.25rem;
+        padding: 1.375rem;
     }
     .popup-container th, .popup-container td {
-        padding: 0.3rem;
+        padding: 0.55rem;
     }
 }
 

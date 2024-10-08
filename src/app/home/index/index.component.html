@@ -17,6 +17,7 @@
 
     <div class="product-grid flex-grow px-2">
         <div *ngFor="let product of productsCategories; trackBy: trackByProduct"
+            [id]="'product-' + product.product_category_id"
             class="product-item  font-medium cursor-pointer text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out relative group"
             [ngClass]="{'highlight': isMatchingSearch(product)}"
             (click)="isLoggedIn ? openEditPopup(product) : openPopupCart(product)">

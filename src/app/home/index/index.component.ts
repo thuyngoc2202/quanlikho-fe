@@ -291,16 +291,7 @@ export class IndexComponent implements OnInit, OnDestroy {
     });
   }
 
-  searchProductCategories() {
-    if (!this.searchQuery) {
-      this.filteredProductsCategories = this.productsCategories;
-    } else {
-      this.filteredProductsCategories = this.productsCategories.filter(productCategory =>
-        productCategory.product_name.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
-    }
-  }
-
+  
   loadProductCategoryByCategoryId(categoryId: string | null) {
     if (categoryId) {
       if (this.isLoggedIn) {
@@ -650,8 +641,48 @@ export class IndexComponent implements OnInit, OnDestroy {
       );
     }
 
+     setTimeout(() => {
+    const lastMatchingProduct = this.findLastMatchingProduct();
+    if (lastMatchingProduct) {
+      this.scrollToElement(lastMatchingProduct);
+    }
+  }, 0);
     return false;
   }
+
+  scrollToElement(element: HTMLElement) {
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  findLastMatchingProduct(): HTMLElement | null {
+    const products = this.productsCategories.slice().reverse();
+    for (let product of products) {
+      if (this.isMatchingSearch(product)) {
+        const element = document.getElementById(`product-${product.product_category_id}`);
+        if (element) {
+          return element;
+        }
+      }
+    }
+    return null;
+  }
+
+  searchProductCategories() {
+    if (!this.searchQuery) {
+      this.filteredProductsCategories = this.productsCategories;
+    } else {
+      this.filteredProductsCategories = this.productsCategories.filter(productCategory =>
+        productCategory.product_name.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    }
+    setTimeout(() => {
+      const lastMatchingProduct = this.findLastMatchingProduct();
+      if (lastMatchingProduct) {
+        this.scrollToElement(lastMatchingProduct);
+      }
+    }, 0);
+  }
+
 
   openFileUploadPopup() {
     this.showFileUploadPopup = true;
