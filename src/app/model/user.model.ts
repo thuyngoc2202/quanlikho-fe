@@ -3,13 +3,13 @@ export class User {
     last_name: string;
     password: string;
     email: string;
-    role: string;
+    role_id: string;
 
     constructor(){
         this.first_name = '';
         this.last_name = '';
         this.password = '';
         this.email = '';
-        this.role = '';
+        this.role_id = '';
     }
 }

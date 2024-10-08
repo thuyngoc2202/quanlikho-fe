@@ -48,7 +48,7 @@ export class ReportComponent implements OnInit {
   today: Date = new Date();
 
   categories: Category[] = [];
-  selectedCategory: string = '';
+  selectedCategory: string = 'all';
 
  
   constructor(
@@ -67,6 +67,7 @@ export class ReportComponent implements OnInit {
   ngOnInit() {
     // Không cần gọi updateDateClass() ở đây nữa
     this.getCategory();
+    this.selectedCategory = 'all';
   }
 
   getCategory() {
@@ -120,6 +121,9 @@ export class ReportComponent implements OnInit {
 
   closeExportPopup() {
     this.isExportPopupOpen = false;
+    this.showCalendar = false;
+    this.selectedCategory = 'all';
+    this.clearDateRange();
   }
 
   clearDateRange() {
@@ -228,6 +232,8 @@ export class ReportComponent implements OnInit {
 
   closeExportBuPopup() {
     this.isExportBuPopupOpen = false;
+    this.showCalendarBu = false;
+    this.selectedCategory = 'all';
     this.clearDateRangeBu();
   }
 
@@ -247,7 +253,7 @@ export class ReportComponent implements OnInit {
   exportBuReport() {
     const formattedEndDate = moment(this.endDateBu).format('YYYY-MM-DD');
     const formattedStartDate = moment(this.startDateBu).format('YYYY-MM-DD');
-    this.adminService.getBuReport(formattedStartDate).subscribe({
+    this.adminService.getBuReport(formattedStartDate, this.selectedCategory).subscribe({
       next: (response: Blob) => {
         if (response instanceof Blob) {
           let fileName = `Nhập bù hàng ${formattedEndDate}.csv`;

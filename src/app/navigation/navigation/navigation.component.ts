@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { CartService } from 'src/app/util/Cart.service';
 import { AuthService } from 'src/app/auth/auth.service';
@@ -11,6 +11,8 @@ import { AdminServiceService } from 'src/app/service/admin-service.service';
 import { ToastrService } from 'ngx-toastr';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Product } from 'src/app/model/product.model';
+import { LoginServiceService } from 'src/app/service/login-service.service';
+import { User } from 'src/app/model/user.model';
 
 @Component({
   selector: 'app-navigation',
@@ -69,6 +71,16 @@ export class NavigationComponent implements OnInit, OnDestroy {
   isAddAccountPopupOpen: boolean = false;
   products: Product[] = [];
 
+  isChangePasswordPopupOpen = false;
+  oldPassword = '';
+  newPassword = '';
+  confirmPassword = '';
+  email: string | null = null;
+  showOldPassword = false;
+  showNewPassword = false;
+  showConfirmPassword = false;
+  newAccount: User = new User();
+
 
   constructor(private activeMenuService: ActiveMenuService,
     public router: Router,
@@ -78,7 +90,9 @@ export class NavigationComponent implements OnInit, OnDestroy {
     private adminService: AdminServiceService,
     private toastr: ToastrService,
     private categoryService: SelectedCategoryService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private loginService: LoginServiceService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -272,8 +286,10 @@ export class NavigationComponent implements OnInit, OnDestroy {
   }
 
   openAddCategoryConfirmPopup() {
+    this.cdr.detectChanges();
     if (this.newCategory.category_name && this.newCategory.category_name.trim()) {
       this.isAddCategoryConfirmPopupOpen = true;
+      this.cdr.detectChanges(); // Thêm dòng này
     } else {
       this.toastr.error('Tên danh mục không được để trống', 'Lỗi');
     }
@@ -281,31 +297,35 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   openEditCategoryConfirmPopup() {
     this.isConfirmUpdatePopupOpen = true;
+    this.cdr.detectChanges();
   }
 
   openEditCategoryPopup(category: any) {
     this.editingCategory = { ...category };
-    this.showEditCategoryPopup = true;
+    this.showEditCategoryPopup = true;  
+      this.cdr.detectChanges();
+
   }
 
   cancelEditCategory() {
     this.showEditCategoryPopup = false;
+    this.cdr.detectChanges();
   }
 
   saveEditCategory() {
     // Implement the logic to save the edited category
 
     this.adminService.updateCategory(this.editingCategory).subscribe({
-      next: (response) => {
-        this.getCategory();
-        this.showEditCategoryPopup = false;
-        this.isConfirmUpdatePopupOpen = false;
-        this.toastr.success('Sửa loại hàng thành công', 'Thành công');
-      },
-      error: (error) => {
-        console.error('Failed to update category', error);
-        this.isConfirmUpdatePopupOpen = false;
-        this.toastr.error(`${error.error.result_data.msg}`, 'Thất bại');
+      next: (response: any) => {
+        if (response.result_msg === 'SUCCESS') {
+          this.getCategory();
+          this.showEditCategoryPopup = false;
+          this.isConfirmUpdatePopupOpen = false;
+          console.log(response);
+          this.toastr.success('Sửa loại hàng thành công', 'Thành công');
+        } else {
+          this.toastr.error('Sửa loại hàng thất bại', 'Thất bại');
+        }
       }
     });
   }
@@ -313,6 +333,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
   openAddCategoryPopup() {
     this.showAddCategoryPopup = true;
     this.newCategory = new Category();
+    this.cdr.detectChanges();
   }
 
   cancelAddCategory() {
@@ -349,6 +370,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
   openDeleteCategoryPopup(categoryId: string) {
     this.isConfirmDeletePopupOpen = true;
     this.idCategory = categoryId;
+    this.cdr.detectChanges(); // Thêm dòng này
   }
 
   openDeleteConfirmCategoryPopup() {
@@ -368,6 +390,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   openOrderManagementPopup() {
     this.showOrderManagementPopup = true;
+    this.cdr.detectChanges(); // Thêm dòng này
   }
 
   closeOrderManagementPopup() {
@@ -376,6 +399,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   openReportPopup() {
     this.showReportPopup = true;
+    this.cdr.detectChanges(); // Thêm dòng này
   }
 
   closeReportPopup() {
@@ -384,12 +408,14 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   openAddProductCategoryPopup() {
     this.isCreateProductCategoryPopupOpen = true;
+    this.cdr.detectChanges(); // Thêm dòng này
   }
   closeAddProductCategoryPopup() {
     this.isCreateProductCategoryPopupOpen = false;
   }
   openFileUploadProductPopup() {
     this.showFileUploadProductPopup = true;
+    this.cdr.detectChanges(); // Thêm dòng này
   }
   closeFileUploadProductPopup() {
     this.showFileUploadProductPopup = false;
@@ -397,6 +423,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
   }
   confirmCreate() {
     this.isConfirmCreatePopupOpen = true;
+    this.cdr.detectChanges(); // Thêm dòng này
   }
   closePopupCreate() {
     this.isConfirmCreatePopupOpen = false;
@@ -404,6 +431,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   confirmCreateProductCategory() {
     this.isConfirmCreateProductCategoryPopupOpen = true;
+    this.cdr.detectChanges(); // Thêm dòng này
   }
   closePopupCreateProductCategory() {
     this.isConfirmCreateProductCategoryPopupOpen = false;
@@ -411,6 +439,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   openAddProductPopup() {
     this.isCreatePopupOpen = true;
+    this.cdr.detectChanges(); // Thêm dòng này
   }
   closeAddProductPopup() {
     this.isCreatePopupOpen = false;
@@ -420,6 +449,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
   }
   openFileUploadPopup() {
     this.showFileUploadPopup = true;
+    this.cdr.detectChanges(); // Thêm dòng này
   }
 
   closeFileUploadPopup() {
@@ -490,12 +520,6 @@ export class NavigationComponent implements OnInit, OnDestroy {
     }
   }
 
-  openChangePasswordPopup() {
-    this.isAddAccountPopupOpen = true;
-  }
-  closeChangePasswordPopup() {
-    this.isAddAccountPopupOpen = false;
-  }
 
   closeFilePopup() {
     this.showFileUploadPopup = false;
@@ -675,4 +699,80 @@ export class NavigationComponent implements OnInit, OnDestroy {
     });
   }
 
+
+  openChangePasswordPopup() {
+    this.isChangePasswordPopupOpen = true;
+    this.cdr.detectChanges();
+
+  }
+
+  closeChangePasswordPopup() {
+    this.isChangePasswordPopupOpen = false;
+    this.oldPassword = '';
+    this.newPassword = '';
+    this.confirmPassword = '';
+    this.cdr.detectChanges();
+
+  }
+
+  changePassword() {
+    this.email = this.authService.getUserName()
+    this.loginService.changePassword(this.email, this.oldPassword, this.newPassword).subscribe({
+      next: (response: any) => {
+        this.closeChangePasswordPopup();
+        this.toastr.success('Đổi mật khẩu thành công', 'Thành công');
+      },
+      error: (error: any) => {
+        console.error('Failed to change password', error);
+        this.toastr.error('Đổi mật khẩu thất bại', 'Thất bại');
+      }
+    });
+  }
+
+
+  toggleOldPasswordVisibility() {
+    this.showOldPassword = !this.showOldPassword;
+    this.cdr.detectChanges();
+
+  }
+
+  toggleNewPasswordVisibility() {
+    this.showNewPassword = !this.showNewPassword;
+    this.cdr.detectChanges();
+
+  }
+
+  toggleConfirmPasswordVisibility() {
+    this.showConfirmPassword = !this.showConfirmPassword;
+    this.cdr.detectChanges();
+
+  }
+
+  openAddAccountPopup() {
+    this.isAddAccountPopupOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  closeAddAccountPopup() {
+    this.isAddAccountPopupOpen = false;
+    this.cdr.detectChanges();
+  }
+
+  addAccount() {
+    this.newAccount.role_id = "1";
+
+    this.loginService.register(this.newAccount).subscribe({
+      next: (response) => {
+        this.closeAddAccountPopup();
+        this.toastr.success('Thêm tài khoản thành công', 'Thành công');
+      },
+      error: (error) => {
+        console.error('Registration failed', error);
+        this.toastr.error('Thêm tài khoản thất bại', 'Thất bại');
+      }
+    });
+  }
 }
+
+
+

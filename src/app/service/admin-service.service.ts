@@ -178,9 +178,10 @@ export class AdminServiceService {
     });
   }
 
-  getBuReport(startDate: string): Observable<Blob> {
+  getBuReport(startDate: string, categoryId: string): Observable<Blob> {
     let params = new HttpParams()
-      .set('startDate', startDate);
+      .set('startDate', startDate)
+      .set('categoryId', categoryId);
     return this.httpClient.get<Blob>(`${this.API_CONFIG.report}/restock-product-category`, {
       params: params,
       responseType: 'blob' as 'json'

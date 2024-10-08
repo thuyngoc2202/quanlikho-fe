@@ -20,9 +20,10 @@ export class LoginServiceService {
   private headers = new HttpHeaders({
     'Content-Type': 'application/json'
   });
-
+  token: string | '';
   constructor(private backend: HttpBackend, private authService: AuthService) {
     this.httpClient = new HttpClient(backend);
+    this.token = this.authService.getToken();
   }
 
   register(user: User): Observable<any> {
@@ -42,5 +43,13 @@ export class LoginServiceService {
           }
         })
       );
+  }
+
+  changePassword(email: string | null, oldPassword: string, newPassword: string): Observable<any> {
+    // const headers = new HttpHeaders({
+    //   'Content-Type': 'application/json',
+    //   'Authorization': `Bearer ${this.token}`
+    // });
+    return this.httpClient.post(`${this.API_CONFIG.auth.unAuth}/change-password`, { email, oldPassword, newPassword }, { headers: this.headers });
   }
 }

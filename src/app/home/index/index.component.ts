@@ -304,10 +304,12 @@ export class IndexComponent implements OnInit, OnDestroy {
           this.productsCategories = response.result_data.map((product: any) => ({
             ...product,
             inventory_quantity: product.quantity // Lưu số lượng tồn kho
-
+            
           }));
 
           this.filteredProductsCategories = this.productsCategories;
+          console.log('this.productsCategories', this.productsCategories);
+          
         },
         error: (error) => {
           console.error('Failed to load products', error);
@@ -818,11 +820,13 @@ export class IndexComponent implements OnInit, OnDestroy {
   }
   
   isBottomHalf(product: any): boolean {
-    const element = document.getElementById(product.id); // Đảm bảo mỗi sản phẩm có một id duy nhất
+    const element = document.getElementById('product-' + product.product_category_id);
+     // Đảm bảo mỗi sản phẩm có một id duy nhất
     if (element) {
       const rect = element.getBoundingClientRect();
       const windowHeight = window.innerHeight;
-      return rect.top > windowHeight / 2;
+      const result = rect.top > windowHeight / 2;
+      return result;
     }
     return false;
   }

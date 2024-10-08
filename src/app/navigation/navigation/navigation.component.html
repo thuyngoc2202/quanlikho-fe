@@ -111,18 +111,22 @@
                             <ng-template #cartItemsList>
                                 <div class="max-h-60 overflow-y-auto">
                                     <div *ngFor="let item of cartItems"
-                                         class="px-3 py-1 flex items-center justify-between border-b border-gray-200">
+                                        class="px-3 py-1 flex items-center justify-between border-b border-gray-200">
                                         <div class="flex items-center flex-grow">
-                                            <span class="text-sm font-medium text-gray-900 mr-4 truncate max-w-[150px]">{{ item.product_name }}</span>
-                                            <span class="text-xs text-gray-500 whitespace-nowrap"> x {{ item.quantity }} </span>
+                                            <span
+                                                class="text-sm font-medium text-gray-900 mr-4 truncate max-w-[150px]">{{
+                                                item.product_name }}</span>
+                                            <span class="text-xs text-gray-500 whitespace-nowrap"> x {{ item.quantity }}
+                                            </span>
                                         </div>
                                         <button class="text-gray-400 hover:text-gray-600 ml-2 flex-shrink-0"
-                                                (click)="removeItem(item)">
+                                            (click)="removeItem(item)">
                                             <i class="fas fa-times"></i>
                                         </button>
                                     </div>
                                 </div>
-                                <div class="flex items-center justify-between px-3 py-2 border-t border-gray-200 bg-gray-50">
+                                <div
+                                    class="flex items-center justify-between px-3 py-2 border-t border-gray-200 bg-gray-50">
                                     <span class="text-sm font-medium text-gray-900">Tổng số lượng sản phẩm:</span>
                                     <span class="text-sm font-bold text-gray-700">{{ cartCount }}</span>
                                 </div>
@@ -162,7 +166,8 @@
                                     xuất</a>
                                 <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                     (click)="openChangePasswordPopup()">Đổi mật khẩu Admin</a>
-                                <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Thêm tài khoản</a>
+                                <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    (click)="openAddAccountPopup()">Thêm tài khoản</a>
                             </div>
                         </div>
                     </div>
@@ -185,10 +190,11 @@
         <div class="flex justify-end space-x-2">
             <button (click)="cancelEditCategory()"
                 class="px-4 py-2 bg-red-500 text-white-800 rounded hover:bg-gray-400">Xóa toàn bộ</button>
-            <button (click)="cancelEditCategory()"
-                class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">Hủy</button>
             <button (click)="openEditCategoryConfirmPopup()"
                 class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Lưu</button>
+            <button (click)="cancelEditCategory()"
+                class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">Hủy</button>
+
         </div>
     </div>
 </div>
@@ -288,7 +294,7 @@
 <div *ngIf="showFileUploadPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
     (click)="closeFilePopup()">
     <div class="bg-white p-6 rounded-lg shadow-lg w-[1000px]" (click)="$event.stopPropagation()">
-        <h2 class="text-lg font-bold mb-4">Nhập loại hàng</h2>
+        <h2 class="text-lg font-bold mb-4">Nhập loại hàng: {{categoryName}}</h2>
 
         <div class="mb-4">
             <label for="file-upload" class="block text-sm font-medium text-gray-700 mb-2">
@@ -506,6 +512,124 @@
                 class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded">Có</button>
             <button (click)="closePopupCreate()"
                 class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Không</button>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="isChangePasswordPopupOpen"
+    class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
+    (click)="closeChangePasswordPopup()">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"
+        (click)="$event.stopPropagation()">
+        <div class="mt-3 text-center">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Đổi mật khẩu Admin</h3>
+            <div class="mt-2 px-7 py-3">
+                <form (ngSubmit)="changePassword()">
+                    <div class="relative">
+                        <input [type]="showOldPassword ? 'text' : 'password'" [(ngModel)]="oldPassword"
+                            name="oldPassword" placeholder="Mật khẩu hiện tại"
+                            class="mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1">
+                        <span class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                            (click)="toggleOldPasswordVisibility()">
+                            <svg *ngIf="!showOldPassword" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <svg *ngIf="showOldPassword" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="relative">
+                        <input [type]="showNewPassword ? 'text' : 'password'" [(ngModel)]="newPassword"
+                            name="newPassword" placeholder="Mật khẩu mới"
+                            class="mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1">
+                        <span class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                            (click)="toggleNewPasswordVisibility()">
+                            <svg *ngIf="!showNewPassword" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <svg *ngIf="showNewPassword" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="relative">
+                        <input [type]="showConfirmPassword ? 'text' : 'password'" [(ngModel)]="confirmPassword"
+                            name="confirmPassword" placeholder="Xác nhận mật khẩu mới"
+                            class="mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1">
+                        <span class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                            (click)="toggleConfirmPasswordVisibility()">
+                            <svg *ngIf="!showConfirmPassword" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <svg *ngIf="showConfirmPassword" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                            </svg>
+                        </span>
+                    </div>
+                    <span *ngIf="confirmPassword && newPassword === confirmPassword" class="text-xs text-green-500">Mật
+                        khẩu mới khớp</span>
+                    <span *ngIf="confirmPassword && newPassword !== confirmPassword" class="text-xs text-red-500">Mật
+                        khẩu mới không khớp</span>
+
+                    <button type="submit"
+                        class="mt-4 px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                        Đổi mật khẩu
+                    </button>
+                    <button type="button" (click)="closeChangePasswordPopup()"
+                        class="mt-4 px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
+                        Hủy
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="isAddAccountPopupOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
+    (click)="closeAddAccountPopup()">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"
+        (click)="$event.stopPropagation()">
+        <div class="mt-3 text-center">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Thêm tài khoản mới</h3>
+            <div class="mt-2 px-7 py-3">
+                <form (ngSubmit)="addAccount()">
+                    <input type="text" [(ngModel)]="newAccount.email" name="email" placeholder="Email"
+                        class="mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1">
+                    <input type="password" [(ngModel)]="newAccount.password" name="password" placeholder="Mật khẩu"
+                        class="mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1">
+                    <input type="text" [(ngModel)]="newAccount.first_name" name="first_name" placeholder="Họ"
+                        class="mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1">
+                    <input type="text" [(ngModel)]="newAccount.last_name" name="last_name" placeholder="Tên"
+                        class="mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1">
+                    <button type="submit"
+                        class="mt-4 px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                        Thêm tài khoản
+                    </button>
+                    <button type="button" (click)="closeAddAccountPopup()"
+                        class="mt-4 px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
+                        Hủy
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
