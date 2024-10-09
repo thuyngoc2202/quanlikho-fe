@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { first } from 'rxjs';
 import { AuthService } from 'src/app/auth/auth.service';
 import { LoginServiceService } from 'src/app/service/login-service.service';
@@ -16,7 +17,8 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
-    private auth: AuthService
+    private auth: AuthService,
+    private toastr: ToastrService
   ) {
     this.createForm();
   }
@@ -40,20 +42,27 @@ export class LoginComponent implements OnInit {
   }
 
   Login() {
-    
+
     if (this.form.valid) {
 
       if (this.loading) return;
       this.loading = true;
-      
+
       this.LoginService.login(this.form.value).subscribe({
         next: (response) => {
-          this.router.navigate(['../home'], { relativeTo: this.route });
-          this.loading = false;
+          if (response.result_msg === 'SUCCESS') {
+            this.router.navigate(['../home'], { relativeTo: this.route });
+            this.loading = false;
+          }
+          if (response.result_msg === 'FAILURE') {
+            this.toastr.error('Tài khoản mật khẩu không chính xác', 'Thất bại');
+            this.loading = false;
+          }
         },
         error: (error) => {
           console.error('Registration failed', error);
           this.loading = false;
+          this.toastr.error('Tài khoản mật khẩu không chính xác', 'Thất bại');
         }
       });
     } else {

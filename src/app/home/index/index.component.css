@@ -54,13 +54,10 @@ input[type=number]::-webkit-outer-spin-button {
     padding: 0;
     margin: 0;
     position: relative;
-    width: 100%;
     font-size: 10px;
 }
 
 .product-item > div:first-child {
-    width: 100%;
-    height: 100%;
     overflow: hidden;
 }
 
@@ -69,7 +66,7 @@ input[type=number]::-webkit-outer-spin-button {
     position: absolute;
     z-index: 9999;
     left: 0;
-    width: 250px;
+    width: 123px;
     max-height: 185px;
     background-color: white;
     border: 1px solid #ddd;
@@ -125,6 +122,5 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .product-item>div {
-    width: 100%;
     padding-left: 4px;
 }

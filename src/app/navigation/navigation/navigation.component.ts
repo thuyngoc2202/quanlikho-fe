@@ -325,9 +325,13 @@ export class NavigationComponent implements OnInit, OnDestroy {
           this.isConfirmUpdatePopupOpen = false;
           console.log(response);
           this.toastr.success('Sửa loại hàng thành công', 'Thành công');
-        } else {
+        }
+         if (response.result_msg === 'FAILURE') {
           this.toastr.error('Sửa loại hàng thất bại', 'Thất bại');
         }
+      },
+      error: (error) => {
+        this.toastr.error('Sửa loại hàng thất bại', 'Thất bại');
       }
     });
   }
@@ -765,8 +769,13 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
     this.loginService.register(this.newAccount).subscribe({
       next: (response) => {
-        this.closeAddAccountPopup();
-        this.toastr.success('Thêm tài khoản thành công', 'Thành công');
+        if (response.result_msg === 'SUCCESS') {
+          this.closeAddAccountPopup();
+          this.toastr.success('Thêm tài khoản thành công', 'Thành công');
+        }
+        if (response.result_msg === 'FAILURE') {
+          this.toastr.error('Thêm tài khoản thất bại', 'Thất bại');
+        }
       },
       error: (error) => {
         console.error('Registration failed', error);
@@ -790,10 +799,15 @@ export class NavigationComponent implements OnInit, OnDestroy {
         if (response.result_msg === 'SUCCESS') {
           this.toastr.success('Xóa toàn bộ sản phẩm thành công', 'Thành công');
           this.showDeleteAllConfirmPopup = false;
-        } else {
+          this.showEditCategoryPopup = false;
+        } 
+        if (response.result_msg === 'FAILURE') {
           this.toastr.error('Xóa toàn bộ sản phẩm thất bại', 'Thất bại');
         }
       },
+      error: (error) => {
+        this.toastr.error('Xóa toàn bộ sản phẩm thất bại', 'Thất bại');
+      }
     });
   }
 }

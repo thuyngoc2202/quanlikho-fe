@@ -73,15 +73,15 @@
                 <!-- Admin Buttons -->
                 <ng-container *ngIf="isLoggedIn">
                     <button (click)="openFileUploadProductPopup()"
-                        class="bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs sm:text-sm">
+                        class=" text-gray-300 hover:text-white py-1 px-2 rounded text-xs sm:text-sm transition duration-300 ease-in-out">
                         Nhập sản phẩm
                     </button>
                     <button (click)="openAddProductPopup()"
-                        class="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded text-xs sm:text-sm">
+                        class="text-gray-300 hover:text-white py-1 px-2 rounded text-xs sm:text-sm ml-2 transition duration-300 ease-in-out">
                         Thêm sản phẩm
                     </button>
                     <button (click)="openFileUploadPopup()"
-                        class="bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs sm:text-sm">
+                        class=" text-gray-300 hover:text-white py-1 px-2 rounded text-xs sm:text-sm ml-2 transition duration-300 ease-in-out">
                         Nhập hàng
                     </button>
                 </ng-container>
@@ -165,7 +165,7 @@
                                     (click)="logout()">Đăng
                                     xuất</a>
                                 <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                    (click)="openChangePasswordPopup()">Đổi mật khẩu Admin</a>
+                                    (click)="openChangePasswordPopup()">Đổi mật khẩu</a>
                                 <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                     (click)="openAddAccountPopup()">Thêm tài khoản</a>
                             </div>
@@ -188,9 +188,9 @@
         <p>Số lượng tối thiểu:</p>
         <input type="number" [(ngModel)]="editingCategory.min_quantity" class="w-full p-2 border rounded mb-4">
         <div class="flex justify-end space-x-2">
-            <button (click)="deleteProductCategoryAll(editingCategory.category_id)"
-                class="px-4 py-2 bg-red-500 text-white-800 rounded hover:bg-gray-400">Xóa toàn bộ</button>
             <button (click)="openDeleteAllConfirmPopup()"
+                class="px-4 py-2 bg-red-500 text-white rounded hover:bg-gray-400">Xóa toàn bộ</button>
+            <button (click)="openEditCategoryConfirmPopup()"
                 class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Lưu</button>
             <button (click)="cancelEditCategory()"
                 class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">Hủy</button>
@@ -536,7 +536,7 @@
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"
         (click)="$event.stopPropagation()">
         <div class="mt-3 text-center">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Đổi mật khẩu Admin</h3>
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Đổi mật khẩu</h3>
             <div class="mt-2 px-7 py-3">
                 <form (ngSubmit)="changePassword()">
                     <div class="relative">
@@ -604,14 +604,16 @@
                     <span *ngIf="confirmPassword && newPassword !== confirmPassword" class="text-xs text-red-500">Mật
                         khẩu mới không khớp</span>
 
-                    <button type="submit"
-                        class="mt-4 px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                        Đổi mật khẩu
-                    </button>
-                    <button type="button" (click)="closeChangePasswordPopup()"
-                        class="mt-4 px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
-                        Hủy
-                    </button>
+                    <div class="flex justify-between mt-4 space-x-4">
+                        <button type="submit"
+                            class="flex-1 px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-150 ease-in-out">
+                            Đổi mật khẩu
+                        </button>
+                        <button type="button" (click)="closeChangePasswordPopup()"
+                            class="flex-1 px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300 transition duration-150 ease-in-out">
+                            Hủy
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
