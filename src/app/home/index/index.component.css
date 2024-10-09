@@ -31,7 +31,7 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .container-fluid {
-    height: calc(100vh - 60px);
+    height: calc(100vh - 70px);
     /* Điều chỉnh 60px theo chiều cao thực tế của navigation */
     width: 100%;
 }
@@ -44,6 +44,7 @@ input[type=number]::-webkit-outer-spin-button {
     border-top: 1px solid #e2e8f0;
     border-left: 1px solid #e2e8f0;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .product-item {
@@ -62,7 +63,7 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .popup {
-    display: none;
+    display: block;
     position: absolute;
     z-index: 9999;
     left: 0;
@@ -74,7 +75,9 @@ input[type=number]::-webkit-outer-spin-button {
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     overflow-y: auto;
 }
-
+.generic_name {
+    font-size: 9.5px;
+}
 .popup.bottom-full {
     bottom: 100%;
     top: auto;

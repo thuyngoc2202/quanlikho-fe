@@ -1,5 +1,5 @@
 <app-navigation></app-navigation>
-<div class="container-fluid flex flex-col px-2 h-[calc(100vh-60px)] mt-3">
+<div class="container-fluid flex flex-col px-2 h-[calc(100vh-70px)] mt-3">
     <!-- Điều chỉnh 60px theo chiều cao thực tế của navigation -->
     <div class="w-full mb-4">
         <div class="relative">
@@ -34,7 +34,7 @@
                         'top-full ': !isBottomHalf(product)
                     }">
                 <strong class="block mb-1 text-xs">Tên dùng chung:</strong>
-                <div *ngFor="let generic_name of product.generic_name" class="truncate text-xs">
+                <div *ngFor="let generic_name of product.generic_name" class="truncate generic_name">
                     {{ generic_name }}
                 </div>
             </div>

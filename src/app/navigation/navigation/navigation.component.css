@@ -5,3 +5,8 @@
 .group:hover .group-hover\:block:hover {
   display: block;
 }
+
+.text-bottom {
+    margin-bottom: -20px !important;
+}
+
