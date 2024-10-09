@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { CartService } from 'src/app/util/Cart.service';
 import { AuthService } from 'src/app/auth/auth.service';
@@ -9,7 +9,7 @@ import { SelectedCategoryService } from 'src/app/util/categoryService';
 import { filter, Subscription } from 'rxjs';
 import { AdminServiceService } from 'src/app/service/admin-service.service';
 import { ToastrService } from 'ngx-toastr';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { Product } from 'src/app/model/product.model';
 import { LoginServiceService } from 'src/app/service/login-service.service';
 import { User } from 'src/app/model/user.model';
@@ -71,6 +71,8 @@ export class NavigationComponent implements OnInit, OnDestroy {
   isAddAccountPopupOpen: boolean = false;
   products: Product[] = [];
 
+  showValidationErrors: boolean = false;
+
   showDeleteAllConfirmPopup: boolean = false;
 
   isChangePasswordPopupOpen = false;
@@ -82,6 +84,10 @@ export class NavigationComponent implements OnInit, OnDestroy {
   showNewPassword = false;
   showConfirmPassword = false;
   newAccount: User = new User();
+  accountForm!: FormGroup;
+  changePasswordForm!: FormGroup;
+  showValidation = false; // Thêm biến này
+
 
 
   constructor(private activeMenuService: ActiveMenuService,
@@ -144,11 +150,29 @@ export class NavigationComponent implements OnInit, OnDestroy {
         this.updateRouteInfo();
       })
     );
-
+    this.validateAccount();
     this.validate();
     this.validateProduct();
     this.loadProduct();
+    this.initChangePasswordForm();
+  }
 
+  initChangePasswordForm() {
+    this.changePasswordForm = this.fb.group({
+      oldPassword: ['', Validators.required],
+      newPassword: ['', [Validators.required,]],
+      confirmPassword: ['', Validators.required]
+    }, { validator: this.passwordMatchValidator });
+  }
+
+
+  validateAccount() {
+    this.accountForm = this.fb.group({
+      email: ['', Validators.required],
+      password: ['', Validators.required],
+      first_name: ['', Validators.required],
+      last_name: ['', Validators.required],
+    });
   }
 
   ngOnDestroy() {
@@ -326,7 +350,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
           console.log(response);
           this.toastr.success('Sửa loại hàng thành công', 'Thành công');
         }
-         if (response.result_msg === 'FAILURE') {
+        if (response.result_msg === 'FAILURE') {
           this.toastr.error('Sửa loại hàng thất bại', 'Thất bại');
         }
       },
@@ -714,25 +738,45 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   closeChangePasswordPopup() {
     this.isChangePasswordPopupOpen = false;
-    this.oldPassword = '';
-    this.newPassword = '';
-    this.confirmPassword = '';
+    this.changePasswordForm.reset();
     this.cdr.detectChanges();
 
   }
 
+  passwordMatchValidator(g: FormGroup) {
+    return g.get('newPassword')?.value === g.get('confirmPassword')?.value
+      ? null : {'mismatch': true};
+  }
+
+  onChangePassword() {
+    this.showValidation = true; // Thêm biến này
+    this.changePassword();
+  }
+
   changePassword() {
     this.email = this.authService.getUserName()
-    this.loginService.changePassword(this.email, this.oldPassword, this.newPassword).subscribe({
-      next: (response: any) => {
-        this.closeChangePasswordPopup();
-        this.toastr.success('Đổi mật khẩu thành công', 'Thành công');
-      },
-      error: (error: any) => {
-        console.error('Failed to change password', error);
-        this.toastr.error('Đổi mật khẩu thất bại', 'Thất bại');
-      }
-    });
+
+    if (this.changePasswordForm.valid) {
+      const { confirmPassword, ...changePasswordData } = this.changePasswordForm.value;
+      changePasswordData.email = this.email;
+  
+      this.loginService.changePassword(changePasswordData).subscribe({
+        next: (response: any) => {
+          if (response.result_msg === 'SUCCESS') {
+            this.closeChangePasswordPopup();
+            this.changePasswordForm.reset();
+            this.toastr.success('Đổi mật khẩu thành công', 'Thành công');
+          }
+          if (response.result_msg === 'FAILURE') {
+            this.toastr.error('Đổi mật khẩu thất bại', 'Thất bại');
+          }
+        },
+        error: (error) => {
+          console.error('Failed to change password', error);
+          this.toastr.error('Đổi mật khẩu thất bại', 'Thất bại');
+        }
+      });
+    }
   }
 
 
@@ -761,17 +805,33 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   closeAddAccountPopup() {
     this.isAddAccountPopupOpen = false;
+    this.accountForm.reset();
+    this.showValidationErrors = false;
     this.cdr.detectChanges();
   }
 
-  addAccount() {
-    this.newAccount.role_id = "1";
+  onSubmit() {
+    this.showValidationErrors = true;
+    if (this.accountForm.valid) {
+      this.addAccount();
+    }
+  }
 
-    this.loginService.register(this.newAccount).subscribe({
+  addAccount() {
+
+    // Set role_id
+    const accountData = this.accountForm.value;
+    accountData.role_id = "1";
+
+    this.loginService.register(accountData).subscribe({
       next: (response) => {
         if (response.result_msg === 'SUCCESS') {
           this.closeAddAccountPopup();
           this.toastr.success('Thêm tài khoản thành công', 'Thành công');
+          // Reset the form
+          this.accountForm.reset();
+          this.showValidationErrors = false;
+          this.newAccount = new User();
         }
         if (response.result_msg === 'FAILURE') {
           this.toastr.error('Thêm tài khoản thất bại', 'Thất bại');
@@ -779,7 +839,11 @@ export class NavigationComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Registration failed', error);
-        this.toastr.error('Thêm tài khoản thất bại', 'Thất bại');
+        if (error.error && error.error.result_data && error.error.result_data.msg) {
+          this.toastr.error(error.error.result_data.msg, 'Thất bại');
+        } else {
+          this.toastr.error('Thêm tài khoản thất bại', 'Thất bại');
+        }
       }
     });
   }
@@ -800,7 +864,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
           this.toastr.success('Xóa toàn bộ sản phẩm thành công', 'Thành công');
           this.showDeleteAllConfirmPopup = false;
           this.showEditCategoryPopup = false;
-        } 
+        }
         if (response.result_msg === 'FAILURE') {
           this.toastr.error('Xóa toàn bộ sản phẩm thất bại', 'Thất bại');
         }

@@ -262,7 +262,7 @@
     class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
     <div class="bg-white p-6 rounded-lg shadow-lg w-96">
         <h2 class="text-lg font-bold mb-4">Xác nhận xoá danh mục hàng</h2>
-        <p>Bạn có chắc chắn muốn xoá danh mục hàng này?</p>
+        <p>Bạn có chắc chắn muốn xóa danh mục hàng này?</p>
         <div class="flex justify-end mt-4">
             <button (click)="openDeleteConfirmCategoryPopup()"
                 class="bg-green-500 hover:bg-green-700 text-white mr-4 px-4 py-2 rounded">Có</button>
@@ -538,11 +538,12 @@
         <div class="mt-3 text-center">
             <h3 class="text-lg leading-6 font-medium text-gray-900">Đổi mật khẩu</h3>
             <div class="mt-2 px-7 py-3">
-                <form (ngSubmit)="changePassword()">
+                <form [formGroup]="changePasswordForm" (ngSubmit)="onChangePassword()">
                     <div class="relative">
-                        <input [type]="showOldPassword ? 'text' : 'password'" [(ngModel)]="oldPassword"
-                            name="oldPassword" placeholder="Mật khẩu hiện tại"
-                            class="mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1">
+                        <input [type]="showOldPassword ? 'text' : 'password'" formControlName="oldPassword"
+                            placeholder="Mật khẩu hiện tại"
+                            class="mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
+                            [ngClass]="{'border-red-500': changePasswordForm.get('oldPassword')?.invalid && (changePasswordForm.get('oldPassword')?.touched || changePasswordForm.get('oldPassword')?.dirty || showValidation)}">
                         <span class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
                             (click)="toggleOldPasswordVisibility()">
                             <svg *ngIf="!showOldPassword" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -559,10 +560,16 @@
                             </svg>
                         </span>
                     </div>
+                    <div *ngIf="changePasswordForm.get('oldPassword')?.invalid && (changePasswordForm.get('oldPassword')?.touched || changePasswordForm.get('oldPassword')?.dirty || showValidation)"
+                        class="text-red-500 text-xs mt-1">
+                        Vui lòng nhập mật khẩu hiện tại
+                    </div>
+
                     <div class="relative">
-                        <input [type]="showNewPassword ? 'text' : 'password'" [(ngModel)]="newPassword"
-                            name="newPassword" placeholder="Mật khẩu mới"
-                            class="mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1">
+                        <input [type]="showNewPassword ? 'text' : 'password'" formControlName="newPassword"
+                            placeholder="Mật khẩu mới"
+                            class="mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
+                            [ngClass]="{'border-red-500': changePasswordForm.get('newPassword')?.invalid && (changePasswordForm.get('newPassword')?.touched || changePasswordForm.get('newPassword')?.dirty || showValidation )}">
                         <span class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
                             (click)="toggleNewPasswordVisibility()">
                             <svg *ngIf="!showNewPassword" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -579,10 +586,16 @@
                             </svg>
                         </span>
                     </div>
+                    <div *ngIf="changePasswordForm.get('newPassword')?.invalid && (changePasswordForm.get('newPassword')?.touched || changePasswordForm.get('newPassword')?.dirty || showValidation)"
+                        class="text-red-500 text-xs mt-1">
+                        Vui lòng nhập mật khẩu mới
+                    </div>
+
                     <div class="relative">
-                        <input [type]="showConfirmPassword ? 'text' : 'password'" [(ngModel)]="confirmPassword"
-                            name="confirmPassword" placeholder="Xác nhận mật khẩu mới"
-                            class="mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1">
+                        <input [type]="showConfirmPassword ? 'text' : 'password'" formControlName="confirmPassword"
+                            placeholder="Xác nhận mật khẩu mới"
+                            class="mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
+                            [ngClass]="{'border-red-500': changePasswordForm.get('confirmPassword')?.invalid && (changePasswordForm.get('confirmPassword')?.touched || changePasswordForm.get('confirmPassword')?.dirty || showValidation)}">
                         <span class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
                             (click)="toggleConfirmPasswordVisibility()">
                             <svg *ngIf="!showConfirmPassword" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -599,14 +612,25 @@
                             </svg>
                         </span>
                     </div>
-                    <span *ngIf="confirmPassword && newPassword === confirmPassword" class="text-xs text-green-500">Mật
-                        khẩu mới khớp</span>
-                    <span *ngIf="confirmPassword && newPassword !== confirmPassword" class="text-xs text-red-500">Mật
-                        khẩu mới không khớp</span>
+                    <div *ngIf="changePasswordForm.get('confirmPassword')?.invalid && (changePasswordForm.get('confirmPassword')?.touched || changePasswordForm.get('confirmPassword')?.dirty || showValidation)"
+                        class="text-red-500 text-xs mt-1">
+                        Xác nhận mật khẩu không khớp
+                    </div>
+
+                    <span
+                        *ngIf="changePasswordForm.get('confirmPassword')?.value && changePasswordForm.get('newPassword')?.value === changePasswordForm.get('confirmPassword')?.value"
+                        class="text-xs text-green-500">
+                        Mật khẩu mới khớp
+                    </span>
+                    <span
+                        *ngIf="changePasswordForm.get('confirmPassword')?.value && changePasswordForm.get('newPassword')?.value !== changePasswordForm.get('confirmPassword')?.value"
+                        class="text-xs text-red-500">
+                        Mật khẩu mới không khớp
+                    </span>
 
                     <div class="flex justify-between mt-4 space-x-4">
                         <button type="submit"
-                            class="flex-1 px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-150 ease-in-out">
+                            class="flex-1 px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed">
                             Đổi mật khẩu
                         </button>
                         <button type="button" (click)="closeChangePasswordPopup()"
@@ -627,15 +651,39 @@
         <div class="mt-3 text-center">
             <h3 class="text-lg leading-6 font-medium text-gray-900">Thêm tài khoản mới</h3>
             <div class="mt-2 px-7 py-3">
-                <form (ngSubmit)="addAccount()">
-                    <input type="text" [(ngModel)]="newAccount.email" name="email" placeholder="Email"
-                        class="mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1">
-                    <input type="password" [(ngModel)]="newAccount.password" name="password" placeholder="Mật khẩu"
-                        class="mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1">
-                    <input type="text" [(ngModel)]="newAccount.first_name" name="first_name" placeholder="Họ"
-                        class="mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1">
-                    <input type="text" [(ngModel)]="newAccount.last_name" name="last_name" placeholder="Tên"
-                        class="mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1">
+                <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
+                    <input type="text" formControlName="email" placeholder="Tên đăng nhập"
+                        [class]="'mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1 ' + 
+                        (accountForm.get('email')?.invalid && (accountForm.get('email')?.dirty || accountForm.get('email')?.touched || showValidationErrors) ? 'border-red-500' : '')">
+                    <div *ngIf="accountForm.get('email')?.invalid && (accountForm.get('email')?.dirty || accountForm.get('email')?.touched || showValidationErrors)"
+                        class="text-red-500 text-xs mt-1">
+                        Vui lòng nhập tên đăng nhập
+                    </div>
+
+                    <input type="password" formControlName="password" placeholder="Mật khẩu"
+                        [class]="'mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1 ' + 
+                        (accountForm.get('password')?.invalid && (accountForm.get('password')?.dirty || accountForm.get('password')?.touched || showValidationErrors) ? 'border-red-500' : '')">
+                    <div *ngIf="accountForm.get('password')?.invalid && (accountForm.get('password')?.dirty || accountForm.get('password')?.touched || showValidationErrors)"
+                        class="text-red-500 text-xs mt-1">
+                        Vui lòng nhập mật khẩu
+                    </div>
+
+                    <input type="text" formControlName="first_name" placeholder="Họ"
+                        [class]="'mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1 ' + 
+                        (accountForm.get('first_name')?.invalid && (accountForm.get('first_name')?.dirty || accountForm.get('first_name')?.touched || showValidationErrors) ? 'border-red-500' : '')">
+                    <div *ngIf="accountForm.get('first_name')?.invalid && (accountForm.get('first_name')?.dirty || accountForm.get('first_name')?.touched || showValidationErrors)"
+                        class="text-red-500 text-xs mt-1">
+                        Vui lòng nhập họ
+                    </div>
+
+                    <input type="text" formControlName="last_name" placeholder="Tên"
+                        [class]="'mt-2 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1 ' + 
+                        (accountForm.get('last_name')?.invalid && (accountForm.get('last_name')?.dirty || accountForm.get('last_name')?.touched || showValidationErrors) ? 'border-red-500' : '')">
+                    <div *ngIf="accountForm.get('last_name')?.invalid && (accountForm.get('last_name')?.dirty || accountForm.get('last_name')?.touched || showValidationErrors)"
+                        class="text-red-500 text-xs mt-1">
+                        Vui lòng nhập tên
+                    </div>
+
                     <button type="submit"
                         class="mt-4 px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
                         Thêm tài khoản

@@ -45,11 +45,11 @@ export class LoginServiceService {
       );
   }
 
-  changePassword(email: string | null, oldPassword: string, newPassword: string): Observable<any> {
+  changePassword(changePasswordData: any): Observable<any> {
     // const headers = new HttpHeaders({
     //   'Content-Type': 'application/json',
     //   'Authorization': `Bearer ${this.token}`
     // });
-    return this.httpClient.post(`${this.API_CONFIG.auth.unAuth}/change-password`, { email, oldPassword, newPassword }, { headers: this.headers });
+    return this.httpClient.post(`${this.API_CONFIG.auth.unAuth}/change-password`, changePasswordData, { headers: this.headers });
   }
 }
