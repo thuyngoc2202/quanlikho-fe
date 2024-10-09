@@ -188,13 +188,27 @@
         <p>Số lượng tối thiểu:</p>
         <input type="number" [(ngModel)]="editingCategory.min_quantity" class="w-full p-2 border rounded mb-4">
         <div class="flex justify-end space-x-2">
-            <button (click)="cancelEditCategory()"
+            <button (click)="deleteProductCategoryAll(editingCategory.category_id)"
                 class="px-4 py-2 bg-red-500 text-white-800 rounded hover:bg-gray-400">Xóa toàn bộ</button>
-            <button (click)="openEditCategoryConfirmPopup()"
+            <button (click)="openDeleteAllConfirmPopup()"
                 class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Lưu</button>
             <button (click)="cancelEditCategory()"
                 class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">Hủy</button>
 
+        </div>
+    </div>
+</div>
+
+<div *ngIf="showDeleteAllConfirmPopup"
+    class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
+    <div class="bg-white p-5 rounded-lg shadow-xl max-w-md w-full mx-4">
+        <h2 class="text-xl font-bold mb-4">Xác nhận xóa toàn bộ</h2>
+        <p class="mb-4">Bạn có chắc chắn muốn xóa toàn bộ sản phẩm trong danh mục này?</p>
+        <div class="flex justify-end space-x-2">
+            <button (click)="deleteProductCategoryAll(editingCategory.category_id)"
+                class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Xác nhận</button>
+            <button (click)="cancelDeleteAll()"
+                class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">Hủy</button>
         </div>
     </div>
 </div>

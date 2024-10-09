@@ -121,6 +121,10 @@ export class AdminServiceService {
     return this.httpClient.delete<void>(`${this.API_CONFIG.productCategory.unAuth}/delete/${id}`, {  headers: this.headers })
   }
 
+  deleteProductCategoryByCategoryId(categoryId: string): Observable<void> {
+    return this.httpClient.delete<void>(`${this.API_CONFIG.productCategory.unAuth}/all/delete/${categoryId}`, { headers: this.headers })
+  }
+
   getProductCategoryByCategoryId(categoryId: string): Observable<ProductCategory[]> {
     return this.httpClient.get<ProductCategory[]>(`${this.API_CONFIG.productCategory.unAuth}/${categoryId}`);
   }

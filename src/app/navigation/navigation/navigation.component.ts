@@ -71,6 +71,8 @@ export class NavigationComponent implements OnInit, OnDestroy {
   isAddAccountPopupOpen: boolean = false;
   products: Product[] = [];
 
+  showDeleteAllConfirmPopup: boolean = false;
+
   isChangePasswordPopupOpen = false;
   oldPassword = '';
   newPassword = '';
@@ -302,8 +304,8 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   openEditCategoryPopup(category: any) {
     this.editingCategory = { ...category };
-    this.showEditCategoryPopup = true;  
-      this.cdr.detectChanges();
+    this.showEditCategoryPopup = true;
+    this.cdr.detectChanges();
 
   }
 
@@ -770,6 +772,28 @@ export class NavigationComponent implements OnInit, OnDestroy {
         console.error('Registration failed', error);
         this.toastr.error('Thêm tài khoản thất bại', 'Thất bại');
       }
+    });
+  }
+
+  openDeleteAllConfirmPopup() {
+    this.showDeleteAllConfirmPopup = true;
+  }
+
+  cancelDeleteAll() {
+    this.showDeleteAllConfirmPopup = false;
+  }
+
+  deleteProductCategoryAll(categoryId: string) {
+    console.log(categoryId);
+    this.adminService.deleteProductCategoryByCategoryId(categoryId).subscribe({
+      next: (response: any) => {
+        if (response.result_msg === 'SUCCESS') {
+          this.toastr.success('Xóa toàn bộ sản phẩm thành công', 'Thành công');
+          this.showDeleteAllConfirmPopup = false;
+        } else {
+          this.toastr.error('Xóa toàn bộ sản phẩm thất bại', 'Thất bại');
+        }
+      },
     });
   }
 }
