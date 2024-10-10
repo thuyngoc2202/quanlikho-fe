@@ -621,34 +621,33 @@ export class IndexComponent implements OnInit, OnDestroy {
   }
 
   isMatchingSearch(product: any): boolean {
-    if (!this.searchQuery) return false; // Không highlight nếu không có từ khóa tìm kiếm
-
+    if (!this.searchQuery) return false;
+  
     const searchLower = this.searchQuery.toLowerCase();
-
+  
     // Kiểm tra tên sản phẩm
     if (product.product_name.toLowerCase().includes(searchLower)) {
       return true;
     }
-
-    // Kiểm tra từ khóa (nếu có)
+  
+    // Kiểm tra tên chung (generic_name)
     if (product.generic_name && Array.isArray(product.generic_name)) {
-      return product.generic_name.some((generic_name: string) =>
-        generic_name.toLowerCase().includes(searchLower)
-      );
+      if (product.generic_name.some((genericName: string) =>
+        genericName.toLowerCase().includes(searchLower)
+      )) {
+        return true;
+      }
     }
-
+  
+    // Kiểm tra từ khóa
     if (product.keywords && Array.isArray(product.keywords)) {
-      return product.keywords.some((keyword: string) =>
+      if (product.keywords.some((keyword: string) =>
         keyword.toLowerCase().includes(searchLower)
-      );
+      )) {
+        return true;
+      }
     }
-
-     setTimeout(() => {
-    const lastMatchingProduct = this.findLastMatchingProduct();
-    if (lastMatchingProduct) {
-      this.scrollToElement(lastMatchingProduct);
-    }
-  }, 0);
+  
     return false;
   }
 
@@ -674,7 +673,7 @@ export class IndexComponent implements OnInit, OnDestroy {
       this.filteredProductsCategories = this.productsCategories;
     } else {
       this.filteredProductsCategories = this.productsCategories.filter(productCategory =>
-        productCategory.product_name.toLowerCase().includes(this.searchQuery.toLowerCase())
+        this.isMatchingSearch(productCategory)
       );
     }
     setTimeout(() => {

@@ -1,7 +1,6 @@
 .highlight {
     background-color: red;
     color: white;
-    font-weight: bold;
 }
 
 .product-grid {
@@ -38,8 +37,8 @@ input[type=number]::-webkit-outer-spin-button {
 
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-    grid-auto-rows: 30px;
+    grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+    grid-auto-rows: 40px;
     width: 100%;
     border-top: 1px solid #e2e8f0;
     border-left: 1px solid #e2e8f0;
@@ -55,7 +54,7 @@ input[type=number]::-webkit-outer-spin-button {
     padding: 0;
     margin: 0;
     position: relative;
-    font-size: 10px;
+    font-size: 11px;
 }
 
 .product-item > div:first-child {
@@ -74,6 +73,7 @@ input[type=number]::-webkit-outer-spin-button {
     border-radius: 4px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     overflow-y: auto;
+    color: #000;
 }
 .generic_name {
     font-size: 9.5px;
@@ -104,12 +104,12 @@ input[type=number]::-webkit-outer-spin-button {
         grid-auto-rows: 20px;
     }
 }
-@media (max-height: 720px) {
+/* @media (max-height: 720px) {
     .product-grid {
         grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
         grid-auto-rows: 20px;
     }
-}
+} */
 
 .product-item:hover .group-hover\:opacity-100 {
     opacity: 1 !important;

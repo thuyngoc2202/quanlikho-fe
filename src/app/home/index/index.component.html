@@ -27,7 +27,7 @@
                     {{ product?.product_name || '' }}
                 </span>
             </div>
-            <div *ngIf="product && !isMatchingSearch(product)" class="popup absolute bg-white border border-gray-300 rounded shadow-lg p-2 w-max max-w-xs 
+            <div *ngIf="product" class="popup absolute bg-white border border-gray-300 rounded shadow-lg p-2 w-max max-w-xs 
                         opacity-0 invisible group-hover:opacity-100 group-hover:visible 
                         transition-all duration-300 ease-in-out z-50" [ngClass]="{
                         'bottom-full ': isBottomHalf(product),
