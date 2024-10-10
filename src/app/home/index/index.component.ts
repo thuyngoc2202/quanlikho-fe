@@ -71,7 +71,7 @@ export class IndexComponent implements OnInit, OnDestroy {
   showFileUploadProductPopup: boolean = false;
   isCreateProductCategoryPopupOpen: boolean = false;
   isConfirmCreateProductCategoryPopupOpen: boolean = false;
-  
+
   selectedProductImport: any;
   paginatedProducts: any[] = []; // Danh sách sản phẩm đã phân trang
   currentPage: number = 1;
@@ -157,43 +157,43 @@ export class IndexComponent implements OnInit, OnDestroy {
   decreaseQuantity(product: any) {
     if (!this.productQuantities[product.product_category_id]) {
       this.productQuantities[product.product_category_id] = 0;
-      return; 
+      return;
     }
-    
-  
+
+
     let currentQuantity = Number(this.productQuantities[product.product_category_id]);
     const minQuantity = Number(product.min_quantity) || 1;
-    
- 
+
+
     let newQuantity = currentQuantity - minQuantity;
-    
- 
+
+
     newQuantity = Math.max(0, Math.floor(newQuantity / minQuantity) * minQuantity);
-    
- 
+
+
     this.productQuantities[product.product_category_id] = newQuantity;
-  
+
   }
 
   increaseQuantity(product: any) {
     if (!this.productQuantities[product.product_category_id]) {
       this.productQuantities[product.product_category_id] = 0;
     }
-    
+
     const currentQuantity = Number(this.productQuantities[product.product_category_id]);
     const stock = Number(product.quantity) || 0;
     const minQuantity = Number(product.min_quantity) || 1;
-    
+
     let newQuantity = currentQuantity + minQuantity;
-    
+
     newQuantity = Math.floor(newQuantity / minQuantity) * minQuantity;
-    
+
     if (newQuantity <= stock) {
       this.productQuantities[product.product_category_id] = newQuantity;
     } else {
       this.productQuantities[product.product_category_id] = Math.floor(stock / minQuantity) * minQuantity;
     }
-  
+
   }
 
   handleInputChange(event: Event, item: any): void {
@@ -291,7 +291,7 @@ export class IndexComponent implements OnInit, OnDestroy {
     });
   }
 
-  
+
   loadProductCategoryByCategoryId(categoryId: string | null) {
     if (categoryId) {
       if (this.isLoggedIn) {
@@ -304,12 +304,12 @@ export class IndexComponent implements OnInit, OnDestroy {
           this.productsCategories = response.result_data.map((product: any) => ({
             ...product,
             inventory_quantity: product.quantity // Lưu số lượng tồn kho
-            
+
           }));
 
           this.filteredProductsCategories = this.productsCategories;
           console.log('this.productsCategories', this.productsCategories);
-          
+
         },
         error: (error) => {
           console.error('Failed to load products', error);
@@ -456,7 +456,7 @@ export class IndexComponent implements OnInit, OnDestroy {
     this.resetProductForm();
     this.showEditPopup = true;
     console.log('productsCategory', productsCategory);
-    
+
     this.formProduct.patchValue({
       product_name: productsCategory.product_name,
     });
@@ -622,14 +622,14 @@ export class IndexComponent implements OnInit, OnDestroy {
 
   isMatchingSearch(product: any): boolean {
     if (!this.searchQuery) return false;
-  
+
     const searchLower = this.searchQuery.toLowerCase();
-  
+
     // Kiểm tra tên sản phẩm
     if (product.product_name.toLowerCase().includes(searchLower)) {
       return true;
     }
-  
+
     // Kiểm tra tên chung (generic_name)
     if (product.generic_name && Array.isArray(product.generic_name)) {
       if (product.generic_name.some((genericName: string) =>
@@ -638,7 +638,7 @@ export class IndexComponent implements OnInit, OnDestroy {
         return true;
       }
     }
-  
+
     // Kiểm tra từ khóa
     if (product.keywords && Array.isArray(product.keywords)) {
       if (product.keywords.some((keyword: string) =>
@@ -647,7 +647,7 @@ export class IndexComponent implements OnInit, OnDestroy {
         return true;
       }
     }
-  
+
     return false;
   }
 
@@ -681,7 +681,7 @@ export class IndexComponent implements OnInit, OnDestroy {
       if (lastMatchingProduct) {
         this.scrollToElement(lastMatchingProduct);
       }
-    }, 1000);
+    }, 0);
   }
 
 
@@ -701,12 +701,12 @@ export class IndexComponent implements OnInit, OnDestroy {
       this.selectedFile = null;
     }
   }
- 
-  
 
-  
 
-  
+
+
+
+
 
 
   closeFilePopup() {
@@ -728,8 +728,8 @@ export class IndexComponent implements OnInit, OnDestroy {
     this.newKeywords = [];
     this.newGenericNames = [];
   }
-  
-  
+
+
   openAddProductCategoryPopup() {
     this.isCreateProductCategoryPopupOpen = true;
   }
@@ -817,7 +817,7 @@ export class IndexComponent implements OnInit, OnDestroy {
   trackByProduct(index: number, product: any): any {
     return product.product_category_id; // hoặc bất kỳ thuộc tính duy nhất nào của sản phẩm
   }
-  
+
   isBottomHalf(product: any): boolean {
     const element = document.getElementById('product-' + product.product_category_id);
      // Đảm bảo mỗi sản phẩm có một id duy nhất
