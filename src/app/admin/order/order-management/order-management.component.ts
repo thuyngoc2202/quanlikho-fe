@@ -38,7 +38,7 @@ export class OrderManagementComponent implements OnInit {
 
   paginatedProducts: any[] = [];
   currentPage: number = 1;
-  pageSize: number = 13; // Số lượng sản phẩm trên mỗi trang
+  pageSize: number = 12; // Số lượng sản phẩm trên mỗi trang
   totalPages: number = 1;
   originalQuantities: { [key: string]: number } = {};
 
@@ -175,7 +175,7 @@ export class OrderManagementComponent implements OnInit {
   this.adminService.updateOrder(order).subscribe({
     next: (response: any) => {
       this.getAllOrder();
-      this.closePopup();
+      this.closeProductListPopup();
       this.isConfirmUpdatePopupOpen = false;
       this.toastr.success('Cập nhật đơn hàng thành công');
     },
@@ -327,5 +327,6 @@ export class OrderManagementComponent implements OnInit {
 
   closeProductListPopup() {
     this.isProductListPopupOpen = false;
+    this.currentPage = 1;
   }
 }

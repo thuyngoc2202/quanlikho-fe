@@ -1,5 +1,5 @@
 <app-navigation></app-navigation>
-<div class="container-fluid flex flex-col px-2 h-[calc(100vh-70px)] mt-3">
+<div class="container-fluid flex flex-col px-2 mt-3">
     <!-- Điều chỉnh 60px theo chiều cao thực tế của navigation -->
     <div class="w-full mb-4">
         <div class="relative">
@@ -15,26 +15,28 @@
         </div>
     </div>
 
-    <div class="product-grid flex-grow px-2 overflow-visible">
+    <div
+        class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 3xl:grid-cols-16">
         <div *ngFor="let product of productsCategories; trackBy: trackByProduct"
             [id]="'product-' + product.product_category_id"
-            class="product-item font-medium cursor-pointer text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out relative group"
+            class="p-2 border text-sm font-medium cursor-pointer text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out relative group"
             [ngClass]="{'highlight': isMatchingSearch(product)}"
             (click)="isLoggedIn ? openEditPopup(product) : openPopupCart(product)">
-            <div
-                class="truncate group-hover:truncate-none transition-all duration-300 ease-in-out h-full flex items-center">
-                <span class="inline-block group-hover:animate-marquee text-left pl-[2px]">
-                    {{ product?.product_name || '' }}
-                </span>
+            <div class="overflow-hidden">
+                <div class="truncate group-hover:truncate-none transition-all duration-300 ease-in-out">
+                    <span class="inline-block group-hover:animate-marquee">
+                        {{ product?.product_name || '' }}
+                    </span>
+                </div>
             </div>
-            <div *ngIf="product" class="popup absolute bg-white border border-gray-300 rounded shadow-lg p-2 w-max max-w-xs 
-                        opacity-0 invisible group-hover:opacity-100 group-hover:visible 
-                        transition-all duration-300 ease-in-out z-50" [ngClass]="{
-                        'bottom-full ': isBottomHalf(product),
-                        'top-full ': !isBottomHalf(product)
-                    }">
-                <strong class="block mb-1 text-xs">Tên dùng chung:</strong>
-                <div *ngFor="let generic_name of product.generic_name" class="truncate generic_name">
+            <div *ngIf="product"
+                class="absolute z-50 left-0 p-2 bg-white border rounded shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out min-w-[150px] max-w-[200px] max-h-[235px] overflow-y-auto"
+                [ngClass]="{
+                        'bottom-full mb-1': isBottomHalf(product),
+                        'top-full mt-1': !isBottomHalf(product)
+                    }" [style.transform]="'translateY(' + (isBottomHalf(product) ? '-1%' : '0') + ')'">
+                <strong class="block mb-1 text-black">Tên dùng chung:</strong>
+                <div *ngFor="let generic_name of product.generic_name" class="truncate text-black">
                     {{ generic_name }}
                 </div>
             </div>

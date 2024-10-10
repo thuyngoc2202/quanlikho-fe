@@ -29,9 +29,8 @@ input[type=number]::-webkit-outer-spin-button {
     margin: 0;
 }
 
-.container-fluid {
+/* .container-fluid {
     height: calc(100vh - 70px);
-    /* Điều chỉnh 60px theo chiều cao thực tế của navigation */
     width: 100%;
 }
 
@@ -104,12 +103,12 @@ input[type=number]::-webkit-outer-spin-button {
         grid-auto-rows: 20px;
     }
 }
-/* @media (max-height: 720px) {
+@media (max-height: 720px) {
     .product-grid {
         grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
         grid-auto-rows: 20px;
     }
-} */
+}
 
 .product-item:hover .group-hover\:opacity-100 {
     opacity: 1 !important;
@@ -126,4 +125,4 @@ input[type=number]::-webkit-outer-spin-button {
 
 .product-item>div {
     padding-left: 4px;
-}
+} */
