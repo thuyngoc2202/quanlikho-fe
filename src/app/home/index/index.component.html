@@ -20,7 +20,7 @@
         <div *ngFor="let product of productsCategories; trackBy: trackByProduct"
             [id]="'product-' + product.product_category_id"
             class="p-2 border text-sm font-medium cursor-pointer text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out relative group"
-            [ngClass]="{'highlight': isMatchingSearch(product)}"
+            [ngClass]="{'highlight': isMatchingSearch(product),'bg-yellow-200': checkMode && isLowStock(product)}"
             (click)="isLoggedIn ? openEditPopup(product) : openPopupCart(product)">
             <div class="overflow-hidden">
                 <div class="truncate group-hover:truncate-none transition-all duration-300 ease-in-out">

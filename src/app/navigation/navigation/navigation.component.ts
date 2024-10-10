@@ -13,6 +13,7 @@ import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { Product } from 'src/app/model/product.model';
 import { LoginServiceService } from 'src/app/service/login-service.service';
 import { User } from 'src/app/model/user.model';
+import { ProductCheckService } from 'src/app/util/ProductCheckService';
 
 @Component({
   selector: 'app-navigation',
@@ -100,7 +101,8 @@ export class NavigationComponent implements OnInit, OnDestroy {
     private categoryService: SelectedCategoryService,
     private fb: FormBuilder,
     private loginService: LoginServiceService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private productCheckService: ProductCheckService
   ) { }
 
   ngOnInit(): void {
@@ -347,7 +349,6 @@ export class NavigationComponent implements OnInit, OnDestroy {
           this.getCategory();
           this.showEditCategoryPopup = false;
           this.isConfirmUpdatePopupOpen = false;
-          console.log(response);
           this.toastr.success('Sửa loại hàng thành công', 'Thành công');
         }
         if (response.result_msg === 'FAILURE') {
@@ -503,7 +504,6 @@ export class NavigationComponent implements OnInit, OnDestroy {
     const formData = new FormData();
     formData.append('file', this.selectedFile);
     if (this.selectedCategoryId !== null) {
-      console.log(this.selectedCategoryId);
       this.adminService.importVerifyProductCategory(this.selectedCategoryId, formData).subscribe({
         next: (response) => {
           // Add success handling here (e.g., display a message, close popup)
@@ -857,7 +857,6 @@ export class NavigationComponent implements OnInit, OnDestroy {
   }
 
   deleteProductCategoryAll(categoryId: string) {
-    console.log(categoryId);
     this.adminService.deleteProductCategoryByCategoryId(categoryId).subscribe({
       next: (response: any) => {
         if (response.result_msg === 'SUCCESS') {
@@ -873,6 +872,9 @@ export class NavigationComponent implements OnInit, OnDestroy {
         this.toastr.error('Xóa toàn bộ sản phẩm thất bại', 'Thất bại');
       }
     });
+  }
+  checkProduct() {
+    this.productCheckService.toggleCheck();
   }
 }
 

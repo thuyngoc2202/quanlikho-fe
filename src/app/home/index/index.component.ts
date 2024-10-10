@@ -16,6 +16,7 @@ import { Product } from 'src/app/model/product.model';
 import { AdminServiceService } from 'src/app/service/admin-service.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { ProductCheckService } from 'src/app/util/ProductCheckService';
 
 @Component({
   selector: 'app-index',
@@ -81,6 +82,9 @@ export class IndexComponent implements OnInit, OnDestroy {
   typeLogin: string = '';
   private dataChangedSubscription!: Subscription;
 
+  private checkSubscription!: Subscription;
+  checkMode: boolean = false;
+
   constructor(
     private userService: UserServiceService,
     private activeMenuService: ActiveMenuService,
@@ -91,7 +95,8 @@ export class IndexComponent implements OnInit, OnDestroy {
     private adminService: AdminServiceService,
     private fb: FormBuilder,
     private toastr: ToastrService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private productCheckService: ProductCheckService
   ) { }
 
   ngOnInit(): void {
@@ -125,13 +130,22 @@ export class IndexComponent implements OnInit, OnDestroy {
     this.dataChangedSubscription = this.adminService.dataChanged$.subscribe(() => {
       this.loadProductCategoryByCategoryId(this.selectedCategoryId);
     });
+
+    this.checkSubscription = this.productCheckService.checkProducts$.subscribe(
+      check => {
+        this.checkMode = check;
+      }
+    );
+
   }
 
   ngOnDestroy() {
     if (this.categorySubscription) {
       this.categorySubscription.unsubscribe();
     }
-
+    if (this.checkSubscription) {
+      this.checkSubscription.unsubscribe();
+    }
   }
 
   validate() {
@@ -308,7 +322,6 @@ export class IndexComponent implements OnInit, OnDestroy {
           }));
 
           this.filteredProductsCategories = this.productsCategories;
-          console.log('this.productsCategories', this.productsCategories);
 
         },
         error: (error) => {
@@ -455,7 +468,6 @@ export class IndexComponent implements OnInit, OnDestroy {
   openEditPopup(productsCategory: ProductCategory) {
     this.resetProductForm();
     this.showEditPopup = true;
-    console.log('productsCategory', productsCategory);
 
     this.formProduct.patchValue({
       product_name: productsCategory.product_name,
@@ -830,4 +842,7 @@ export class IndexComponent implements OnInit, OnDestroy {
     return false;
   }
 
+  isLowStock(product: any): boolean {
+    return product.quantity <= product.min_limit;
+  }
 }

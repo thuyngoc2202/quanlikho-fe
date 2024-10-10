@@ -138,11 +138,9 @@ export class OrderManagementComponent implements OnInit {
 
  updateOrderStatus() {
   let invalidItems: any[] = [];
-  console.log('selectedOrder', this.selectedOrder);
-  console.log('originalQuantities', this.originalQuantities);
+
   this.selectedOrder.product_order_detail_list_responses.forEach(item => {
     this.originalQuantities[item.product_order_id] = item.quantity;
-    console.log('originalQuantities', this.originalQuantities);
   });
   if (this.selectedOrder.status === 'PENDING') {
     invalidItems = this.selectedOrder.product_order_detail_list_responses.filter(

@@ -72,6 +72,10 @@
             <div class="flex items-center space-x-2 order-3">
                 <!-- Admin Buttons -->
                 <ng-container *ngIf="isLoggedIn">
+                    <button (click)="checkProduct()"
+                        class=" text-gray-300 hover:text-white py-1 px-2 rounded text-xs sm:text-sm transition duration-300 ease-in-out">
+                        Check
+                    </button>
                     <button (click)="openFileUploadProductPopup()"
                         class=" text-gray-300 hover:text-white py-1 px-2 rounded text-xs sm:text-sm transition duration-300 ease-in-out">
                         Nhập sản phẩm
