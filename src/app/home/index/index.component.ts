@@ -681,7 +681,7 @@ export class IndexComponent implements OnInit, OnDestroy {
       if (lastMatchingProduct) {
         this.scrollToElement(lastMatchingProduct);
       }
-    }, 0);
+    }, 1000);
   }
 
 
